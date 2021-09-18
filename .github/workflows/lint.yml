@@ -1,7 +1,10 @@
 ---
 name: Lint
 
-on: push
+on:
+  push:
+  schedule:
+    - cron: "0 9 * * *" # every day at 9am
 
 jobs:
   lint:
