@@ -1,0 +1,132 @@
+version: "3"
+
+services:
+  homeassistant:
+    image: homeassistant/home-assistant:stable
+    container_name: homeassistant
+    volumes:
+      - /home/pi/homeassistant:/config
+    environment:
+      - TZ=${TZ}
+    restart: always
+    network_mode: host
+
+  plex:
+    build:
+      context: ./dependencies/pms-docker
+      dockerfile: Dockerfile.armv7
+    container_name: plex
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - TZ=${TZ}
+      - PLEX_CLAIM=${PLEX_CLAIM}
+      - ADVERTISE_IP=http://${STATIC_IP}:32400/
+    volumes:
+      - /home/pi/plex/config:/config
+      - media:/data
+
+  adguardhome:
+    image: adguard/adguardhome
+    container_name: adguardhome
+    network_mode: host
+    volumes:
+      - /home/pi/adguard/work:/opt/adguardhome/work
+      - /home/pi/adguard/conf:/opt/adguardhome/conf
+    restart: unless-stopped
+
+  transmission:
+    image: ghcr.io/linuxserver/transmission
+    container_name: transmission
+    network_mode: host
+    environment:
+      - PID=1000
+      - PGID=1000
+      - TZ=${TZ}
+    volumes:
+      - /home/pi/transmission/config:/config
+      - downloads:/downloads
+    ports:
+      - 9091:9091
+      - 51413:51413
+      - 51413:51413/udp
+    restart: unless-stopped
+
+  radarr:
+    image: ghcr.io/linuxserver/radarr
+    container_name: radarr
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+    volumes:
+      - /home/pi/radarr/config:/config
+      - media:/movies
+      - downloads:/downloads
+
+  sonarr:
+    image: ghcr.io/linuxserver/sonarr
+    container_name: sonarr
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+    volumes:
+      - /home/pi/sonarr/config:/config
+      - media:/tv
+      - downloads:/downloads
+
+  jackett:
+    image: ghcr.io/linuxserver/jackett
+    container_name: jackett
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+      - AUTO_UPDATE=true
+    ports:
+      - 9117:9117
+    restart: unless-stopped
+    volumes:
+      - /home/pi/jackett/config:/config
+      - downloads:/downloads
+
+  caddy:
+    build:
+      context: .
+      dockerfile: caddy.Dockerfile
+    container_name: caddy
+    network_mode: host
+    ports:
+      - 80:80 # for HTTP -> HTTPS redirect
+      - 443:443
+    restart: unless-stopped
+    volumes:
+      - /home/pi/Caddyfile:/etc/caddy/Caddyfile
+      - /home/pi/caddy/config:/config
+      - /home/pi/caddy/data:/data
+    depends_on:
+      - adguardhome
+
+volumes:
+  media:
+    driver: local
+    driver_opts:
+      type: cifs
+      device: //${NAS_IP}/media
+      o: "addr=${NAS_IP},username=${NAS_USERNAME},password=${NAS_PASSWORD},file_mode=0777,dir_mode=0777"
+      driver: local
+  downloads:
+    driver_opts:
+      type: cifs
+      device: //${NAS_IP}/downloads
+      o: "addr=${NAS_IP},username=${NAS_USERNAME},password=${NAS_PASSWORD},file_mode=0777,dir_mode=0777"
