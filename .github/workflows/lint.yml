@@ -19,5 +19,16 @@ jobs:
         uses: github/super-linter@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ANSIBLE_DIRECTORY: .
-          ANSIBLE_CONFIG_FILE: .ansible-lint.yml
+          VALIDATE_ANSIBLE: false # see currently open issue https://github.com/github/super-linter/issues/1671
+
+  ansible-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Run ansible lint
+        uses: ansible/ansible-lint-action@master
+        with:
+          targets: 'playbook.yml'
