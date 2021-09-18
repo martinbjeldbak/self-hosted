@@ -43,3 +43,8 @@ You will also need to populate your own `.env` file, copied from [`.env.example`
 1. Sit back and wait until you have a fully configured PiHole running in about 5-10 minutes
 
 You may need to make some changes in [`hosts.yml`](/hosts.yml) to match the static IP of your Raspberry Pi
+
+## On the list to do
+
+- [ ] Use docker secrets over environment files
+- [ ] Make all services work over HTTPS
