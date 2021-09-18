@@ -1,0 +1,21 @@
+# TODO: FINISH
+---
+name: Lint
+
+on: push
+
+jobs:
+  ansible-lint:
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python # TODO
+
+      - name: Install ansible-lint
+        run: sudo pip install -U "ansible-lint[community,yamllint]"
+
+      - name: Lint
+        run: ansible-lint .
+
