@@ -1,4 +1,3 @@
 ---
 skip_list:
   - '401' # Git checkouts must contain explicit version
-  - '301' # Commands should not change things if nothing needs doing
