@@ -45,7 +45,7 @@
     - name: Setup SSH authorization
       authorized_key:
         user: pi
-        state: resent
+        state: present
         key: https://github.com/martinbjeldbak.keys
 
     - name: Change pi user password
@@ -61,71 +61,71 @@
         type: ed26619
       register: deploy_key
 
-      - name: Ensure deploy key is authorized with repository
-        community.general.github_deploy_key:
-          key: "{{  deploy_key.public_key }}"
-          name: Raspberry Pi
-          state: present
-          owner: martinbjeldbak
-          repo: raspberry-pi
-          token: "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='GitHub', field='token') }}"
+    - name: Ensure deploy key is authorized with repository
+      community.general.github_deploy_key:
+        key: "{{  deploy_key.public_key }}"
+        name: Raspberry Pi
+        state: present
+        owner: martinbjeldbak
+        repo: raspberry-pi
+        token: "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='GitHub', field='token') }}"
 
-      - name: Clone GitHub repository
-        git:
-          repo: git@github.com:martinbjeldbak/raspberry-pi.git
-          dest: /home/pi/raspberry-pi/
-          clone: true
-          update: true
-          key_file: ~/.ssh/id_github
-          accept_hostkey: true
+    - name: Clone GitHub repository
+      git:
+        repo: git@github.com:martinbjeldbak/raspberry-pi.git
+        dest: /home/pi/raspberry-pi/
+        clone: true
+        update: true
+        key_file: ~/.ssh/id_github
+        accept_hostkey: true
 
-      - name: Install unattended upgrades
-        become: true
-        apt:
-          name: unattended-upgrades
-          state: present
+    - name: Install unattended upgrades
+      become: true
+      apt:
+        name: unattended-upgrades
+        state: present
 
-      - name: Setup unattended upgrades
-        debconf:
-          name: unattended-upgrades
-          question: unattended-upgrades/enable_auto_updates
-          vtype: boolean
-          value: "true"
+    - name: Setup unattended upgrades
+      debconf:
+        name: unattended-upgrades
+        question: unattended-upgrades/enable_auto_updates
+        vtype: boolean
+        value: "true"
 
-      - name: Install fail2ban # prevent SSH bruteforcing
-        become: true
-        apt:
-          name: fail2ban
-          state: present
+    - name: Install fail2ban # prevent SSH bruteforcing
+      become: true
+      apt:
+        name: fail2ban
+        state: present
 
-      - name: Install ufw
-        become: true
-        apt:
-          name: ufw
-          state: present
+    - name: Install ufw
+      become: true
+      apt:
+        name: ufw
+        state: present
 
-      - name: Limit ssh
-        become: true
-        community.general.ufw:
-          rule: limit
-          port: ssh
-          proto: tcp
+    - name: Limit ssh
+      become: true
+      community.general.ufw:
+        rule: limit
+        port: ssh
+        proto: tcp
 
-      - name: Allow access to required ports
-        become: true
-        community.general.ufw:
-          rule: allow
-          port: '{{ item }}'
-        loop:
-          - SSH
-          - DNS
-          - WWW
-          - WWW Secure
+    - name: Allow access to required ports
+      become: true
+      community.general.ufw:
+        rule: allow
+        port: '{{ item }}'
+      loop:
+        - SSH
+        - DNS
+        - WWW
+        - WWW Secure
 
-      - name: Enable ufw and default to deny
-        become: true
-        ufw:
-          state: enabled
-          default: deny
+    - name: Enable ufw and default to deny
+      become: true
+      ufw:
+        state: enabled
+        default: deny
 
 
