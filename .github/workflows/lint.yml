@@ -4,20 +4,16 @@ name: Lint
 on: push
 
 jobs:
-  ansible-lint:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Setup Python
-        uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
+          fetch-depth: 0
 
-      - name: Install ansible-lint
-        run: sudo pip install -U "ansible-lint[community,yamllint]"
-
-      - name: Lint
-        run: ansible-lint .
+      - name: Lint Code Base
+        uses: github/super-linter@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
