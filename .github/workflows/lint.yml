@@ -28,6 +28,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Create dummy .env file
+        run: cp .env.example .env
+
       - name: Run ansible lint
         uses: ansible/ansible-lint-action@master
         with:
