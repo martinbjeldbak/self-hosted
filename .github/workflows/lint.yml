@@ -1,4 +1,3 @@
-# TODO: FINISH
 ---
 name: Lint
 
@@ -6,12 +5,15 @@ on: push
 
 jobs:
   ansible-lint:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
       - name: Setup Python
-        uses: actions/setup-python # TODO
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
 
       - name: Install ansible-lint
         run: sudo pip install -U "ansible-lint[community,yamllint]"
