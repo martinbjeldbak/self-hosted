@@ -81,8 +81,9 @@
         accept_hostkey: true
 
     - name: Copy .env file (this is gitignored in cloned repo)
-      src: .env
-      dest: /home/pi/raspberry-pi/.env
+      ansible.builtin.copy:
+        src: .env
+        dest: /home/pi/raspberry-pi/.env
 
     - name: Install unattended upgrades
       become: true
