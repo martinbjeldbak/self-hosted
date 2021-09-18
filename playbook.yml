@@ -6,6 +6,126 @@
     - name: Leaving a mark
       command: 'touch /tmp/ansible_was_here'
 
+
+    - name: Create and start docker-compose services
+      community.docker.docker_compose:
+        project_src: /home/pi/raspberry-pi
+        pull: true
+        build: true
+        remove_orphans: true
+      register: output
+
+    - name: Update and upgrade apt packages
+      become: true
+      apt:
+        upgrade: dist
+        update_cache: true
+
+    # Set static IP
+    - name: Install network manager
+      become: true
+      apt:
+        name: network-manager
+        state: present
+
+    - name: Configure network
+      become: true
+      community.general.nmcli:
+        state: present
+        conn_name: eth0
+        ifname: eth0
+        type: ethernet
+        ip4: 192.168.1.250/24
+        gw4: 192.168.1.1
+        dns4:
+          - 1.1.1.1
+
+    - name: Setup SSH authorization
+      authorized_key:
+        user: pi
+        state: resent
+        key: https://github.com/martinbjeldbak.keys
+
+    - name: Change pi user password
+      become: true
+      user:
+        name: pi
+        update_password: always
+        password: "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='SSH', field='password') | password_hash('sha512') }}"
+
+    - name: Ensure deploy key is present
+      community.crypto.openssh_keypair:
+        path: "~/.ssh/id_github"
+        type: ed26619
+      register: deploy_key
+
+      - name: Ensure deploy key is authorized with repository
+        community.general.github_deploy_key:
+          key: "{{  deploy_key.public_key }}"
+          name: Raspberry Pi
+          state: present
+          owner: martinbjeldbak
+          repo: raspberry-pi
+          token: "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='GitHub', field='token') }}"
+
+      - name: Clone GitHub repository
+        git:
+          repo: git@github.com:martinbjeldbak/raspberry-pi.git
+          dest: /home/pi/raspberry-pi/
+          clone: true
+          update: true
+          key_file: ~/.ssh/id_github
+          accept_hostkey: true
+
+      - name: Install unattended upgrades
+        become: true
+        apt:
+          name: unattended-upgrades
+          state: present
+
+      - name: Setup unattended upgrades
+        debconf:
+          name: unattended-upgrades
+          question: unattended-upgrades/enable_auto_updates
+          vtype: boolean
+          value: "true"
+
+      - name: Install fail2ban # prevent SSH bruteforcing
+        become: true
+        apt:
+          name: fail2ban
+          state: present
+
+      - name: Install ufw
+        become: true
+        apt:
+          name: ufw
+          state: present
+
+      - name: Limit ssh
+        become: true
+        community.general.ufw:
+          rule: limit
+          port: ssh
+          proto: tcp
+
+      - name: Allow access to required ports
+        become: true
+        community.general.ufw:
+          rule: allow
+          port: '{{ item }}'
+        loop:
+          - SSH
+          - DNS
+          - WWW
+          - WWW Secure
+
+      - name: Enable ufw and default to deny
+        become: true
+        ufw:
+          state: enabled
+          default: deny
+
   roles:
     - role: "nickjj.docker"
       tags: ["docker"]
