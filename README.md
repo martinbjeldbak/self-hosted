@@ -32,7 +32,11 @@ ansible-galaxy collection install community.docker
 ansible-galaxy collection install community.crypto
 ```
 
-use a password manager. In these scripts, I use the 1Password CLI [`op`](https://support.1password.com/command-line/).
+I am assuming you are using a password manager. In these scripts, I use the 1Password CLI [`op`](https://support.1password.com/command-line/) which has ansible collection support. Most major password managers will have Ansible support.
+
+You will also need to populate your own `.env` file, copied from [`.env.example`](.env.example)
+
+
 
 ## Usage
 
