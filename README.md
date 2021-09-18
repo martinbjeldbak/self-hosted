@@ -20,14 +20,19 @@ all of these services are managed via docker using docker-compose.
 Ansible installed on control node. See installation guide [here](https://docs.ansible.com/ansible/latest/installation_guide/index.html) or install it via brew if on macOS:
 
 ```sh
-brew install ansible
+brew install ansible 1password-cli
 ```
 
-Install Ansible Galaxy packages
+Install Ansible Galaxy packages with the below commands
 
 ```sh
 ansible-galaxy install -r requirements.yml
+ansible-galaxy collection install community.general
+ansible-galaxy collection install community.docker
+ansible-galaxy collection install community.crypto
 ```
+
+use a password manager. In these scripts, I use the 1Password CLI [`op`](https://support.1password.com/command-line/).
 
 ## Usage
 
