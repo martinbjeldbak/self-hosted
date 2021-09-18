@@ -6,6 +6,8 @@
     - name: Leaving a mark
       command: 'touch /tmp/ansible_was_here'
 
+    - name: Install and set up docker and docker-compose
+      include_role: nickjj.docker
 
     - name: Create and start docker-compose services
       community.docker.docker_compose:
@@ -126,7 +128,4 @@
           state: enabled
           default: deny
 
-  roles:
-    - role: "nickjj.docker"
-      tags: ["docker"]
 
