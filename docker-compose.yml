@@ -13,7 +13,7 @@ services:
 
   plex:
     build:
-      context: ./dependencies/pms-docker
+      context: ./pms-docker
       dockerfile: Dockerfile.armv7
     container_name: plex
     restart: unless-stopped
