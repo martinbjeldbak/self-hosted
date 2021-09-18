@@ -36,8 +36,6 @@ I am assuming you are using a password manager. In these scripts, I use the 1Pas
 
 You will also need to populate your own `.env` file, copied from [`.env.example`](.env.example)
 
-
-
 ## Usage
 
 1. Download the [Raspberry Pi Imager](https://www.raspberrypi.org/software/) and flash the latest version of Raspberry Pi OS Lite `brew install raspberry-pi-imager`
