@@ -1,6 +1,6 @@
 # Martin's Raspberry Pi Setup
 
-Inspired by Ben Balter's [blog](https://ben.balter.com/2020/12/04/over-engineered-home-network-for-privacy-and-security/) [posts](https://ben.balter.com/2021/09/01/how-i-re-over-engineered-my-home-network/), I wanted to keep a version controled 
+Inspired by Ben Balter's [blog](https://ben.balter.com/2020/12/04/over-engineered-home-network-for-privacy-and-security/) [posts](https://ben.balter.com/2021/09/01/how-i-re-over-engineered-my-home-network/), I wanted to keep a version controlled copy of my existing configuration on my Raspberry Pi 3 Model B.
 
 My personal configuration of Raspberry Pi running
 
@@ -40,7 +40,7 @@ You will also need to populate your own `.env` file, copied from [`.env.example`
 
 ## Usage
 
-1.  Download the [Raspberry Pi Imager](https://www.raspberrypi.org/software/) and flash the latest version of Raspberry Pi OS Lite `brew install raspberry-pi-imager`.
+1. Download the [Raspberry Pi Imager](https://www.raspberrypi.org/software/) and flash the latest version of Raspberry Pi OS Lite `brew install raspberry-pi-imager`
 1. Run `ansible-playbook playbook.yml --inventory hosts.yml`
 1. Sit back and wait until you have a fully configured PiHole running in about 5-10 minutes
 
