@@ -36,31 +36,31 @@ panel_iframe:
     icon: 'mdi:cloud'
   transmission:
     title: 'Transmission'
-    url: http://raspberrypi.local:9091
+    url: http://192.168.1.250:9091
     icon: 'mdi:progress-download'
   plex:
     title: 'Plex'
-    url: http://raspberrypi.local:32400
+    url: http://192.168.1.250:32400
     icon: 'mdi:plex'
   plex_webtools:
     title: 'Plex WebTools'
-    url: http://raspberrypi.local:3340 
+    url: http://192.168.1.250:3340 
     icon: 'mdi:plex'
   adguard:
     title: 'AdGuard'
-    url: http://raspberrypi.local:3000
+    url: http://192.168.1.250:3000
     icon: 'mdi:download'
   sonarr:
     title: 'Sonarrr'
-    url: http://raspberrypi.local:8989
+    url: http://192.168.1.250:8989
     icon: 'mdi:television-box'
   radarr:
     title: 'Radarr'
-    url: http://raspberrypi.local:7878
+    url: http://192.168.1.250:7878
     icon: 'mdi:filmstrip'
   jackett:
     title: 'Jackett'
-    url: http://raspberrypi.local:9117
+    url: http://192.168.1.250:9117
     icon: 'mdi:hanger'
 
 spotify:
