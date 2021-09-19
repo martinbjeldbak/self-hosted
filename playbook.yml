@@ -3,23 +3,25 @@
   hosts: all
 
   tasks:
-    - name: Install and set up docker and docker-compose
-      include_role:
-        name: nickjj.docker
-
-    - name: Create and start docker-compose services
-      community.docker.docker_compose:
-        project_src: /home/pi/raspberry-pi
-        pull: true
-        build: true
-        remove_orphans: true
-      register: output
-
     - name: Update and upgrade apt packages
       become: true
       apt:
         upgrade: dist
         update_cache: true
+
+    - name: Install and set up docker and docker-compose
+      include_role:
+        name: nickjj.docker
+        apply: 
+          become: true
+      tags:
+        - docker
+
+    - name: Install tmux
+      become: true
+      apt:
+        name: tmux
+        state: present
 
     # Set static IP
     - name: Install network manager
@@ -56,7 +58,7 @@
     - name: Ensure deploy key is present
       community.crypto.openssh_keypair:
         path: "~/.ssh/id_github"
-        type: ed26619
+        type: ed25519
       register: deploy_key
 
     - name: Ensure deploy key is authorized with repository
@@ -81,6 +83,18 @@
       ansible.builtin.copy:
         src: .env
         dest: /home/pi/raspberry-pi/.env
+
+    - name: Create Home Assistant secrets file
+      ansible.builtin.copy:
+        dest: /home/pi/raspberry-pi/homeassistant/secrets.yaml
+        content: |
+          ---
+          latitude: {{ "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Latitude') | password_hash('sha512') }}" }}
+          longitude: {{ "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Longitude') | password_hash('sha512') }}" }}
+          spotifyclientid: {{ "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Spotify Client ID') | password_hash('sha512') }}" }}
+          spotifyclientsecret: {{ "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Spotify Client Secret') | password_hash('sha512') }}" }}
+          routerpassword: {{ "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Router Password') | password_hash('sha512') }}" }}
+          radarr_api_key: {{ "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Radarr API Key') | password_hash('sha512') }}" }}
 
     - name: Install unattended upgrades
       become: true
@@ -136,5 +150,16 @@
       ufw:
         state: enabled
         default: deny
+
+    - name: Create and start docker-compose services
+      community.docker.docker_compose:
+        project_src: /home/pi/raspberry-pi
+        pull: true
+        build: true
+        remove_orphans: true
+      register: output
+      tags:
+        - docker
+
 
 
