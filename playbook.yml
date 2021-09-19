@@ -3,6 +3,15 @@
   hosts: all
 
   tasks:
+    - name: Increase swap size
+      include_role:
+        name: geerlingguy.swap
+        apply: 
+          become: true
+      vars:
+        swap_file_size_mb: '1024'
+        swap_file_path: /etc/dphys-swapfile
+  
     - name: Update and upgrade apt packages
       become: true
       apt:
