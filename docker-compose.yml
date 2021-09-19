@@ -75,7 +75,7 @@ services:
       - PGID=1000
       - TZ=${TZ}
     volumes:
-      - /home/pi/transmission/config:/config # not tracked in git
+      - /home/pi/raspberry-pi/transmission:/config
       - downloads:/downloads
     ports:
       - 9091:9091
