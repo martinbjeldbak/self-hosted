@@ -11,7 +11,7 @@ services:
       - 3000:3000/tcp
     volumes:
       - /home/pi/adguard/work:/opt/adguardhome/work
-      - /home/raspberry-pi/adguardhome:/opt/adguardhome/conf
+      - /home/pi/raspberry-pi/adguardhome:/opt/adguardhome/conf
     restart: unless-stopped
 
   homeassistant:
@@ -38,7 +38,7 @@ services:
       - 9117:9117
     restart: unless-stopped
     volumes:
-      - /home/pi/jackett/config:/config
+      - /home/pi/jackett/config:/config # not tracked in git
       - downloads:/downloads
 
   plex:
@@ -72,7 +72,7 @@ services:
       - PGID=1000
       - TZ=${TZ}
     volumes:
-      - /home/pi/transmission/config:/config
+      - /home/pi/transmission/config:/config # not tracked in git
       - downloads:/downloads
     ports:
       - 9091:9091
@@ -91,7 +91,7 @@ services:
       - 7878:7878
     restart: unless-stopped
     volumes:
-      - /home/pi/radarr/config:/config
+      - /home/pi/radarr/config:/config # not tracked in git
       - media:/movies
       - downloads:/downloads
 
@@ -106,7 +106,7 @@ services:
       - 8989:8989
     restart: unless-stopped
     volumes:
-      - /home/pi/sonarr/config:/config
+      - /home/pi/sonarr/config:/config # not tracked in git
       - media:/tv
       - downloads:/downloads
 
