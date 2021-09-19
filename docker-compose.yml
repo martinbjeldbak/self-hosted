@@ -64,7 +64,7 @@ services:
       - PLEX_CLAIM=${PLEX_CLAIM}
       - ADVERTISE_IP=http://${STATIC_IP}:32400/
     volumes:
-      - /home/pi/raspberry-pi/plex/config:/config
+      - /home/pi/plex/config:/config
       - media:/data
 
   transmission:
