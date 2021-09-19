@@ -15,12 +15,13 @@ services:
     restart: unless-stopped
 
   homeassistant:
-    image: homeassistant/raspberrypi3-homeassistant:stable
+    image: ghcr.io/homeassistant/raspberrypi3-homeassistant:stable
     container_name: homeassistant
     ports:
       - 8123:8123
     volumes:
       - /home/pi/raspberry-pi/homeassistant:/config
+      - /etc/localtime:/etc/localtime:ro
     environment:
       - TZ=${TZ}
     restart: always
