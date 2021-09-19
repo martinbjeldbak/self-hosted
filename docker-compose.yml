@@ -79,7 +79,7 @@ services:
       - downloads:/downloads
     ports:
       - 9091:9091
-      - 51413:51413
+      - 51413:51413/tcp
       - 51413:51413/udp
     restart: unless-stopped
 
