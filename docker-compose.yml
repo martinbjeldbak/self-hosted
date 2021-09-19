@@ -14,6 +14,8 @@ services:
   homeassistant:
     image: homeassistant/home-assistant:stable
     container_name: homeassistant
+    ports:
+      - 8123:8123
     volumes:
       - /home/pi/raspberry-pi/homeassistant:/config
     environment:
@@ -95,21 +97,21 @@ services:
       - media:/tv
       - downloads:/downloads
 
-  caddy:
-    build:
-      context: .
-      dockerfile: caddy.Dockerfile
-    container_name: caddy
-    ports:
-      - 80:80 # for HTTP -> HTTPS redirect
-      - 443:443
-    restart: unless-stopped
-    volumes:
-      - /home/pi/Caddyfile:/etc/caddy/Caddyfile
-      - /home/pi/caddy/config:/config
-      - /home/pi/caddy/data:/data
-    depends_on:
-      - adguardhome
+  # caddy:
+  #   build:
+  #     context: .
+  #     dockerfile: caddy.Dockerfile
+  #   container_name: caddy
+  #   ports:
+  #     - 80:80 # for HTTP -> HTTPS redirect
+  #     - 443:443
+  #   restart: unless-stopped
+  #   volumes:
+  #     - /home/pi/Caddyfile:/etc/caddy/Caddyfile
+  #     - /home/pi/caddy/config:/config
+  #     - /home/pi/caddy/data:/data
+  #   depends_on:
+  #     - adguardhome
 
 volumes:
   media:
