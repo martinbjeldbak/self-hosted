@@ -121,12 +121,10 @@ services:
 
 volumes:
   media:
-    driver: local
     driver_opts:
       type: cifs
       device: //${NAS_IP}/media
       o: "addr=${NAS_IP},username=${NAS_USERNAME},password=${NAS_PASSWORD},file_mode=0777,dir_mode=0777"
-      driver: local
   downloads:
     driver_opts:
       type: cifs
