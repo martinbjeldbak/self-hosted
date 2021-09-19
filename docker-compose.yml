@@ -22,6 +22,22 @@ services:
     restart: always
     network_mode: host
 
+  jackett:
+    image: ghcr.io/linuxserver/jackett
+    container_name: jackett
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+      - AUTO_UPDATE=true
+    ports:
+      - 9117:9117
+    restart: unless-stopped
+    volumes:
+      - /home/pi/jackett/config:/config
+      - downloads:/downloads
+
   plex:
     build:
       context: ./pms-docker
@@ -34,7 +50,7 @@ services:
       - PLEX_CLAIM=${PLEX_CLAIM}
       - ADVERTISE_IP=http://${STATIC_IP}:32400/
     volumes:
-      - /home/pi/plex/config:/config
+      - /home/pi/raspberry-pi/plex/config:/config
       - media:/data
 
   transmission:
@@ -84,22 +100,6 @@ services:
     volumes:
       - /home/pi/sonarr/config:/config
       - media:/tv
-      - downloads:/downloads
-
-  jackett:
-    image: ghcr.io/linuxserver/jackett
-    container_name: jackett
-    network_mode: host
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=${TZ}
-      - AUTO_UPDATE=true
-    ports:
-      - 9117:9117
-    restart: unless-stopped
-    volumes:
-      - /home/pi/jackett/config:/config
       - downloads:/downloads
 
   caddy:
