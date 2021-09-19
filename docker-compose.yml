@@ -6,6 +6,9 @@ services:
   adguardhome:
     image: adguard/adguardhome
     container_name: adguardhome
+    ports:
+      - 53:53/tcp
+      - 3000:3000/tcp
     volumes:
       - /home/pi/adguard/work:/opt/adguardhome/work
       - /home/raspberry-pi/adguardhome:/opt/adguardhome/conf
