@@ -166,6 +166,7 @@
         - '51413' # Transmission
         - '7878' # Radarr
         - '8989' # Sonarr
+        - '8123' # Home Assistant
 
     - name: Enable ufw and default to deny
       become: true
