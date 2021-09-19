@@ -15,7 +15,7 @@
     "download-dir": "/downloads/complete",
     "download-queue-enabled": true,
     "download-queue-size": 5,
-    "encryption": 1,
+    "encryption": 2,
     "idle-seeding-limit": 30,
     "idle-seeding-limit-enabled": false,
     "incomplete-dir": "/downloads/incomplete",
