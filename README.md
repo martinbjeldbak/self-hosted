@@ -41,6 +41,8 @@ You will also need to populate your own `.env` file, copied from [`.env.example`
 ## Usage
 
 1. Download the [Raspberry Pi Imager](https://www.raspberrypi.org/software/) and flash the latest version of Raspberry Pi OS Lite `brew install raspberry-pi-imager`
+1. Add an empty `ssh` file to the boot partition to enable the SSH server
+1. Once Raspberry Pi online, copy your SSH public key to it via `ssh-copy-id pi@raspberrypi.local`
 1. Run `ansible-playbook playbook.yml --inventory hosts.yml`
 1. Sit back and wait until you have a fully configured PiHole running in about 5-10 minutes
 
@@ -56,3 +58,4 @@ Once booted, manually configure
 
 - [ ] Use docker secrets over environment files
 - [ ] Make all services work over HTTPS
+- [ ] Setup [tautulli](https://tautulli.com/)
