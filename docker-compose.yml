@@ -15,7 +15,7 @@ services:
     restart: unless-stopped
 
   homeassistant:
-    image: ghcr.io/homeassistant/raspberrypi3-homeassistant:stable
+    image: homeassistant/raspberrypi3-homeassistant:stable
     container_name: homeassistant
     ports:
       - 8123:8123
