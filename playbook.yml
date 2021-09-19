@@ -79,22 +79,28 @@
         key_file: ~/.ssh/id_github
         accept_hostkey: true
 
-    - name: Copy .env file (this is gitignored in cloned repo)
+    - name: Copy .env file for Docker
       ansible.builtin.copy:
-        src: .env
         dest: /home/pi/raspberry-pi/.env
+        content: |
+          TZ=Australia/Melbourne
+          STATIC_IP=192.168.1.250
+          PLEX_CLAIM={{ lookup('community.general.onepassword', 'Raspberry Pi', section='Plex', field='Claim') }}
+          NAS_IP=192.168.1.160
+          NAS_USERNAME={{ lookup('community.general.onepassword', 'Raspberry Pi', section='NAS', field='Username') }}
+          NAS_PASSWORD={{ lookup('community.general.onepassword', 'Raspberry Pi', section='NAS', field='Password') }}
 
-    - name: Create Home Assistant secrets file
+    - name: Create Home Assistant secrets.yaml
       ansible.builtin.copy:
         dest: /home/pi/raspberry-pi/homeassistant/secrets.yaml
         content: |
           ---
-          latitude: {{ "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Latitude') | password_hash('sha512') }}" }}
-          longitude: {{ "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Longitude') | password_hash('sha512') }}" }}
-          spotifyclientid: {{ "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Spotify Client ID') | password_hash('sha512') }}" }}
-          spotifyclientsecret: {{ "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Spotify Client Secret') | password_hash('sha512') }}" }}
-          routerpassword: {{ "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Router Password') | password_hash('sha512') }}" }}
-          radarr_api_key: {{ "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Radarr API Key') | password_hash('sha512') }}" }}
+          latitude: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Latitude') }}
+          longitude: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Longitude') }}
+          spotifyclientid: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Spotify Client ID') }}
+          spotifyclientsecret: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Spotify Client Secret') }}
+          routerpassword: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Router Password') }}
+          radarr_api_key: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Radarr API Key') }}
 
     - name: Install unattended upgrades
       become: true
@@ -134,10 +140,10 @@
         rule: allow
         port: '{{ item }}'
       loop:
-        - SSH
-        - DNS
-        - WWW
-        - WWW Secure
+        - ssh
+        - http
+        - https
+        - '53' # DNS
         - '9117' # Jackett
         - '32400' # Plex
         - '9091' # Transmission UI
@@ -152,11 +158,14 @@
         default: deny
 
     - name: Create and start docker-compose services
+      become: true
       community.docker.docker_compose:
         project_src: /home/pi/raspberry-pi
         pull: true
         build: true
         remove_orphans: true
+      vars:
+        ansible_python_interpreter: "/usr/bin/env python3-docker"
       register: output
       tags:
         - docker
