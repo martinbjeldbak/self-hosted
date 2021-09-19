@@ -9,6 +9,14 @@
         upgrade: dist
         update_cache: true
 
+    # See https://askubuntu.com/a/1264921/431204
+    - name: Download updated libseccomp for Plex support
+      become: true
+      apt:
+        deb: http://ftp.au.debian.org/debian/pool/main/libs/libseccomp/libseccomp2_2.4.4-1~bpo10+1_armhf.deb
+      tags:
+        - docker
+
     - name: Install and set up docker and docker-compose
       include_role:
         name: nickjj.docker
@@ -79,7 +87,7 @@
         key_file: ~/.ssh/id_github
         accept_hostkey: true
 
-    - name: Copy .env file for Docker
+    - name: Create docker-compose .env file
       ansible.builtin.copy:
         dest: /home/pi/raspberry-pi/.env
         content: |
