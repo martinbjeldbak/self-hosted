@@ -101,6 +101,8 @@
         update: true
         key_file: ~/.ssh/id_github
         accept_hostkey: true
+      tags:
+        - docker # reflect changes in docker-compose.yml
 
     - name: Create docker-compose .env file
       ansible.builtin.copy:

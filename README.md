@@ -59,3 +59,6 @@ Once booted, manually configure
 - [ ] Use docker secrets over environment files
 - [ ] Make all services work over HTTPS
 - [ ] Setup [tautulli](https://tautulli.com/)
+- [ ] Consider how to back up Jackett config
+- [ ] Consider how to back up Radarr config
+- [ ] Consider how to back up Sonarr config
