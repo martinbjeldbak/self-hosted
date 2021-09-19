@@ -124,7 +124,12 @@
         - DNS
         - WWW
         - WWW Secure
-        # TODO review ports in docker compose
+        - '9117' # Jackett
+        - '32400' # Plex
+        - '9091' # Transmission UI
+        - '51413' # Transmission
+        - '7878' # Radarr
+        - '8989' # Sonarr
 
     - name: Enable ufw and default to deny
       become: true
