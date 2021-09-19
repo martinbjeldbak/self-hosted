@@ -6,12 +6,11 @@
     - name: Increase swap size
       include_role:
         name: geerlingguy.swap
-        apply: 
+        apply:
           become: true
       vars:
         swap_file_size_mb: '2048'
-        swap_file_path: /etc/dphys-swapfile
-  
+
     - name: Update and upgrade apt packages
       become: true
       apt:
@@ -29,7 +28,7 @@
     - name: Install and set up docker and docker-compose
       include_role:
         name: nickjj.docker
-        apply: 
+        apply:
           become: true
       tags:
         - docker
