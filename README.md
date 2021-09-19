@@ -44,7 +44,13 @@ You will also need to populate your own `.env` file, copied from [`.env.example`
 1. Run `ansible-playbook playbook.yml --inventory hosts.yml`
 1. Sit back and wait until you have a fully configured PiHole running in about 5-10 minutes
 
-You may need to make some changes in [`hosts.yml`](/hosts.yml) to match the static IP of your Raspberry Pi
+You may need to make some changes in [`hosts.yml`](/hosts.yml) to match the static IP of your Raspberry Pi.
+
+Once booted, manually configure
+
+* Jackett, adding private trackers
+* Sonarr
+* Radarr
 
 ## On the list to do
 
