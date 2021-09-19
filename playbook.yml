@@ -100,7 +100,7 @@
         dest: /home/pi/raspberry-pi/.env
         content: |
           TZ=Australia/Melbourne
-          STATIC_IP=192.168.1.250
+          STATIC_IP=raspberrypi.local
           PLEX_CLAIM={{ lookup('community.general.onepassword', 'Raspberry Pi', section='Plex', field='Claim') }}
           NAS_IP=192.168.1.160
           NAS_USERNAME={{ lookup('community.general.onepassword', 'Raspberry Pi', section='NAS', field='Username') }}
@@ -159,14 +159,22 @@
         - ssh
         - http
         - https
-        - '53' # DNS
+        - '53' # Adguard Home DNS
+        - '3000' # Adguard Home UI
         - '9117' # Jackett
         - '32400' # Plex
+        - '3005'
+        - '32469' # Plex
+        - '1900' # Plex
+        - '32410' # Plex
+        - '32412' # Plex
+        - '32413' # Plex
+        - '32414' # Plex
         - '9091' # Transmission UI
         - '51413' # Transmission
         - '7878' # Radarr
         - '8989' # Sonarr
-        - '8123' # Home Assistant
+        - '8123' # Home Assistant UI
 
     - name: Enable ufw and default to deny
       become: true
