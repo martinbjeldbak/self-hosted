@@ -2,11 +2,21 @@
 version: "3"
 
 services:
+
+  adguardhome:
+    image: adguard/adguardhome
+    container_name: adguardhome
+    network_mode: host
+    volumes:
+      - /home/pi/adguard/work:/opt/adguardhome/work
+      - /home/raspberry-pi/adguardhome:/opt/adguardhome/conf
+    restart: unless-stopped
+
   homeassistant:
     image: homeassistant/home-assistant:stable
     container_name: homeassistant
     volumes:
-      - /home/pi/homeassistant:/config
+      - /home/pi/raspberry-pi/homeassistant:/config
     environment:
       - TZ=${TZ}
     restart: always
@@ -26,15 +36,6 @@ services:
     volumes:
       - /home/pi/plex/config:/config
       - media:/data
-
-  adguardhome:
-    image: adguard/adguardhome
-    container_name: adguardhome
-    network_mode: host
-    volumes:
-      - /home/pi/adguard/work:/opt/adguardhome/work
-      - /home/pi/adguard/conf:/opt/adguardhome/conf
-    restart: unless-stopped
 
   transmission:
     image: ghcr.io/linuxserver/transmission

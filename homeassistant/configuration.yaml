@@ -1,0 +1,85 @@
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+# Uncomment this if you are using SSL/TLS, running in Docker container, etc.
+# http:
+#   base_url: example.duckdns.org:8123
+
+# Text to speech
+
+homeassistant:
+  name: Home
+  unit_system: metric
+  time_zone: Australia/Melbourne
+
+  #device_tracker:
+  #  - platform: netgear
+  #    password: !secret routerpassword
+
+light:
+  - platform: group
+    name: Living Room
+    entities:
+      - light.living_room
+      - light.hue_lightstrip
+  - platform: group
+    name: Bedroom
+    entities:
+      - light.martin_s_side
+      - light.nandar_s_side
+
+panel_iframe:
+  nas:
+    title: 'NAS'
+    url: http://192.168.1.160:5000
+    icon: 'mdi:cloud'
+  transmission:
+    title: 'Transmission'
+    url: http://192.168.1.250:9091
+    icon: 'mdi:progress-download'
+  plex:
+    title: 'Plex'
+    url: http://192.168.1.250:32400
+    icon: 'mdi:plex'
+  plex_webtools:
+    title: 'Plex WebTools'
+    url: http://192.168.1.250:3340 
+    icon: 'mdi:plex'
+  adguard:
+    title: 'AdGuard'
+    url: http://192.168.1.250:3000
+    icon: 'mdi:download'
+  sonarr:
+    title: 'Sonarrr'
+    url: http://192.168.1.250:8989
+    icon: 'mdi:television-box'
+  radarr:
+    title: 'Radarr'
+    url: http://192.168.1.250:7878
+    icon: 'mdi:filmstrip'
+  jackett:
+    title: 'Jackett'
+    url: http://192.168.1.250:9117
+    icon: 'mdi:hanger'
+
+spotify:
+  client_id: !secret spotifyclientid
+  client_secret: !secret spotifyclientsecret
+
+sensor:
+  - platform: systemmonitor
+    resources:
+      - type: disk_use_percent
+        arg: /
+      - type: memory_free
+      - type: load_15m
+
+  - platform: radarr
+    api_key: !secret radarr_api_key
+    days: 31
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml

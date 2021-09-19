@@ -32,3 +32,28 @@ jobs:
         uses: ansible/ansible-lint-action@master
         with:
           targets: 'playbook.yml'
+
+  homeassistant-config:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: homeassistant
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install homeassistant
+
+      - name: Copy secrets
+        run: mv secrets.sample.yaml secrets.yaml
+
+      - name: Check configuration
+        run: hass -c . --script check_config
