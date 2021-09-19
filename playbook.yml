@@ -9,7 +9,7 @@
         apply: 
           become: true
       vars:
-        swap_file_size_mb: '1024'
+        swap_file_size_mb: '2048'
         swap_file_path: /etc/dphys-swapfile
   
     - name: Update and upgrade apt packages
@@ -186,6 +186,3 @@
       register: output
       tags:
         - docker
-
-
-
