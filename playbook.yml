@@ -124,6 +124,7 @@
         - DNS
         - WWW
         - WWW Secure
+        # TODO review ports in docker compose
 
     - name: Enable ufw and default to deny
       become: true
