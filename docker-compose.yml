@@ -6,7 +6,6 @@ services:
   adguardhome:
     image: adguard/adguardhome
     container_name: adguardhome
-    network_mode: host
     volumes:
       - /home/pi/adguard/work:/opt/adguardhome/work
       - /home/raspberry-pi/adguardhome:/opt/adguardhome/conf
@@ -20,12 +19,10 @@ services:
     environment:
       - TZ=${TZ}
     restart: always
-    network_mode: host
 
   jackett:
     image: ghcr.io/linuxserver/jackett
     container_name: jackett
-    network_mode: host
     environment:
       - PUID=1000
       - PGID=1000
@@ -44,7 +41,6 @@ services:
       dockerfile: Dockerfile.armv7
     container_name: plex
     restart: unless-stopped
-    network_mode: host
     environment:
       - TZ=${TZ}
       - PLEX_CLAIM=${PLEX_CLAIM}
@@ -56,7 +52,6 @@ services:
   transmission:
     image: ghcr.io/linuxserver/transmission
     container_name: transmission
-    network_mode: host
     environment:
       - PID=1000
       - PGID=1000
@@ -73,7 +68,6 @@ services:
   radarr:
     image: ghcr.io/linuxserver/radarr
     container_name: radarr
-    network_mode: host
     environment:
       - PUID=1000
       - PGID=1000
@@ -89,7 +83,6 @@ services:
   sonarr:
     image: ghcr.io/linuxserver/sonarr
     container_name: sonarr
-    network_mode: host
     environment:
       - PUID=1000
       - PGID=1000
@@ -107,7 +100,6 @@ services:
       context: .
       dockerfile: caddy.Dockerfile
     container_name: caddy
-    network_mode: host
     ports:
       - 80:80 # for HTTP -> HTTPS redirect
       - 443:443
