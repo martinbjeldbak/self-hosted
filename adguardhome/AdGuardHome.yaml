@@ -33,11 +33,12 @@ dns:
   - https://dns.cloudflare.com/dns-query
   - https://doh.mullvad.net/dns-query
   - https://dns.adguard.com/dns-query
+  - '[/local/]192.168.1.1'
   upstream_dns_file: ""
   bootstrap_dns:
   - 1.1.1.1
   - 1.0.0.1
-  all_servers: true
+  all_servers: false
   fastest_addr: false
   allowed_clients: []
   disallowed_clients: []
@@ -67,8 +68,8 @@ dns:
   - domain: raspberrypi.local
     answer: 192.168.1.250
   blocked_services: []
-  local_domain_name: lan
-  resolve_clients: true
+  local_domain_name: local
+  resolve_clients: false
   local_ptr_upstreams:
   - 192.168.1.1
 tls:
