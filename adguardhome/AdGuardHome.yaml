@@ -70,8 +70,7 @@ dns:
   blocked_services: []
   local_domain_name: local
   resolve_clients: false
-  local_ptr_upstreams:
-  - 192.168.1.1
+  local_ptr_upstreams: []
 tls:
   enabled: false
   server_name: ""
