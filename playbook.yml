@@ -11,6 +11,17 @@
       vars:
         swap_file_size_mb: '2048'
 
+    - name: Set timezone to Melbourne
+      become: true
+      community.general.timezone:
+        name: Australia/Melbourne
+
+    - name: Restart crond to pick up timezone change
+      become: true
+      ansible.builtin.service:
+        name: cron
+        state: restarted
+
     - name: Update and upgrade apt packages
       become: true
       apt:
@@ -44,7 +55,6 @@
       apt:
         name: vim
         state: present
-
 
     # Set static IP
     - name: Install network manager
