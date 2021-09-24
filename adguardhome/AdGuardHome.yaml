@@ -13,7 +13,7 @@ dns:
   bind_hosts:
   - 0.0.0.0
   port: 53
-  statistics_interval: 7
+  statistics_interval: 1
   querylog_enabled: true
   querylog_file_enabled: true
   querylog_interval: 7
@@ -33,7 +33,6 @@ dns:
   - https://dns.cloudflare.com/dns-query
   - https://doh.mullvad.net/dns-query
   - https://dns.adguard.com/dns-query
-  - '[/local/]192.168.1.1'
   upstream_dns_file: ""
   bootstrap_dns:
   - 1.1.1.1
@@ -46,7 +45,7 @@ dns:
   - version.bind
   - id.server
   - hostname.bind
-  cache_size: 16000000
+  cache_size: 0
   cache_ttl_min: 0
   cache_ttl_max: 0
   bogus_nxdomain: []
@@ -70,7 +69,8 @@ dns:
   blocked_services: []
   local_domain_name: local
   resolve_clients: false
-  local_ptr_upstreams: []
+  local_ptr_upstreams:
+  - 192.168.1.1
 tls:
   enabled: false
   server_name: ""
