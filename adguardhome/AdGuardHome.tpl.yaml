@@ -2,8 +2,8 @@ bind_host: 0.0.0.0
 bind_port: 3000
 beta_bind_port: 0
 users:
-  - name: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='AdGuard', field='username') }}
-    password: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='AdGuard', field='password') }}
+  - name: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='AdGuard', field='Username') }}
+    password: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='AdGuard', field='Encrypted Password') }}
 auth_attempts: 5
 block_auth_min: 15
 http_proxy: ""
@@ -319,7 +319,7 @@ whitelist_filters:
   name: anudeepND whitelist
   id: 1631888126
 user_rules:
-{{ lookup('community.general.onepassword', 'Adguard User Rules', field='notes') }}
+{{ lookup('file', 'adguardhome/user_rules.yaml') }}
 dhcp:
   enabled: false
   interface_name: ""
