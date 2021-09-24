@@ -116,6 +116,14 @@
       tags:
         - docker # reflect changes in docker-compose.yml
         - caddy
+        - adguard
+
+    - name: Set Adguard Configuration file
+      ansible.builtin.template:
+        src: adguardhome/AdGuardHome.tpl.yaml
+        dest: /home/pi/raspberry-pi/adguardhome/AdGuardHome.yaml
+      tags:
+        - adguard
 
     - name: Create docker-compose .env file
       ansible.builtin.copy:
@@ -141,6 +149,7 @@
           spotifyclientsecret: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Spotify Client Secret') }}
           routerpassword: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Router Password') }}
           radarr_api_key: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Radarr API Key') }}
+          external_url: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='External URL') }}
       tags:
         - credentials
 
@@ -190,8 +199,9 @@
         rule: allow
         port: '{{ item }}'
       loop:
+        # TODO: Remove all these ports now that we have caddy
         - ssh
-        - http
+        - http # TODO: remove
         - https
         - '53' # Adguard Home DNS
         - '3000' # Adguard Home UI
