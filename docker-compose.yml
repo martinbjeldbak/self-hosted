@@ -23,7 +23,7 @@ services:
     ports:
       - 8123:8123
     volumes:
-      -  home/homeassistant:/config
+      -  ./homeassistant:/config
       - /etc/localtime:/etc/localtime:ro
     environment:
       - TZ=${TZ}
