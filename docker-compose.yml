@@ -11,7 +11,7 @@ services:
       - 3000:3000/tcp # UI
     volumes:
       - /home/pi/adguardhome/work:/opt/adguardhome/work
-      - $PWD/adguardhome:/opt/adguardhome/conf
+      - ./adguardhome:/opt/adguardhome/conf
       - /etc/localtime:/etc/localtime:ro
     environment:
       - TZ=${TZ}
@@ -23,7 +23,7 @@ services:
     ports:
       - 8123:8123
     volumes:
-      - $PWD/homeassistant:/config
+      -  home/homeassistant:/config
       - /etc/localtime:/etc/localtime:ro
     environment:
       - TZ=${TZ}
@@ -76,7 +76,7 @@ services:
       - TZ=${TZ}
       - TRANSMISSION_WEB_HOME=/flood-for-transmission/
     volumes:
-      - $PWD/transmission:/config
+      - ./transmission:/config
       - downloads:/downloads
     ports:
       - 9091:9091
@@ -124,7 +124,7 @@ services:
       - 443:443
     restart: unless-stopped
     volumes:
-      - $PWD/Caddyfile:/etc/caddy/Caddyfile
+      - ./Caddyfile:/etc/caddy/Caddyfile
       - /home/pi/caddy/config:/config
       - /home/pi/caddy/data:/data
     healthcheck:
