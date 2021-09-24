@@ -133,10 +133,6 @@ services:
       test: ["CMD', "caddy", "version"]
     depends_on:
       - adguardhome
-    dns:
-      - 1.0.0.1
-    networks:
-      net: {}
 
 volumes:
   media:
