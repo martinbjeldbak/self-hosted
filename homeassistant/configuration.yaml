@@ -3,10 +3,13 @@
 default_config:
 
 # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
-# http:
-#   base_url: example.duckdns.org:8123
+http:
+  trusted_proxies:
+    - caddy
+  use_x_forwarded_for: true
+  ip_ban_enabled: true
+  login_attempts_threshold: 5
 
-# Text to speech
 
 homeassistant:
   name: Home
