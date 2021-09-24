@@ -23,7 +23,7 @@ services:
     ports:
       - 8123:8123
     volumes:
-      -  ./homeassistant:/config
+      - ./homeassistant:/config
       - /etc/localtime:/etc/localtime:ro
     environment:
       - TZ=${TZ}
@@ -64,7 +64,7 @@ services:
       - PLEX_CLAIM=${PLEX_CLAIM}
       - ADVERTISE_IP=http://${STATIC_IP}:32400/
     volumes:
-      - /home/pi/plex/config:/config
+      - /home/pi/plex/config:/config # not tracked in git
       - media:/data
 
   transmission:
