@@ -157,7 +157,7 @@
       ansible.builtin.copy:
         dest: /home/pi/raspberry-pi/.caddy.env
         content: |
-          CLOUDFLARE_API_TOKEN={{ lookup('community.general.onepassword', 'Raspberry Pi', section='SSH', field='password') }}
+          CLOUDFLARE_API_TOKEN={{ lookup('community.general.onepassword', 'Raspberry Pi', section='Caddy', field='Cloudflare Token') }}
       tags:
         - caddy
 
