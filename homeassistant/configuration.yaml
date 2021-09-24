@@ -18,12 +18,8 @@ homeassistant:
   latitude: !secret latitude
   longitude: !secret longitude
   currency: AUD
-  internal_url: "https://raspberrypi.local"
+  internal_url: "http://raspberrypi.local:8123"
   external_url: !secret external_url
-
-  #device_tracker:
-  #  - platform: netgear
-  #    password: !secret routerpassword
 
 light:
   - platform: group
