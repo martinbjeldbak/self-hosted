@@ -130,7 +130,7 @@ services:
       - /home/pi/caddy/config:/config
       - /home/pi/caddy/data:/data
     healthcheck:
-      test: ["CMD', "caddy", "version"]
+      test: ["CMD", "caddy", "version"]
     depends_on:
       - adguardhome
 
