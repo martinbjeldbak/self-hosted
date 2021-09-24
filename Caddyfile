@@ -1,11 +1,18 @@
-dns.martinbjeldbak.com {
-  reverse_proxy adguardhome:3000
-
+*.raspberrypi.local {
   tls me@martinbjeldbak.com {
     dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-    resolvers adguardhome
   }
 
-}
+  @dns host dns.raspberrypi.local
+  handle @dns {
+    encode gzip
+    reverse_proxy adguardhome:3000
+  }
 
-# encode zst gzip
+  # osv..
+
+  # Fallback for otherwise unhandled domains
+  handle {
+    abort
+  }
+}
