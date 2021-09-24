@@ -125,6 +125,13 @@
       tags:
         - adguard
 
+    - name: Set Jackett Configuration file
+      ansible.builtin.template:
+        src: jackett/config/Jackett/ServerConfig.tpl.json
+        dest: /home/pi/raspberry-pi/jackett/config/Jackett/ServerConfig.json
+      tags:
+        - adguard
+
     - name: Create docker-compose .env file
       ansible.builtin.copy:
         dest: /home/pi/raspberry-pi/.env
