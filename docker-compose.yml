@@ -41,7 +41,7 @@ services:
       - 9117:9117
     restart: unless-stopped
     volumes:
-      - /home/pi/jackett/config:/config # not tracked in git
+      - ./jackett/config:/config # not tracked in git
       - downloads:/downloads
 
   plex:
