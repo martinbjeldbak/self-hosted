@@ -109,10 +109,12 @@
         dest: /home/pi/raspberry-pi/
         clone: true
         update: true
+        recursive: true
         key_file: ~/.ssh/id_github
         accept_hostkey: true
       tags:
         - docker # reflect changes in docker-compose.yml
+        - caddy
 
     - name: Create docker-compose .env file
       ansible.builtin.copy:
@@ -146,6 +148,8 @@
         dest: /home/pi/raspberry-pi/.caddy.env
         content: |
           CLOUDFLARE_API_TOKEN={{ lookup('community.general.onepassword', 'Raspberry Pi', section='SSH', field='password') }}
+      tags:
+        - caddy
 
     - name: Install unattended upgrades
       become: true
@@ -224,3 +228,4 @@
       tags:
         - docker
         - credentials
+        - caddy

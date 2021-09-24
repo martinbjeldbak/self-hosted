@@ -14,6 +14,8 @@ My personal configuration of Raspberry Pi running
 * [Sonarr](https://sonarr.tv) - monitor & download TV shows
 * [Jackett](https://github.com/Jackett/Jackett) - proxy supporting private torrent tracker integration with Radarr & Sonarr
 * [Caddy](https://caddyserver.com) (TODO) - HTTPS support with Let's Encrypt
+* [Bazarr](https://github.com/morpheus65535/bazarr) (TODO) - fetch subtitles for Sonarr and Radarr
+* [Overseerr](https://github.com/sct/overseerr) - manage requests for media using Sonarr, Radarr, and Plex
 
 all of these services are managed via docker using docker-compose.
 
@@ -48,7 +50,7 @@ You will also need to populate your own `.env` file, copied from [`.env.example`
 
 You may need to make some changes in [`hosts.yml`](/hosts.yml) to match the static IP of your Raspberry Pi.
 
-Once booted, manually configure
+Once booted, manually configure, or restore from backup
 
 * Jackett, adding private trackers
 * Sonarr
@@ -62,3 +64,4 @@ Once booted, manually configure
 - [ ] Consider how to back up Jackett config
 - [ ] Consider how to back up Radarr config
 - [ ] Consider how to back up Sonarr config
+- [ ] Buy upgraded NAS, move transmission setup there
