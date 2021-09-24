@@ -12,6 +12,11 @@ homeassistant:
   name: Home
   unit_system: metric
   time_zone: Australia/Melbourne
+  latitude: !secret latitude
+  longitude: !secret longitude
+  currency: AUD
+  internal_url: "https://raspberrypi.local"
+  external_url: !secret external_url
 
   #device_tracker:
   #  - platform: netgear
