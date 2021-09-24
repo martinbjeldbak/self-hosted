@@ -8,5 +8,4 @@ dns.martinbjeldbak.com {
 
 }
 
-encode zst gzip
-
+# encode zst gzip
