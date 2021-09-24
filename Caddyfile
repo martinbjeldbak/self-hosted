@@ -1,9 +1,13 @@
-*.raspberrypi.local {
+*.martinbjeldbak.com {
   tls me@martinbjeldbak.com {
     dns cloudflare {env.CLOUDFLARE_API_TOKEN}
   }
 
-  @dns host dns.raspberrypi.local
+  log {
+    output file /data/access.log
+  }
+
+  @dns host dns.martinbjeldbak.com
   handle @dns {
     encode gzip
     reverse_proxy adguardhome:3000
