@@ -5,7 +5,8 @@ default_config:
 # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
 http:
   trusted_proxies:
-    - caddy
+    - 192.168.1.0/24 # Local Lan
+    - 172.0.0.0/10 # Docker network
   use_x_forwarded_for: true
   ip_ban_enabled: true
   login_attempts_threshold: 5
