@@ -25,6 +25,12 @@
     reverse_proxy plex:32400
   }
 
+  @plex host jackett.martinbjeldbak.com
+  handle @jackett {
+    encode gzip
+    reverse_proxy jackett:9117
+  }
+
   # Fallback for otherwise unhandled domains
   handle {
     abort
