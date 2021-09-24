@@ -13,7 +13,17 @@
     reverse_proxy adguardhome:3000
   }
 
-  # osv..
+  @homeassistant host homeassistant.martinbjeldbak.com
+  handle @homeassistant {
+    encode gzip
+    reverse_proxy homeassistant:8123
+  }
+
+  @plex host plex.martinbjeldbak.com
+  handle @plex {
+    encode gzip
+    reverse_proxy plex:32400
+  }
 
   # Fallback for otherwise unhandled domains
   handle {
