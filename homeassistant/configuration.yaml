@@ -40,31 +40,31 @@ light:
 panel_iframe:
   nas:
     title: 'NAS'
-    url: http://192.168.1.160:5000
+    url: !secret nas_url
     icon: 'mdi:cloud'
   transmission:
     title: 'Transmission'
-    url: http://raspberrypi.local:9091
+    url: !secret transmission_url
     icon: 'mdi:progress-download'
   plex:
     title: 'Plex'
-    url: http://raspberrypi.local:32400
+    url: !secret plex_url
     icon: 'mdi:plex'
   adguard:
     title: 'AdGuard'
-    url: http://raspberrypi.local:3000
+    url: !secret adguard_url
     icon: 'mdi:download'
   sonarr:
     title: 'Sonarrr'
-    url: http://raspberrypi.local:8989
+    url: !secret sonarr_url
     icon: 'mdi:television-box'
   radarr:
     title: 'Radarr'
-    url: http://raspberrypi.local:7878
+    url: !secret radarr_url
     icon: 'mdi:filmstrip'
   jackett:
     title: 'Jackett'
-    url: http://raspberrypi.local:9117
+    url: !secret jackett_url
     icon: 'mdi:hanger'
 
 spotify:
