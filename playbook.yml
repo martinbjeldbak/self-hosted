@@ -144,25 +144,11 @@
       tags:
         - credentials
 
+
     - name: Create Home Assistant secrets.yaml
-      ansible.builtin.copy:
+      ansible.builtin.template:
+        src: homeassistant/secrets.tpl.yaml
         dest: /home/pi/raspberry-pi/homeassistant/secrets.yaml
-        content: |
-          ---
-          latitude: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Latitude') }}
-          longitude: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Longitude') }}
-          spotifyclientid: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Spotify Client ID') }}
-          spotifyclientsecret: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Spotify Client Secret') }}
-          routerpassword: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Router Password') }}
-          radarr_api_key: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Radarr API Key') }}
-          external_url: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='External URL') }}
-          nas_url: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='NAS URL') }}
-          transmission_url: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Transmission URL') }}
-          plex_url: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Plex URL') }}
-          adguard_url: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Adguard URL') }}
-          sonarr_url: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Sonarr URL') }}
-          radarr_url: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Radarr URL') }}
-          jackett_url: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='Home Assistant', field='Jackett URL') }}
       tags:
         - credentials
 
