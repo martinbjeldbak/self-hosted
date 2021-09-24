@@ -9,8 +9,6 @@ services:
       - 53:53/tcp # plain DNS
       - 53:53/udp # plain DNS
       - 3000:3000/tcp # UI
-      - 443:443/tcp # UI
-      - 443:443/udp # UI
     volumes:
       - /home/pi/adguardhome/work:/opt/adguardhome/work
       - $PWD/adguardhome:/opt/adguardhome/conf
