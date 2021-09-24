@@ -2,7 +2,7 @@
   "Port": 9117,
   "AllowExternal": true,
   "APIKey": "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='Jackett', field='API Key') }}",
-  "AdminPassword": "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='Jackett', field='Admin Password') }}",
+  "AdminPassword": "{{ lookup('community.general.onepassword', 'Raspberry Pi', section='Jackett', field='Encrypted Admin Password') }}",
   "InstanceId": "zsc54ztd9lzgg08f3s0y7466q4i3a5bxn8wqqzw6emichhcpp6okpdillck6vbds",
   "BlackholeDir": null,
   "UpdateDisabled": false,

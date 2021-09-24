@@ -25,7 +25,7 @@
     reverse_proxy plex:32400
   }
 
-  @plex host jackett.martinbjeldbak.com
+  @jackett host jackett.martinbjeldbak.com
   handle @jackett {
     encode gzip
     reverse_proxy jackett:9117

@@ -116,7 +116,6 @@
       tags:
         - docker # reflect changes in docker-compose.yml
         - caddy
-        - adguard
 
     - name: Set Adguard Configuration file
       ansible.builtin.template:
@@ -130,7 +129,7 @@
         src: jackett/config/Jackett/ServerConfig.tpl.json
         dest: /home/pi/raspberry-pi/jackett/config/Jackett/ServerConfig.json
       tags:
-        - adguard
+        - jackett
 
     - name: Create docker-compose .env file
       ansible.builtin.copy:
