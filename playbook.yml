@@ -108,6 +108,7 @@
         repo: git@github.com:martinbjeldbak/raspberry-pi.git
         dest: /home/pi/raspberry-pi/
         clone: true
+        depth: 1
         update: true
         recursive: true
         key_file: ~/.ssh/id_github
