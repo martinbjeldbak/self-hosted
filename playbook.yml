@@ -141,6 +141,12 @@
       tags:
         - credentials
 
+    - name: Set Caddy secret
+      ansible.builtin.copy:
+        dest: /home/pi/raspberry-pi/.caddy.env
+        content: |
+          CLOUDFLARE_API_TOKEN={{ lookup('community.general.onepassword', 'Raspberry Pi', section='SSH', field='password') }}
+
     - name: Install unattended upgrades
       become: true
       apt:

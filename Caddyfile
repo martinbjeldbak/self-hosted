@@ -1,0 +1,12 @@
+dns.martinbjeldbak.com {
+  reverse_proxy adguardhome:3000
+
+  tls me@martinbjeldbak.com {
+    dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+    resolvers adguardhome
+  }
+
+}
+
+encode zst gzip
+

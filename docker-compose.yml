@@ -76,6 +76,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=${TZ}
+      - TRANSMISSION_WEB_HOME=/flood-for-transmission/
     volumes:
       - $PWD/transmission:/config
       - downloads:/downloads
@@ -115,27 +116,27 @@ services:
       - media:/tv
       - downloads:/downloads
 
-  # caddy:
-  #   build:
-  #     context: .
-  #     dockerfile: caddy.Dockerfile
-  #   container_name: caddy
-  #   ports:
-  #     - 80:80 # for HTTP -> HTTPS redirect
-  #     - 443:443
-  #   restart: unless-stopped
-  #   volumes:
-  #     - $PWD/Caddyfile:/etc/caddy/Caddyfile
-  #     - /home/pi/caddy/config:/config
-  #     - /home/pi/caddy/data:/data
-  #   healthcheck:
-  #     test: ["CMD', "caddy", "version"]
-  #   depends_on:
-  #     - adguardhome
-  #   dns:
-  #     - 1.0.0.1
-  #   networks:
-  #     net: {}
+  caddy:
+    build:
+      context: .
+      dockerfile: caddy.Dockerfile
+    container_name: caddy
+    ports:
+      - 80:80 # for HTTP -> HTTPS redirect
+      - 443:443
+    restart: unless-stopped
+    volumes:
+      - $PWD/Caddyfile:/etc/caddy/Caddyfile
+      - /home/pi/caddy/config:/config
+      - /home/pi/caddy/data:/data
+    healthcheck:
+      test: ["CMD', "caddy", "version"]
+    depends_on:
+      - adguardhome
+    dns:
+      - 1.0.0.1
+    networks:
+      net: {}
 
 volumes:
   media:
