@@ -1,7 +1,9 @@
 bind_host: 0.0.0.0
 bind_port: 3000
 beta_bind_port: 0
-users: []
+users:
+  - name: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='AdGuard', field='username') }}
+    password: {{ lookup('community.general.onepassword', 'Raspberry Pi', section='AdGuard', field='password') }}
 auth_attempts: 5
 block_auth_min: 15
 http_proxy: ""
@@ -316,6 +318,8 @@ whitelist_filters:
   url: https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/whitelist.txt
   name: anudeepND whitelist
   id: 1631888126
+user_rules:
+{{ lookup('community.general.onepassword', 'Adguard User Rules', field='notes') }}
 dhcp:
   enabled: false
   interface_name: ""
