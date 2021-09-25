@@ -146,6 +146,10 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - /home/pi/caddy/config:/config
       - /home/pi/caddy/data:/data
+    environment:
+      - CADDYUID=1000
+      - CADDYGID=1000
+      - TZ=${TZ}
     env_file:
       - .caddy.env
     healthcheck:
