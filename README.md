@@ -60,9 +60,7 @@ Once booted, manually configure, or restore from backup
 ## On the list to do
 
 - [ ] Use docker secrets over environment files
-- [ ] Make all services work over HTTPS
+- [x] Make all services work over HTTPS
 - [ ] Setup [tautulli](https://tautulli.com/)
-- [ ] Consider how to back up Jackett config
-- [ ] Consider how to back up Radarr config
-- [ ] Consider how to back up Sonarr config
-- [ ] Buy upgraded NAS, move transmission setup there
+- [ ] Buy upgraded NAS, move jackett, sonarr, radarr, plex & transmission setup there
+- [ ] Add rsync to ansible for backup
