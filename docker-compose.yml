@@ -52,13 +52,12 @@ services:
     container_name: plex
     restart: unless-stopped
     ports:
-      - 3005:3005/tcp
-      - 32469:32469/tcp # access to the Plex DLNA Server
       - 1900:1900/udp # access to the Plex DLNA Server
       - 32410:32410/udp # current GDM network discovery
       - 32412:32412/udp # current GDM network discovery
       - 32413:32413/udp # current GDM network discovery
       - 32414:32414/udp # current GDM network discovery
+      - 32469:32469/tcp # access to the Plex DLNA Server
     expose:
       - 32400 # access to the Plex Media Server
     environment:
