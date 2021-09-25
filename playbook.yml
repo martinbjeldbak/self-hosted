@@ -201,24 +201,14 @@
       loop:
         # TODO: Remove all these ports now that we have caddy
         - ssh
-        - http # TODO: remove
         - https
         - '53' # Adguard Home DNS
-        - '3000' # Adguard Home UI
-        - '9117' # Jackett
-        - '32400' # Plex
-        - '3005'
         - '32469' # Plex
-        - '1900' # Plex
         - '32410' # Plex
         - '32412' # Plex
         - '32413' # Plex
         - '32414' # Plex
-        - '9091' # Transmission UI
         - '51413' # Transmission
-        - '7878' # Radarr
-        - '8989' # Sonarr
-        - '8123' # Home Assistant UI
 
     - name: Enable ufw and default to deny
       become: true
@@ -231,7 +221,7 @@
       community.docker.docker_compose:
         project_src: /home/pi/raspberry-pi
         pull: true
-        build: true
+        # build: true
         remove_orphans: true
       vars:
         ansible_python_interpreter: "/usr/bin/env python3-docker"
