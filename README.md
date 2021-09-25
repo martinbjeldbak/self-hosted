@@ -14,9 +14,8 @@ My personal configuration of Raspberry Pi running
 * [Sonarr](https://sonarr.tv) - monitor & download TV shows
 * [Jackett](https://github.com/Jackett/Jackett) - proxy supporting private torrent tracker integration with Radarr & Sonarr
 * [Caddy](https://caddyserver.com) - HTTPS support with Let's Encrypt
-* [Bazarr](https://github.com/morpheus65535/bazarr) (TODO) - fetch subtitles for Sonarr and Radarr
+* [Bazarr](https://github.com/morpheus65535/bazarr) - fetch subtitles for Sonarr and Radarr
 * [Overseerr](https://github.com/sct/overseerr) (maybe) - manage requests for media using Sonarr, Radarr, and Plex
-* [Portainer] (TODO) - manage docker containers
 
 all of these services are managed via docker using docker-compose.
 

@@ -174,7 +174,7 @@
         vtype: boolean
         value: "true"
 
-    - name: Install fail2ban # prevent SSH bruteforcing
+    - name: Install fail2ban
       become: true
       apt:
         name: fail2ban
@@ -186,7 +186,7 @@
         name: ufw
         state: present
 
-    - name: Limit ssh
+    - name: Limit ssh # connection reate limiting
       become: true
       community.general.ufw:
         rule: limit
@@ -199,7 +199,6 @@
         rule: allow
         port: '{{ item }}'
       loop:
-        # TODO: Remove all these ports now that we have caddy
         - ssh
         - https
         - '53' # Adguard Home DNS
