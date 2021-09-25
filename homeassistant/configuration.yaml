@@ -73,8 +73,8 @@ sensor:
       - type: disk_use_percent
         arg: /
       - type: memory_free
+      - type: load_1m
       - type: load_15m
-      - type: load_30m
 
   - platform: radarr
     api_key: !secret radarr_api_key
