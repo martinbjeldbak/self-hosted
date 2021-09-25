@@ -40,7 +40,7 @@
     "ratio-limit": 1.5000,
     "ratio-limit-enabled": true,
     "rename-partial-files": true,
-    "rpc-authentication-required": false,
+    "rpc-authentication-required": true,
     "rpc-bind-address": "0.0.0.0",
     "rpc-enabled": true,
     "rpc-host-whitelist": "",
