@@ -8,7 +8,8 @@ services:
     ports:
       - 53:53/tcp # plain DNS
       - 53:53/udp # plain DNS
-      - 3000:3000/tcp # UI
+    expose:
+      - 3000 # UI
     volumes:
       - /home/pi/adguardhome/work:/opt/adguardhome/work
       - ./adguardhome:/opt/adguardhome/conf
@@ -20,8 +21,8 @@ services:
   homeassistant:
     image: homeassistant/raspberrypi3-homeassistant:stable
     container_name: homeassistant
-    ports:
-      - 8123:8123
+    expose:
+      - 8123
     volumes:
       - ./homeassistant:/config
       - /etc/localtime:/etc/localtime:ro
@@ -37,8 +38,8 @@ services:
       - PGID=1000
       - TZ=${TZ}
       - AUTO_UPDATE=true
-    ports:
-      - 9117:9117
+    expose:
+      - 9117
     restart: unless-stopped
     volumes:
       - ./jackett/config:/config # not tracked in git
@@ -51,7 +52,6 @@ services:
     container_name: plex
     restart: unless-stopped
     ports:
-      - 32400:32400/tcp # access to the Plex Media Server
       - 3005:3005/tcp
       - 32469:32469/tcp # access to the Plex DLNA Server
       - 1900:1900/udp # access to the Plex DLNA Server
@@ -59,6 +59,8 @@ services:
       - 32412:32412/udp # current GDM network discovery
       - 32413:32413/udp # current GDM network discovery
       - 32414:32414/udp # current GDM network discovery
+    expose:
+      - 32400:32400/tcp # access to the Plex Media Server
     environment:
       - TZ=${TZ}
       - PLEX_CLAIM=${PLEX_CLAIM}
@@ -81,9 +83,10 @@ services:
       - ./transmission:/config
       - downloads:/downloads
     ports:
-      - 9091:9091
       - 51413:51413/tcp
       - 51413:51413/udp
+    expose:
+      - 9091
     restart: unless-stopped
 
   radarr:
@@ -93,8 +96,8 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=${TZ}
-    ports:
-      - 7878:7878
+    expose:
+      - 7878
     restart: unless-stopped
     volumes:
       - /home/pi/radarr/config:/config # not tracked in git
@@ -108,8 +111,8 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=${TZ}
-    ports:
-      - 8989:8989
+    expose:
+      - 8989
     restart: unless-stopped
     volumes:
       - /home/pi/sonarr/config:/config # not tracked in git
