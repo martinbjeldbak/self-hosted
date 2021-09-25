@@ -145,7 +145,7 @@
           TZ=Australia/Melbourne
           STATIC_IP=raspberrypi.local
           PLEX_CLAIM={{ lookup('community.general.onepassword', 'Raspberry Pi', section='Plex', field='Claim') }}
-          NAS_IP=192.168.1.160
+          NAS_IP={{ lookup('community.general.onepassword', 'Raspberry Pi', section='NAS', field='NAS IP') }}
           NAS_USERNAME={{ lookup('community.general.onepassword', 'Raspberry Pi', section='NAS', field='Username') }}
           NAS_PASSWORD={{ lookup('community.general.onepassword', 'Raspberry Pi', section='NAS', field='Password') }}
           TRANSMISSION_USERNAME={{ lookup('community.general.onepassword', 'Raspberry Pi', section='Transmission', field='Username') }}
@@ -192,6 +192,8 @@
       apt:
         name: ufw
         state: present
+      tags:
+        - firewall
 
     - name: Limit ssh # connection reate limiting
       become: true
@@ -199,6 +201,8 @@
         rule: limit
         port: ssh
         proto: tcp
+      tags:
+        - firewall
 
     - name: Allow access to required ports
       become: true
@@ -215,12 +219,53 @@
         - '32413' # Plex
         - '32414' # Plex
         - '51413' # Transmission
+      tags:
+        - firewall
 
     - name: Enable ufw and default to deny
       become: true
       ufw:
         state: enabled
         default: deny
+      tags:
+        - firewall
+
+    - name: Setup backup task to backup every day at 5am
+      ansible.builtin.cron:
+        name: "Backup to NAS"
+        minute: "0"
+        hour: "5"
+        job: "rsync -av --progress /home/pi {{ lookup('community.general.onepassword', 'Raspberry Pi', section='NAS', field='Username') }}@{{ lookup('community.general.onepassword', 'Raspberry Pi', section='NAS', field='IP') }}:/volume1/NetBackup/raspberry-pi-backups"
+      tags:
+        - backup
+
+    - name: Setup logrotate
+      become: true
+      blockinfile:
+        path: "/etc/logrotate.d/{{ item.path }}"
+        block: "{{ item.conf }}"
+        create: true
+      loop:
+        - path: adguardhome-logs
+          conf: |
+            /home/pi/adguardhome/work/adguardhome-*.log {
+              weekly
+              rotate 3
+              size 10M
+              compress
+              delaycompress
+            }
+        - path: adguardhome-query-logs
+          conf: |
+            /home/pi/adguardhome/work/data/querylog.json {
+              weekly
+              rotate 3
+              size 10M
+              compress
+              delaycompress
+            }
+      tags:
+        - logrotate
 
     - name: Create and start docker-compose services
       become: true
