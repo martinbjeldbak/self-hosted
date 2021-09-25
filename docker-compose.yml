@@ -136,8 +136,6 @@ services:
       - .caddy.env
     healthcheck:
       test: ["CMD", "caddy", "version"]
-    depends_on:
-      - adguardhome
 
 volumes:
   media:

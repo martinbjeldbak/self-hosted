@@ -9,44 +9,51 @@
 
   @dns host dns.martinbjeldbak.com
   handle @dns {
-    encode gzip
     reverse_proxy adguardhome:3000
+
+    encode gzip
   }
 
   @homeassistant host homeassistant.martinbjeldbak.com
   handle @homeassistant {
-    encode gzip
     reverse_proxy homeassistant:8123
+
+    encode gzip
   }
 
   @plex host plex.martinbjeldbak.com
   handle @plex {
-    encode gzip
     reverse_proxy plex:32400
+
+    encode gzip
   }
 
   @jackett host jackett.martinbjeldbak.com
   handle @jackett {
-    encode gzip
     reverse_proxy jackett:9117
+
+    encode gzip
   }
 
   @radarr host radarr.martinbjeldbak.com
   handle @radarr {
-    encode gzip
     reverse_proxy radarr:7878
+
+    encode gzip
   }
 
   @sonarr host sonarr.martinbjeldbak.com
   handle @sonarr {
-    encode gzip
     reverse_proxy sonarr:8989
+
+    encode gzip
   }
 
   @torrents host torrents.martinbjeldbak.com
   handle @torrents {
-    encode gzip
     reverse_proxy transmission:9091
+
+    encode gzip
   }
 
   # Fallback for otherwise unhandled domains
