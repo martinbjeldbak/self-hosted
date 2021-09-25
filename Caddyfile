@@ -43,6 +43,12 @@
     reverse_proxy sonarr:8989
   }
 
+  @torrents host torrents.martinbjeldbak.com
+  handle @torrents {
+    encode gzip
+    reverse_proxy transmission:9091
+  }
+
   # Fallback for otherwise unhandled domains
   handle {
     abort

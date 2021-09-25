@@ -75,6 +75,8 @@ services:
       - PGID=1000
       - TZ=${TZ}
       - TRANSMISSION_WEB_HOME=/flood-for-transmission/
+      - USER=${TRANSMISSION_USERNAME}
+      - PASS=${TRANSMISSION_PASSWORD}
     volumes:
       - ./transmission:/config
       - downloads:/downloads

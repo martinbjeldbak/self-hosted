@@ -141,9 +141,10 @@
           NAS_IP=192.168.1.160
           NAS_USERNAME={{ lookup('community.general.onepassword', 'Raspberry Pi', section='NAS', field='Username') }}
           NAS_PASSWORD={{ lookup('community.general.onepassword', 'Raspberry Pi', section='NAS', field='Password') }}
+          TRANSMISSION_USERNAME={{ lookup('community.general.onepassword', 'Raspberry Pi', section='Transmission', field='Username') }}
+          TRANSMISSION_PASSWORD={{ lookup('community.general.onepassword', 'Raspberry Pi', section='Transmission', field='Password') }}
       tags:
         - credentials
-
 
     - name: Create Home Assistant secrets.yaml
       ansible.builtin.template:

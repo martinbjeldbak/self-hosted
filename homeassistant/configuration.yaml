@@ -74,6 +74,7 @@ sensor:
         arg: /
       - type: memory_free
       - type: load_15m
+      - type: load_30m
 
   - platform: radarr
     api_key: !secret radarr_api_key
