@@ -124,12 +124,19 @@
       tags:
         - adguard
 
-    - name: Set Jackett Configuration file
+    - name: Set Jackett configuration file
       ansible.builtin.template:
         src: jackett/config/Jackett/ServerConfig.tpl.json
         dest: /home/pi/raspberry-pi/jackett/config/Jackett/ServerConfig.json
       tags:
         - jackett
+
+    - name: Set Transmission configuration file
+      ansible.builtin.template:
+        src: transmission/settings.tpl.json
+        dest: /home/pi/raspberry-pi/transmission/settings.json
+      tags:
+        - transmission
 
     - name: Create docker-compose .env file
       ansible.builtin.copy:

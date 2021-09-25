@@ -61,6 +61,10 @@ panel_iframe:
     title: 'Jackett'
     url: !secret jackett_url
     icon: 'mdi:hanger'
+  bazarr:
+    title: 'Bazarr'
+    url: !secret bazarr_url
+    icon: 'mdi:closed-caption'
 
 spotify:
   client_id: !secret spotifyclientid
