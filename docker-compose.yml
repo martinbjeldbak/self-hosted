@@ -118,6 +118,21 @@ services:
       - media:/tv
       - downloads:/downloads
 
+  bazarr:
+    image: ghcr.io/linuxserver/bazarr
+    container_name: bazarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TZ}
+    expose:
+      - 6767
+    restart: unless-stopped
+    volumes:
+      - ./bazarr:/config
+      - media:/movies
+      - media:/tv
+
   caddy:
     build:
       context: .

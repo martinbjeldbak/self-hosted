@@ -56,6 +56,13 @@
     encode gzip
   }
 
+  @bazarr host bazarr.martinbjeldbak.com
+  handle @bazarr {
+    reverse_proxy bazarr:6767
+
+    encode gzip
+  }
+
   # Fallback for otherwise unhandled domains
   handle {
     abort
