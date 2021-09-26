@@ -20,6 +20,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ANSIBLE: false # see currently open issue https://github.com/github/super-linter/issues/1671
+          FILTER_REGEX_EXCLUDE: 'adguardhome/AdGuardHome.tpl.yaml'
 
   ansible-lint:
     runs-on: ubuntu-latest

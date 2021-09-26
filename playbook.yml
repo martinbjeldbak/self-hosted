@@ -235,7 +235,7 @@
         name: "Backup to NAS"
         minute: "0"
         hour: "5"
-        job: "rsync -av --progress /home/pi {{ lookup('community.general.onepassword', 'Raspberry Pi', section='NAS', field='Username') }}@{{ lookup('community.general.onepassword', 'Raspberry Pi', section='NAS', field='IP') }}:/volume1/NetBackup/raspberry-pi-backups"
+        job: "rsync -av --progress /home/pi {{ lookup('community.general.onepassword', 'Raspberry Pi', section='NAS', field='Username') }}@{{ lookup('community.general.onepassword', 'Raspberry Pi', section='NAS', field='IP') }}:/volume1/NetBackup/raspberry-pi-backups" # noqa 208
       tags:
         - backup
 
@@ -245,6 +245,7 @@
         path: "/etc/logrotate.d/{{ item.path }}"
         block: "{{ item.conf }}"
         create: true
+        mode: '644'
       loop:
         - path: adguardhome-logs
           conf: |
