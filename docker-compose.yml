@@ -43,7 +43,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./jackett/config:/config # not tracked in git
-      - media:/downloads
+      - nas:/downloads
 
   plex:
     build:
@@ -66,7 +66,7 @@ services:
       - ADVERTISE_IP=http://${STATIC_IP}:32400/
     volumes:
       - /home/pi/plex/config:/config # not tracked in git
-      - media:/data
+      - nas:/data
 
   transmission:
     image: ghcr.io/linuxserver/transmission
@@ -80,7 +80,7 @@ services:
       - PASS=${TRANSMISSION_PASSWORD}
     volumes:
       - ./transmission:/config
-      - media:/downloads
+      - nas:/downloads
     ports:
       - 51413:51413/tcp
       - 51413:51413/udp
@@ -100,8 +100,8 @@ services:
     restart: unless-stopped
     volumes:
       - /home/pi/radarr/config:/config # not tracked in git
-      - media:/movies
-      - media:/downloads
+      - nas:/movies
+      - nas:/downloads
 
   sonarr:
     image: ghcr.io/linuxserver/sonarr
@@ -115,8 +115,8 @@ services:
     restart: unless-stopped
     volumes:
       - /home/pi/sonarr/config:/config # not tracked in git
-      - media:/tv
-      - media:/downloads
+      - nas:/tv
+      - nas:/downloads
 
   bazarr:
     image: ghcr.io/linuxserver/bazarr
@@ -130,8 +130,8 @@ services:
     restart: unless-stopped
     volumes:
       - ./bazarr:/config
-      - media:/movies
-      - media:/tv
+      - nas:/movies
+      - nas:/tv
 
   caddy:
     build:
@@ -156,7 +156,7 @@ services:
       test: ["CMD", "caddy", "version"]
 
 volumes:
-  media:
+  nas:
     driver_opts:
       type: cifs
       device: //${NAS_IP}/media
