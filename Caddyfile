@@ -35,15 +35,15 @@
     encode gzip
   }
 
-  @radarr host radarr.martinbjeldbak.com
-  handle @radarr {
+  @movies host movies.martinbjeldbak.com
+  handle @movies {
     reverse_proxy radarr:7878
 
     encode gzip
   }
 
-  @sonarr host sonarr.martinbjeldbak.com
-  handle @sonarr {
+  @tv host tv.martinbjeldbak.com
+  handle @tv {
     reverse_proxy sonarr:8989
 
     encode gzip
@@ -56,8 +56,8 @@
     encode gzip
   }
 
-  @bazarr host bazarr.martinbjeldbak.com
-  handle @bazarr {
+  @subtitles host subtitles.martinbjeldbak.com
+  handle @subtitles {
     reverse_proxy bazarr:6767
 
     encode gzip
