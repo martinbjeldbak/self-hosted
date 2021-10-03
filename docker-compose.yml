@@ -43,7 +43,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./jackett/config:/config # not tracked in git
-      - downloads:/downloads
+      - media/downloads:/downloads
 
   plex:
     build:
@@ -80,7 +80,7 @@ services:
       - PASS=${TRANSMISSION_PASSWORD}
     volumes:
       - ./transmission:/config
-      - downloads:/downloads
+      - media:/downloads
     ports:
       - 51413:51413/tcp
       - 51413:51413/udp
@@ -101,7 +101,7 @@ services:
     volumes:
       - /home/pi/radarr/config:/config # not tracked in git
       - media:/movies
-      - downloads:/downloads
+      - media:/downloads
 
   sonarr:
     image: ghcr.io/linuxserver/sonarr
@@ -116,7 +116,7 @@ services:
     volumes:
       - /home/pi/sonarr/config:/config # not tracked in git
       - media:/tv
-      - downloads:/downloads
+      - media:/downloads
 
   bazarr:
     image: ghcr.io/linuxserver/bazarr
@@ -160,9 +160,4 @@ volumes:
     driver_opts:
       type: cifs
       device: //${NAS_IP}/media
-      o: "addr=${NAS_IP},username=${NAS_USERNAME},password=${NAS_PASSWORD},file_mode=0777,dir_mode=0777"
-  downloads:
-    driver_opts:
-      type: cifs
-      device: //${NAS_IP}/downloads
       o: "addr=${NAS_IP},username=${NAS_USERNAME},password=${NAS_PASSWORD},file_mode=0777,dir_mode=0777"
