@@ -145,7 +145,7 @@
           TZ=Australia/Melbourne
           STATIC_IP=raspberrypi.local
           PLEX_CLAIM={{ lookup('community.general.onepassword', 'Raspberry Pi', section='Plex', field='Claim') }}
-          NAS_IP={{ lookup('community.general.onepassword', 'Raspberry Pi', section='NAS', field='NAS IP') }}
+          NAS_IP={{ lookup('community.general.onepassword', 'Raspberry Pi', section='NAS', field='IP') }}
           NAS_USERNAME={{ lookup('community.general.onepassword', 'Raspberry Pi', section='NAS', field='Username') }}
           NAS_PASSWORD={{ lookup('community.general.onepassword', 'Raspberry Pi', section='NAS', field='Password') }}
           TRANSMISSION_USERNAME={{ lookup('community.general.onepassword', 'Raspberry Pi', section='Transmission', field='Username') }}
