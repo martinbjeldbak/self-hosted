@@ -43,7 +43,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./jackett/config:/config # not tracked in git
-      - media/downloads:/downloads
+      - media:/downloads
 
   plex:
     build:
