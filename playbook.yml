@@ -131,13 +131,6 @@
       tags:
         - jackett
 
-    - name: Set Transmission configuration file
-      ansible.builtin.template:
-        src: transmission/settings.tpl.json
-        dest: /home/pi/raspberry-pi/transmission/settings.json
-      tags:
-        - transmission
-
     - name: Create docker-compose .env file
       ansible.builtin.copy:
         dest: /home/pi/raspberry-pi/.env

@@ -68,26 +68,6 @@ services:
       - /home/pi/plex/config:/config # not tracked in git
       - nas:/data
 
-  transmission:
-    image: ghcr.io/linuxserver/transmission
-    container_name: transmission
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=${TZ}
-      - TRANSMISSION_WEB_HOME=/flood-for-transmission/
-      - USER=${TRANSMISSION_USERNAME}
-      - PASS=${TRANSMISSION_PASSWORD}
-    volumes:
-      - ./transmission:/config
-      - nas:/downloads
-    ports:
-      - 51413:51413/tcp
-      - 51413:51413/udp
-    expose:
-      - 9091
-    restart: unless-stopped
-
   radarr:
     image: ghcr.io/linuxserver/radarr
     container_name: radarr
