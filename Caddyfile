@@ -51,7 +51,7 @@
 
   @torrents host torrents.martinbjeldbak.com
   handle @torrents {
-    reverse_proxy 192.168.160:9091
+    reverse_proxy transmission:9091
 
     encode gzip
   }

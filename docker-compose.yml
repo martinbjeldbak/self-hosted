@@ -134,6 +134,9 @@ services:
       - .caddy.env
     healthcheck:
       test: ["CMD", "caddy", "version"]
+    extra_hosts:
+      - 'transmission:${NAS_IP}'
+
 
 volumes:
   nas:
