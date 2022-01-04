@@ -65,7 +65,7 @@
 
   @portainer host portainer.martinbjeldbak.com
   handle @portainer {
-    reverse_proxy portainer:8000
+    reverse_proxy portainer:9000
 
     encode gzip
   }
