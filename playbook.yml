@@ -207,6 +207,7 @@
       loop:
         - ssh
         - https
+        - '53'    # Adguard home
         - '32469' # Plex
         - '32410' # Plex
         - '32412' # Plex
