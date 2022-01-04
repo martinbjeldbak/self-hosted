@@ -139,6 +139,11 @@ services:
 
   portainer:
     image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 8000:8000
 
