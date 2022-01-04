@@ -137,6 +137,10 @@ services:
     extra_hosts:
       - 'transmission:${NAS_IP}'
 
+  portainer:
+    image: portainer/portainer-ce:latest
+    ports:
+      - 8000:8000
 
 volumes:
   nas:

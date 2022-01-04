@@ -31,8 +31,10 @@
     # See https://askubuntu.com/a/1264921/431204
     - name: Download updated libseccomp for Plex support
       become: true
+      vars:
+        libseccomp_version: 2.5.1-1
       apt:
-        deb: http://ftp.au.debian.org/debian/pool/main/libs/libseccomp/libseccomp2_2.4.4-1~bpo10+1_armhf.deb
+        deb: 'http://ftp.au.debian.org/debian/pool/main/libs/libseccomp/libseccomp2_{{ libseccomp_version }}~bpo10+1_armhf.deb'
       tags:
         - docker
 
@@ -108,7 +110,7 @@
         repo: git@github.com:martinbjeldbak/raspberry-pi.git
         dest: /home/pi/raspberry-pi/
         clone: true
-        depth: 1
+        depth: '1'
         update: true
         recursive: true
         key_file: ~/.ssh/id_github
@@ -205,7 +207,6 @@
       loop:
         - ssh
         - https
-        - '53' # Adguard Home DNS
         - '32469' # Plex
         - '32410' # Plex
         - '32412' # Plex

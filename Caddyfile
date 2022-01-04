@@ -63,6 +63,13 @@
     encode gzip
   }
 
+  @portainer host portainer.martinbjeldbak.com
+  handle @portainer {
+    reverse_proxy portainer:8000
+
+    encode gzip
+  }
+
   # Fallback for otherwise unhandled domains
   handle {
     abort

@@ -6,6 +6,7 @@ I also wanted to keep a version controlled copy of my existing configuration on 
 
 My personal configuration of Raspberry Pi running
 
+* [Portainer](https://github.com/portainer/portainer) - UI to help manage containers
 * [Adguard Home](https://github.com/AdguardTeam/AdGuardHome) - self-hosted DNS server with ad-blocking
 * [Plex Media Server](https://www.plex.tv) - connects to my Synology NAS and hosts database
 * [Home Assistant](https://www.home-assistant.io) - integrates all my IoT devices
@@ -51,6 +52,7 @@ You may need to make some changes in [`hosts.yml`](/hosts.yml) to match the stat
 
 Once booted, manually configure, or restore from backup
 
+* Portainer
 * Jackett, adding private trackers
 * Sonarr
 * Radarr
