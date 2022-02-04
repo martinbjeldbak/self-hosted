@@ -10,108 +10,132 @@ services:
       - 53:53/udp # plain DNS
     expose:
       - 3000 # UI
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
-      - /home/pi/adguardhome/work:/opt/adguardhome/work
+      - ${DOCKER_CONF_DIR}/adguardhome:/opt/adguardhome/work
       - ./adguardhome:/opt/adguardhome/conf
       - /etc/localtime:/etc/localtime:ro
-    environment:
-      - TZ=${TZ}
     restart: unless-stopped
 
-  # homeassistant:
-  #   image: homeassistant/raspberrypi3-homeassistant:stable
-  #   container_name: homeassistant
-  #   expose:
-  #     - 8123
-  #   volumes:
-  #     - ./homeassistant:/config
-  #     - /etc/localtime:/etc/localtime:ro
-  #   environment:
-  #     - TZ=${TZ}
-  #   restart: always
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: homeassistant
+    expose:
+      - 8123
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ./homeassistant:/config
+      - /etc/localtime:/etc/localtime:ro
+    restart: always
 
-  # jackett:
-  #   image: ghcr.io/linuxserver/jackett
-  #   container_name: jackett
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ=${TZ}
-  #     - AUTO_UPDATE=true
-  #   expose:
-  #     - 9117
-  #   restart: unless-stopped
-  #   volumes:
-  #     - ./jackett/config:/config # not tracked in git
-  #     - nas:/downloads
+  jackett:
+    image: ghcr.io/linuxserver/jackett
+    container_name: jackett
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - AUTO_UPDATE=true
+    expose:
+      - 9117
+    restart: unless-stopped
+    volumes:
+      - ./jackett/config:/config # not tracked in git
+      - /volume1/data/downloads:/downloads
 
-  # plex:
-  #   build:
-  #     context: ./pms-docker
-  #     dockerfile: Dockerfile.armv7
-  #   container_name: plex
-  #   restart: unless-stopped
-  #   ports:
-  #     - 1900:1900/udp # access to the Plex DLNA Server
-  #     - 32410:32410/udp # current GDM network discovery
-  #     - 32412:32412/udp # current GDM network discovery
-  #     - 32413:32413/udp # current GDM network discovery
-  #     - 32414:32414/udp # current GDM network discovery
-  #     - 32469:32469/tcp # access to the Plex DLNA Server
-  #   expose:
-  #     - 32400 # access to the Plex Media Server
-  #   environment:
-  #     - TZ=${TZ}
-  #     - PLEX_CLAIM=${PLEX_CLAIM}
-  #     - ADVERTISE_IP=http://${STATIC_IP}:32400/
-  #   volumes:
-  #     - /home/pi/plex/config:/config # not tracked in git
-  #     - nas:/data
+  plex:
+    image: plexinc/pms-docker
+    container_name: plex
+    restart: unless-stopped
+    ports:
+      #- 1900:1900/udp # access to the Plex DLNA Server
+      - 32400:32400/tcp # access to the Plex Media Server
+      - 32410:32410/udp # current GDM network discovery
+      - 32412:32412/udp # current GDM network discovery
+      - 32413:32413/udp # current GDM network discovery
+      - 32414:32414/udp # current GDM network discovery
+      - 32469:32469/tcp # access to the Plex DLNA Server
+    expose:
+      - 32400 # access to the Plex Media Server
+    environment:
+      - TZ=${TZ}
+      - ADVERTISE_IP=http://${STATIC_IP}:32400/,https://plex.martinbjeldbak.com/
+      - PLEX_UID=${PUID}
+      - PLEX_GID=${PGID}
+      - PLEX_CLAIM=${PLEX_CLAIM}
+    volumes:
+      - ${DOCKER_CONF_DIR}/plex/database:/config
+      - ${DOCKER_CONF_DIR}/plex/transcode:/transcode
+      - /volume1/data/media:/data
+    devices:
+      - /dev/dri:/dev/dri # optional: Synology w/ Intel CPU and quicksync for hardware encoding
 
-  # radarr:
-  #   image: ghcr.io/linuxserver/radarr
-  #   container_name: radarr
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ=${TZ}
-  #   expose:
-  #     - 7878
-  #   restart: unless-stopped
-  #   volumes:
-  #     - /home/pi/radarr/config:/config # not tracked in git
-  #     - nas:/movies
-  #     - nas:/downloads
+  radarr:
+    image: ghcr.io/linuxserver/radarr
+    container_name: radarr
+    expose:
+      - 7878
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKER_CONF_DIR}/radarr:/config
+      - /volume1/data/:/data
 
-  # sonarr:
-  #   image: ghcr.io/linuxserver/sonarr
-  #   container_name: sonarr
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ=${TZ}
-  #   expose:
-  #     - 8989
-  #   restart: unless-stopped
-  #   volumes:
-  #     - /home/pi/sonarr/config:/config # not tracked in git
-  #     - nas:/tv
-  #     - nas:/downloads
+  sonarr:
+    image: ghcr.io/linuxserver/sonarr
+    container_name: sonarr
+    expose:
+      - 8989
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    restart: unless-stopped
+    volumes:
+      - ${DOCKER_CONF_DIR}/sonarr:/config
+      - /volume1/data/:/data
 
-  # bazarr:
-  #   image: ghcr.io/linuxserver/bazarr
-  #   container_name: bazarr
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ=${TZ}
-  #   expose:
-  #     - 6767
-  #   restart: unless-stopped
-  #   volumes:
-  #     - ./bazarr:/config
-  #     - nas:/movies
-  #     - nas:/tv
+  bazarr:
+    image: ghcr.io/linuxserver/bazarr
+    container_name: bazarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    expose:
+      - 6767
+    restart: unless-stopped
+    volumes:
+      - ${DOCKER_CONF_DIR}/bazarr:/config
+      - /volume1/data/media:/data
+
+  transmission:
+     image: ghcr.io/linuxserver/transmission
+     container_name: transmission
+     restart: unless-stopped
+     environment:
+       - PUID=${PUID}
+       - PGID=${PGID}
+       - TZ=${TZ}
+       - USER=${TRANSMISSION_USERNAME}
+       - PASS=${TRANSMISSION_PASSWORD}
+     volumes:
+       - ./transmission:/config
+       - /volume1/data/downloads/torrents:/data/downloads/torrents
+     ports:
+       - 51413:51413/tcp
+       - 51413:51413/udp
+     expose:
+       - 9091
 
   caddy:
     build:
@@ -119,37 +143,69 @@ services:
       dockerfile: caddy.Dockerfile
     container_name: caddy
     ports:
-      - 80:80 # for HTTP -> HTTPS redirect
-      - 443:443
+      - 4443:443
     restart: unless-stopped
+    environment:
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
-      - /home/pi/caddy/config:/config
-      - /home/pi/caddy/data:/data
-    environment:
-      - CADDYUID=1000
-      - CADDYGID=1000
-      - TZ=${TZ}
-    env_file:
-      - .caddy.env
+      - ${DOCKER_CONF_DIR}/caddy/config:/config
+      - ${DOCKER_CONF_DIR}/caddy/data:/data
     healthcheck:
       test: ["CMD", "caddy", "version"]
-    extra_hosts:
-      - 'transmission:${NAS_IP}'
 
   portainer:
-    image: portainer/portainer-ce:latest
+    image: portainer/portainer-ce
     container_name: portainer
     restart: unless-stopped
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock
+      - ${DOCKER_CONF_DIR}/portainer:/data
     ports:
       - 9000:9000
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
 
-volumes:
-  nas:
-    driver_opts:
-      type: cifs
-      device: //${NAS_IP}/media
-      o: "addr=${NAS_IP},username=${NAS_USERNAME},password=${NAS_PASSWORD},file_mode=0777,dir_mode=0777"
+  unpackerr:
+    image: golift/unpackerr
+    container_name: unpackerr
+    volumes:
+      - /volume1/data/downloads:/data/downloads
+    restart: always
+    user: ${PUID}:${PGID}
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+
+      # Sonarr config
+      - UN_SONARR_0_URL=http://sonarr:8989
+      - UN_SONARR_0_API_KEY=${SONARR_API_KEY}
+      - UN_SONARR_0_PATHS_0=/data/downloads/torrents/complete
+
+      # Radarr config
+      - UN_RADARR_0_URL=http://radarr:7878
+      - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
+      - UN_RADARR_0_PATHS_0=/data/downloads/torrents/complete
+
+    security_opt:
+      - no-new-privileges:true
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - /etc/localtime:/etc/localtime:ro
+      - WATCHTOWER_NOTIFICATIONS=shoutrrr
+      - WATCHTOWER_NOTIFICATION_URL=${DISCORD_NOTIFICATION_URL}
+      - WATCHTOWER_MONITOR_ONLY=true
