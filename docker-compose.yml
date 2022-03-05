@@ -1,5 +1,5 @@
 ---
-version: "3"
+version: "3.1"
 
 services:
   adguardhome:
@@ -165,8 +165,8 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - ${DOCKER_CONF_DIR}/portainer:/data
-    ports:
-      - 9000:9000
+    expose:
+      - 9000
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
@@ -200,7 +200,6 @@ services:
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
-    restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro
@@ -209,3 +208,43 @@ services:
       - WATCHTOWER_NOTIFICATIONS=shoutrrr
       - WATCHTOWER_NOTIFICATION_URL=${DISCORD_NOTIFICATION_URL}
       - WATCHTOWER_MONITOR_ONLY=true
+    command: --schedule "0 0 3 * * ?"
+
+  db:
+    image: postgres:14.2-alpine
+    container_name: postgres
+    ports:
+      - 5431:5432
+    restart: always
+    volumes:
+      - ${DOCKER_CONF_DIR}/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+  huginn:
+    build:
+      context: .
+      dockerfile: huginn.Dockerfile
+    container_name: huginn
+    restart: always
+    expose:
+      - 3000
+    environment:
+      - TIMEZONE=${HUGINN_TIMEZONE}
+      - EMAIL_FROM_ADDRESS=${HUGINN_EMAIL_FROM_ADDRESS}
+      - SMTP_DOMAIN=${HUGINN_SMTP_DOMAIN}
+      - SMTP_PASSWORD=${HUGINN_SMTP_PASSWORD}
+      - INVITATION_CODE=${HUGINN_INVITATION_CODE}
+      - SMTP_USER_NAME=${SMTP_USER_NAME}
+      - SMTP_SERVER=${SMTP_SERVER}
+      - SMTP_PORT=465
+      - SMTP_SSL=true
+      - SMTP_AUTHENTICATION=plain
+      - ENABLE_INSECURE_AGENTS=true # trust all users
+      #- SCHEDULER_FREQUENCY=1
+      - DATABASE_ADAPTER=postgresql
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
+      - DATABASE_HOST=db
+    depends_on:
+      - db
