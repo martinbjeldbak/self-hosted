@@ -213,8 +213,6 @@ services:
   db:
     image: postgres:14.2-alpine
     container_name: postgres
-    ports:
-      - 5431:5432
     restart: always
     volumes:
       - ${DOCKER_CONF_DIR}/postgres:/var/lib/postgresql/data
