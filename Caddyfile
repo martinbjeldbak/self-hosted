@@ -1,92 +1,91 @@
-*.martinbjeldbak.com {
-  tls me@martinbjeldbak.com {
-    dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-  }
+*.{env.SITE_ADDRESS}
 
-  log {
-    output file /data/access.log
-  }
+tls me@{env.SITE_ADDRESS} {
+  dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+}
 
-  @dns host dns.martinbjeldbak.com
-  handle @dns {
-    reverse_proxy adguardhome:3000
+log {
+  output file /data/access.log
+}
 
-    encode gzip
-  }
+@dns host dns.{env.SITE_ADDRESS}
+handle @dns {
+  reverse_proxy adguardhome:3000
 
-  @homeassistant host homeassistant.martinbjeldbak.com
-  handle @homeassistant {
-    reverse_proxy homeassistant:8123
+  encode gzip
+}
 
-    encode gzip
-  }
+@homeassistant host homeassistant.{env.SITE_ADDRESS}
+handle @homeassistant {
+  reverse_proxy homeassistant:8123
 
-  @plex host plex.martinbjeldbak.com
-  handle @plex {
-    reverse_proxy plex:32400
+  encode gzip
+}
 
-    encode gzip
-  }
+@plex host plex.{env.SITE_ADDRESS}
+handle @plex {
+  reverse_proxy plex:32400
 
-  @jackett host jackett.martinbjeldbak.com
-  handle @jackett {
-    reverse_proxy jackett:9117
+  encode gzip
+}
 
-    encode gzip
-  }
+@jackett host jackett.{env.SITE_ADDRESS}
+handle @jackett {
+  reverse_proxy jackett:9117
 
-  @movies host movies.martinbjeldbak.com
-  handle @movies {
-    reverse_proxy radarr:7878
+  encode gzip
+}
 
-    encode gzip
-  }
+@radarr host movies.{env.SITE_ADDRESS}
+handle @radarr {
+  reverse_proxy radarr:7878
 
-  @tv host tv.martinbjeldbak.com
-  handle @tv {
-    reverse_proxy sonarr:8989
+  encode gzip
+}
 
-    encode gzip
-  }
+@sonarr host tv.{env.SITE_ADDRESS}
+handle @sonarr {
+  reverse_proxy sonarr:8989
 
-  @torrents host torrents.martinbjeldbak.com
-  handle @torrents {
-    reverse_proxy transmission:9091
+  encode gzip
+}
 
-    encode gzip
-  }
+@transmission host torrents.{env.SITE_ADDRESS}
+handle @transmission {
+  reverse_proxy transmission:9091
 
-  @subtitles host subtitles.martinbjeldbak.com
-  handle @subtitles {
-    reverse_proxy bazarr:6767
+  encode gzip
+}
 
-    encode gzip
-  }
+@bazarr host subtitles.{env.SITE_ADDRESS}
+handle @bazarr {
+  reverse_proxy bazarr:6767
 
-  @portainer host portainer.martinbjeldbak.com
-  handle @portainer {
-    reverse_proxy portainer:9000
+  encode gzip
+}
 
-    encode gzip
-  }
+@portainer host portainer.{env.SITE_ADDRESS}
+handle @portainer {
+  reverse_proxy portainer:9000
 
-  @huginn host h.martinbjeldbak.com
-  handle @huginn {
-    reverse_proxy huginn:3000
+  encode gzip
+}
 
-    encode gzip
-  }
+@huginn host h.{env.SITE_ADDRESS}
+handle @huginn {
+  reverse_proxy huginn:3000
 
-  @nas host nas.martinbjeldbak.com
-  handle @nas {
-    reverse_proxy 192.168.1.250:5000
+  encode gzip
+}
 
-    encode gzip
-  }
+@nas host nas.{env.SITE_ADDRESS}
+handle @nas {
+  reverse_proxy 192.168.1.250:5000
 
+  encode gzip
+}
 
-  # Fallback for otherwise unhandled domains
-  handle {
-    abort
-  }
+# Fallback for otherwise unhandled domains
+handle {
+  abort
 }

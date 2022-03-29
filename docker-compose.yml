@@ -76,6 +76,15 @@ services:
     devices:
       - /dev/dri:/dev/dri # optional: Synology w/ Intel CPU and quicksync for hardware encoding
 
+  plextraktsync:
+    image: ghcr.io/taxel/plextraktsync
+    container_name: plextraktsync
+    restart: always
+    volumes:
+      - ${DOCKER_CONF_DIR}/plextraktsync:/app/config
+    depends_on:
+      - plex
+
   radarr:
     image: ghcr.io/linuxserver/radarr
     container_name: radarr
@@ -147,6 +156,7 @@ services:
     restart: unless-stopped
     environment:
       - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
+      - SITE_ADDRESS=${CADDY_HOSTNAME}
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
@@ -208,7 +218,7 @@ services:
       - WATCHTOWER_NOTIFICATIONS=shoutrrr
       - WATCHTOWER_NOTIFICATION_URL=${DISCORD_NOTIFICATION_URL}
       - WATCHTOWER_MONITOR_ONLY=true
-    command: --schedule "0 0 3 * * ?"
+    command: --schedule "0 0 3 * * ?" # run at 3am
 
   db:
     image: postgres:14.2-alpine
