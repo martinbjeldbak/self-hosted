@@ -85,6 +85,17 @@ services:
     depends_on:
       - plex
 
+  plex-meta-manager:
+    image: meisnate12/plex-meta-manager
+    container_name: plex-meta-manager
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKER_CONF_DIR}/plex-meta-manager:/config
+    depends_on:
+      - plex
+
   radarr:
     image: ghcr.io/linuxserver/radarr
     container_name: radarr
@@ -167,20 +178,20 @@ services:
     healthcheck:
       test: ["CMD", "caddy", "version"]
 
-  portainer:
-    image: portainer/portainer-ce
-    container_name: portainer
-    restart: unless-stopped
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ${DOCKER_CONF_DIR}/portainer:/data
-    expose:
-      - 9000
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+  # portainer:
+  #   image: portainer/portainer-ce
+  #   container_name: portainer
+  #   restart: unless-stopped
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - ${DOCKER_CONF_DIR}/portainer:/data
+  #   expose:
+  #     - 9000
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
 
   unpackerr:
     image: golift/unpackerr
