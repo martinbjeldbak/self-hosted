@@ -91,6 +91,7 @@ services:
     restart: unless-stopped
     environment:
       - TZ=${TZ}
+      - PMM_TIME=02:00,15:00
     volumes:
       - ${DOCKER_CONF_DIR}/plex-meta-manager:/config
     depends_on:
