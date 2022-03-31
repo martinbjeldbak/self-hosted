@@ -139,23 +139,23 @@ services:
       - /volume1/data:/data
 
   transmission:
-     image: ghcr.io/linuxserver/transmission
-     container_name: transmission
-     restart: unless-stopped
-     environment:
-       - PUID=${PUID}
-       - PGID=${PGID}
-       - TZ=${TZ}
-       - USER=${TRANSMISSION_USERNAME}
-       - PASS=${TRANSMISSION_PASSWORD}
-     volumes:
-       - ./transmission:/config
-       - /volume1/data/downloads/torrents:/data/downloads/torrents
-     ports:
-       - 51413:51413/tcp
-       - 51413:51413/udp
-     expose:
-       - 9091
+    image: ghcr.io/linuxserver/transmission
+    container_name: transmission
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - USER=${TRANSMISSION_USERNAME}
+      - PASS=${TRANSMISSION_PASSWORD}
+    volumes:
+      - ${DOCKER_CONF_DIR}/transmission:/config
+      - /volume1/data/downloads/torrents:/data/downloads/torrents
+    ports:
+      - 51413:51413/tcp
+      - 51413:51413/udp
+    expose:
+      - 9091
 
   caddy:
     build:
