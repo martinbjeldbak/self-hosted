@@ -80,7 +80,6 @@ services:
   plextraktsync:
     image: ghcr.io/taxel/plextraktsync
     container_name: plextraktsync
-    restart: always
     volumes:
       - ${DOCKER_CONF_DIR}/plextraktsync:/app/config
     depends_on:
@@ -125,6 +124,19 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/sonarr:/config
       - /volume1/data/:/data
+
+  tautulli:
+    image: tautulli/tautulli
+    container_name: tautulli
+    restart: unless-stopped
+    volumes:
+      - ${DOCKER_CONF_DIR}/tautulli:/config
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    expose:
+      - 8181
 
   bazarr:
     image: ghcr.io/linuxserver/bazarr

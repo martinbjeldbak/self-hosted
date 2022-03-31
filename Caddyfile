@@ -85,6 +85,13 @@ handle @nas {
   encode gzip
 }
 
+@tautulli host tautulli.{env.SITE_ADDRESS}
+handle @tautulli {
+  reverse_proxy tautulli:8181
+
+  encode gzip
+}
+
 # Fallback for otherwise unhandled domains
 handle {
   abort
