@@ -46,7 +46,7 @@ services:
       - 9117
     restart: unless-stopped
     volumes:
-      - ./jackett/config:/config # not tracked in git
+      - ${DOCKER_CONF_DIR}/jackett/config:/config
       - /volume1/data/downloads:/downloads
 
   plex:
@@ -136,7 +136,7 @@ services:
     restart: unless-stopped
     volumes:
       - ${DOCKER_CONF_DIR}/bazarr:/config
-      - /volume1/data/media:/data
+      - /volume1/data:/data
 
   transmission:
      image: ghcr.io/linuxserver/transmission
