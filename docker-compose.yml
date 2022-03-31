@@ -15,8 +15,8 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - ${DOCKER_CONF_DIR}/adguardhome:/opt/adguardhome/work
-      - ./adguardhome:/opt/adguardhome/conf
+      - ${DOCKER_CONF_DIR}/adguardhome/work:/opt/adguardhome/work
+      - ${DOCKER_CONF_DIR}/adguardhome/conf:/opt/adguardhome/conf
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
 
