@@ -152,22 +152,34 @@ services:
       - ${DOCKER_CONF_DIR}/bazarr:/config
       - /volume1/data:/data
 
-  transmission:
-    image: ghcr.io/linuxserver/transmission
-    container_name: transmission
-    restart: unless-stopped
+  transmission-openvpn:
+    image: haugene/transmission-openvpn
+    container_name: transmission-openvpn
+    cap_add:
+      - net_admin # required to modify network intrfaces
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0 # see https://haugene.github.io/docker-transmission-openvpn/provider-specific/#mullvad
     environment:
+      - CREATE_TUN_DEVICE=true
+      - OPENVPN_PROVIDER=MULLVAD
+      - OPENVPN_USERNAME=${MULLVAD_USERNAME}
+      - OPENVPN_PASSWORD=m
+      - OPENVPN_CONFIG=au_mel
+      - OPENVPN_OPTS=--inactive 3600 --ping 10 --ping-exit 60
+      - LOCAL_NETWORK=192.168.1.0/24
+      - TRANSMISSION_RPC_USERNAME=${TRANSMISSION_USERNAME}
+      - TRANSMISSION_RPC_PASSWORD=${TRANSMISSION_PASSWORD}
+      - TRANSMISSION_RPC_AUTHENTICATION_REQUIRED=true
       - PUID=${PUID}
       - PGID=${PGID}
-      - TZ=${TZ}
-      - USER=${TRANSMISSION_USERNAME}
-      - PASS=${TRANSMISSION_PASSWORD}
     volumes:
-      - ${DOCKER_CONF_DIR}/transmission:/config
-      - /volume1/data/downloads/torrents:/data/downloads/torrents
-    ports:
-      - 51413:51413/tcp
-      - 51413:51413/udp
+      - ${DOCKER_CONF_DIR}/transmission-openvpn:/data/transmission-home
+      - /volume1/data/downloads/torrents/completed:/data/completed
+      - /volume1/data/downloads/torrents/incomplete:/data/incomplete
+      - /volume1/data/downloads/torrents/watch:/data/watch
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
     expose:
       - 9091
 
