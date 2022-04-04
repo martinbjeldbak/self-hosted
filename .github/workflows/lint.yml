@@ -19,20 +19,6 @@ jobs:
         uses: github/super-linter@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_ANSIBLE: false # see currently open issue https://github.com/github/super-linter/issues/1671
-          FILTER_REGEX_EXCLUDE: 'adguardhome/AdGuardHome.tpl.yaml'
-
-  ansible-lint:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Run ansible lint
-        uses: ansible/ansible-lint-action@master
-        with:
-          targets: 'playbook.yml'
 
   homeassistant-config:
     runs-on: ubuntu-latest
@@ -48,7 +34,7 @@ jobs:
       - name: Install python
         uses: actions/setup-python@v1
         with:
-          python-version: '3.x'
+          python-version: '3.9'
 
       - name: Install dependencies
         run: pip install homeassistant
