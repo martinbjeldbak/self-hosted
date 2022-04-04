@@ -29,14 +29,19 @@ flowchart TB
     J[Jackett]-->T[Torrent\nindexers]
     O-->V[VPN Server]
     V-->B[Bittorrent\nPeers]
+    subgraph media metadata
     PTS-->TR[Trakt.tv]
     PMM-->TR
-    PMM-->RT[Rotten Tomatoes]
+    PMM-->RT[Rotten\nTomatoes]
     PMM-->IMDB[IMDb]
+    end
+
+    subgraph subtitle providers
     BARR-->OS[Opensubtitles]
     BARR-->addic7ed
     BARR-->subscene
     BARR-->podnapisi
+    end
 
     subgraph other
     AH[AdGuard\nHome]
