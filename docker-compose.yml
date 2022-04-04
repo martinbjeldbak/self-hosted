@@ -150,7 +150,7 @@ services:
     restart: unless-stopped
     volumes:
       - ${DOCKER_CONF_DIR}/bazarr:/config
-      - /volume1/data:/data
+      - /volume1/data/media:/data/media
 
   transmission:
     image: haugene/transmission-openvpn
