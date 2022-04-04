@@ -74,9 +74,9 @@ services:
       - ${DOCKER_CONF_DIR}/plex/transcode:/transcode
       - /volume1/data/media:/data
     devices:
-      - /dev/dri:/dev/dri # Synology w/ Intel CPU and quicksync for hardware encoding
+      - /dev/dri:/dev/dri # Synology w/ Intel CPU for hardware encoding
 
-  # NOTE: this is a once-off task and is meant to run on schedule, e.g. with cron
+  # NOTE: this is a once-off task and runs using cron
   plextraktsync:
     image: ghcr.io/taxel/plextraktsync
     container_name: plextraktsync
@@ -158,7 +158,8 @@ services:
     cap_add:
       - net_admin # required to modify network intrfaces
     sysctls:
-      - net.ipv6.conf.all.disable_ipv6=0 # see https://haugene.github.io/docker-transmission-openvpn/provider-specific/#mullvad
+      # see https://haugene.github.io/docker-transmission-openvpn/provider-specific/#mullvad
+      - net.ipv6.conf.all.disable_ipv6=0
     environment:
       - OPENVPN_PROVIDER=MULLVAD
       - OPENVPN_USERNAME=${MULLVAD_USERNAME}
