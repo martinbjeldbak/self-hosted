@@ -19,17 +19,30 @@ flowchart TB
     D<-.->L[Library\ndirectory]
     P[Plex Media\nServer]-->L
     *arrs-.-> L & D
+    PTS[plextraktsync]-->P
+    PMM[plex-meta-manager]-->P
+    TAUT[Tautulli]-->P
     end
 
     J[Jackett]-->T[Torrent\nindexers]
     O-->V[VPN Server]
     V-->B[Bittorrent\nPeers]
+    PTS-->TR[Trakt.tv]
+    PMM-->TR
+    PMM-->RT[Rotten Tomatoes]
+    PMM-->IMDB[IMDb]
+
+    subgraph other
+    A[AdGuard\nHome]
+    H[Huginn]
+    HA[Home\nAssistant]
+    end
 
     linkStyle 3,4,5,6,7 stroke:blue;
     classDef internet stroke:#f66;
     classDef folder stroke:blue,fill:none,stroke-dasharray: 5 5;
     class L,D folder
-    class T,V,B internet
+    class T,V,B,TR,RT,IMDB internet
 ```
 
 * [Portainer](https://github.com/portainer/portainer) - UI to help manage containers
