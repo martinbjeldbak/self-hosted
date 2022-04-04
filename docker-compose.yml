@@ -161,7 +161,6 @@ services:
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0 # see https://haugene.github.io/docker-transmission-openvpn/provider-specific/#mullvad
     environment:
-      - CREATE_TUN_DEVICE=true
       - OPENVPN_PROVIDER=MULLVAD
       - OPENVPN_USERNAME=${MULLVAD_USERNAME}
       - OPENVPN_PASSWORD=m
@@ -171,13 +170,14 @@ services:
       - TRANSMISSION_RPC_USERNAME=${TRANSMISSION_USERNAME}
       - TRANSMISSION_RPC_PASSWORD=${TRANSMISSION_PASSWORD}
       - TRANSMISSION_RPC_AUTHENTICATION_REQUIRED=true
+      - TRANSMISSION_DOWNLOAD_DIR=/data/downloads/torrents/completed
+      - TRANSMISSION_INCOMPLETE_DIR=/data/downloads/torrents/incomplete
+      - TRANSMISSION_WATCH_DIR=/data/downloads/torrents/watch
       - PUID=${PUID}
       - PGID=${PGID}
     volumes:
       - ${DOCKER_CONF_DIR}/transmission-openvpn:/data/transmission-home
-      - /volume1/data/downloads/torrents/completed:/data/completed
-      - /volume1/data/downloads/torrents/incomplete:/data/incomplete
-      - /volume1/data/downloads/torrents/watch:/data/watch
+      - /volume1/data/downloads/torrents:/data/downloads/torrents
     dns:
       - 1.1.1.1
       - 1.0.0.1
