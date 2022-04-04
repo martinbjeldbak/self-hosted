@@ -13,15 +13,17 @@ flowchart TB
     end
     *arrs-->J
 
-    *arrs-->G[Transmission]
-    G-->O[OpenVPN Client]
-    G-.->D[Download\ndirectory]
+    *arrs-->TM[Transmission]
+    TM-->O[OpenVPN Client]
+    TM-.->D[Download\ndirectory]
     D<-.->L[Library\ndirectory]
     P[Plex Media\nServer]-->L
     *arrs-.-> L & D
     PTS[plextraktsync]-->P
     PMM[plex-meta-manager]-->P
     TAUT[Tautulli]-->P
+    BARR[Bazarr]-->*arrs
+    U[Unpackerr]-->*arrs
     end
 
     J[Jackett]-->T[Torrent\nindexers]
@@ -31,18 +33,38 @@ flowchart TB
     PMM-->TR
     PMM-->RT[Rotten Tomatoes]
     PMM-->IMDB[IMDb]
+    BARR-->OS[Opensubtitles]
+    BARR-->addic7ed
+    BARR-->subscene
+    BARR-->podnapisi
 
     subgraph other
-    A[AdGuard\nHome]
+    AH[AdGuard\nHome]
     H[Huginn]
     HA[Home\nAssistant]
+    C[Caddy]
+    W[Watchtower]
+    PG[Postgres]
+
+    H-->PG
     end
+
+    C-->AH
+    C-->HA
+    C-->P
+    C-->J
+    C-->R
+    C-->S
+    C-->TM
+    C-->BARR
+    C-->H
+    C-->TAUT
 
     linkStyle 3,4,5,6,7 stroke:blue;
     classDef internet stroke:#f66;
     classDef folder stroke:blue,fill:none,stroke-dasharray: 5 5;
     class L,D folder
-    class T,V,B,TR,RT,IMDB internet
+    class T,V,B,TR,RT,IMDB,OS,addic7ed,subscene,podnapisi internet
 ```
 
 * [Portainer](https://github.com/portainer/portainer) - UI to help manage containers
