@@ -54,6 +54,8 @@ flowchart TB
     H-->PG
     end
 
+    W-->DISCORD[Discord]
+
     C-->AH
     C-->HA
     C-->P
@@ -69,7 +71,7 @@ flowchart TB
     classDef internet stroke:#f66;
     classDef folder stroke:blue,fill:none,stroke-dasharray: 5 5;
     class L,D folder
-    class T,V,B,TR,RT,IMDB,OS,addic7ed,subscene,podnapisi internet
+    class T,V,B,TR,RT,IMDB,OS,addic7ed,subscene,podnapisi,DISCORD internet
 ```
 
 * [Portainer](https://github.com/portainer/portainer) - UI to help manage containers
