@@ -1,10 +1,36 @@
-# Martin's Raspberry Pi Setup
+# Martin's Self-hosting setup
 [![Lint](https://github.com/martinbjeldbak/raspberry-pi/actions/workflows/lint.yml/badge.svg)](https://github.com/martinbjeldbak/raspberry-pi/actions/workflows/lint.yml)
 
-Inspired by Ben Balter's [blog](https://ben.balter.com/2020/12/04/over-engineered-home-network-for-privacy-and-security/) [posts](https://ben.balter.com/2021/09/01/how-i-re-over-engineered-my-home-network/) and his repository [benbalter/pi-hole-cloudflared-docker-compose-ansible-caddy](https://github.com/benbalter/pi-hole-cloudflared-docker-compose-ansible-caddy).
-I also wanted to keep a version controlled copy of my existing configuration on my Raspberry Pi 3 Model B.
+Inspired by Ben Balter's [blog](https://ben.balter.com/2020/12/04/over-engineered-home-network-for-privacy-and-security/) [posts](https://ben.balter.com/2021/09/01/how-i-re-over-engineered-my-home-network/) and his repository [benbalter/pi-hole-cloudflared-docker-compose-ansible-caddy](https://github.com/benbalter/pi-hole-cloudflared-docker-compose-ansible-caddy) and <https://github.com/sebgl/htpc-download-box>
 
-My personal configuration of Raspberry Pi running
+```mermaid
+flowchart TB
+    subgraph HTPC/Download Server
+    subgraph *arrs
+    direction TB
+    S[Sonarr]
+    R[Radarr]
+    end
+    *arrs-->J
+
+    *arrs-->G[Transmission]
+    G-->O[OpenVPN Client]
+    G-.->D[Download\ndirectory]
+    D<-.->L[Library\ndirectory]
+    P[Plex Media\nServer]-->L
+    *arrs-.-> L & D
+    end
+
+    J[Jackett]-->T[Torrent\nindexers]
+    O-->V[VPN Server]
+    V-->B[Bittorrent\nPeers]
+
+    linkStyle 3,4,5,6,7 stroke:blue;
+    classDef internet stroke:#f66;
+    classDef folder stroke:blue,fill:none,stroke-dasharray: 5 5;
+    class L,D folder
+    class T,V,B internet
+```
 
 * [Portainer](https://github.com/portainer/portainer) - UI to help manage containers
 * [Adguard Home](https://github.com/AdguardTeam/AdGuardHome) - self-hosted DNS server with ad-blocking
