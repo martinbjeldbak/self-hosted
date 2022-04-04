@@ -50,11 +50,11 @@ services:
       - /volume1/data/downloads:/downloads
 
   plex:
-    image: plexinc/pms-docker
+    image: ghcr.io/linuxserver/plex
     container_name: plex
     restart: unless-stopped
     ports:
-      #- 1900:1900/udp # access to the Plex DLNA Server
+      #- 1900:1900/udp   # access to the Plex DLNA Server # NOTE: already in use
       - 32400:32400/tcp # access to the Plex Media Server
       - 32410:32410/udp # current GDM network discovery
       - 32412:32412/udp # current GDM network discovery
@@ -65,9 +65,9 @@ services:
       - 32400 # access to the Plex Media Server
     environment:
       - TZ=${TZ}
-      - ADVERTISE_IP=http://${STATIC_IP}:32400/,https://plex.martinbjeldbak.com/
-      - PLEX_UID=${PUID}
-      - PLEX_GID=${PGID}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - VERSION=docker
       - PLEX_CLAIM=${PLEX_CLAIM}
     volumes:
       - ${DOCKER_CONF_DIR}/plex/database:/config
@@ -153,21 +153,33 @@ services:
       - /volume1/data:/data
 
   transmission:
-    image: ghcr.io/linuxserver/transmission
+    image: haugene/transmission-openvpn
     container_name: transmission
-    restart: unless-stopped
+    cap_add:
+      - net_admin # required to modify network intrfaces
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0 # see https://haugene.github.io/docker-transmission-openvpn/provider-specific/#mullvad
     environment:
+      - OPENVPN_PROVIDER=MULLVAD
+      - OPENVPN_USERNAME=${MULLVAD_USERNAME}
+      - OPENVPN_PASSWORD=m
+      - OPENVPN_CONFIG=au_mel
+      - OPENVPN_OPTS=--inactive 3600 --ping 10 --ping-exit 60
+      - LOCAL_NETWORK=192.168.1.0/24
+      - TRANSMISSION_RPC_USERNAME=${TRANSMISSION_USERNAME}
+      - TRANSMISSION_RPC_PASSWORD=${TRANSMISSION_PASSWORD}
+      - TRANSMISSION_RPC_AUTHENTICATION_REQUIRED=true
+      - TRANSMISSION_DOWNLOAD_DIR=/data/downloads/torrents/completed
+      - TRANSMISSION_INCOMPLETE_DIR=/data/downloads/torrents/incomplete
+      - TRANSMISSION_WATCH_DIR=/data/downloads/torrents/watch
       - PUID=${PUID}
       - PGID=${PGID}
-      - TZ=${TZ}
-      - USER=${TRANSMISSION_USERNAME}
-      - PASS=${TRANSMISSION_PASSWORD}
     volumes:
-      - ${DOCKER_CONF_DIR}/transmission:/config
+      - ${DOCKER_CONF_DIR}/transmission-openvpn:/data/transmission-home
       - /volume1/data/downloads/torrents:/data/downloads/torrents
-    ports:
-      - 51413:51413/tcp
-      - 51413:51413/udp
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
     expose:
       - 9091
 
@@ -222,12 +234,12 @@ services:
       # Sonarr config
       - UN_SONARR_0_URL=http://sonarr:8989
       - UN_SONARR_0_API_KEY=${SONARR_API_KEY}
-      - UN_SONARR_0_PATHS_0=/data/downloads/torrents/complete
+      - UN_SONARR_0_PATHS_0=/data/downloads/torrents/completed
 
       # Radarr config
       - UN_RADARR_0_URL=http://radarr:7878
       - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
-      - UN_RADARR_0_PATHS_0=/data/downloads/torrents/complete
+      - UN_RADARR_0_PATHS_0=/data/downloads/torrents/completed
 
     security_opt:
       - no-new-privileges:true
