@@ -65,7 +65,6 @@ services:
       - 32400 # access to the Plex Media Server
     environment:
       - TZ=${TZ}
-      - ADVERTISE_IP=http://${STATIC_IP}:32400/,https://plex.martinbjeldbak.com/
       - PUID=${PUID}
       - PGID=${PGID}
       - VERSION=docker
