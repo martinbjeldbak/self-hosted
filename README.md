@@ -1,5 +1,5 @@
 # Martin's Self-hosting setup
-[![Lint](https://github.com/martinbjeldbak/raspberry-pi/actions/workflows/lint.yml/badge.svg)](https://github.com/martinbjeldbak/raspberry-pi/actions/workflows/lint.yml)
+[![Lint](https://github.com/martinbjeldbak/self-hosting/actions/workflows/lint.yml/badge.svg)](https://github.com/martinbjeldbak/self-hosting/actions/workflows/lint.yml)
 
 Inspired by Ben Balter's [blog](https://ben.balter.com/2020/12/04/over-engineered-home-network-for-privacy-and-security/) [posts](https://ben.balter.com/2021/09/01/how-i-re-over-engineered-my-home-network/) and his repository [benbalter/pi-hole-cloudflared-docker-compose-ansible-caddy](https://github.com/benbalter/pi-hole-cloudflared-docker-compose-ansible-caddy) and <https://github.com/sebgl/htpc-download-box>
 
