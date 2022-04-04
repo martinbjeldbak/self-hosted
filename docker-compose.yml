@@ -50,11 +50,11 @@ services:
       - /volume1/data/downloads:/downloads
 
   plex:
-    image: plexinc/pms-docker
+    image: ghcr.io/linuxserver/plex
     container_name: plex
     restart: unless-stopped
     ports:
-      #- 1900:1900/udp # access to the Plex DLNA Server
+      #- 1900:1900/udp   # access to the Plex DLNA Server # NOTE: already in use
       - 32400:32400/tcp # access to the Plex Media Server
       - 32410:32410/udp # current GDM network discovery
       - 32412:32412/udp # current GDM network discovery
@@ -66,8 +66,9 @@ services:
     environment:
       - TZ=${TZ}
       - ADVERTISE_IP=http://${STATIC_IP}:32400/,https://plex.martinbjeldbak.com/
-      - PLEX_UID=${PUID}
-      - PLEX_GID=${PGID}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - VERSION=docker
       - PLEX_CLAIM=${PLEX_CLAIM}
     volumes:
       - ${DOCKER_CONF_DIR}/plex/database:/config
@@ -152,9 +153,9 @@ services:
       - ${DOCKER_CONF_DIR}/bazarr:/config
       - /volume1/data:/data
 
-  transmission-openvpn:
+  transmission:
     image: haugene/transmission-openvpn
-    container_name: transmission-openvpn
+    container_name: transmission
     cap_add:
       - net_admin # required to modify network intrfaces
     sysctls:
@@ -234,12 +235,12 @@ services:
       # Sonarr config
       - UN_SONARR_0_URL=http://sonarr:8989
       - UN_SONARR_0_API_KEY=${SONARR_API_KEY}
-      - UN_SONARR_0_PATHS_0=/data/downloads/torrents/complete
+      - UN_SONARR_0_PATHS_0=/data/downloads/torrents/completed
 
       # Radarr config
       - UN_RADARR_0_URL=http://radarr:7878
       - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
-      - UN_RADARR_0_PATHS_0=/data/downloads/torrents/complete
+      - UN_RADARR_0_PATHS_0=/data/downloads/torrents/completed
 
     security_opt:
       - no-new-privileges:true
