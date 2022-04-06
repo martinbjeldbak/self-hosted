@@ -287,7 +287,6 @@ services:
       - SMTP_SSL=true
       - SMTP_AUTHENTICATION=plain
       - ENABLE_INSECURE_AGENTS=true # trust all users
-      #- SCHEDULER_FREQUENCY=1
       - DATABASE_ADAPTER=postgresql
       - DATABASE_USERNAME=postgres
       - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
