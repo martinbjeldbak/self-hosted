@@ -193,7 +193,7 @@ services:
       - USER=${TRANSMISSION_USERNAME}
       - PASS=${TRANSMISSION_PASSWORD}
     volumes:
-      - ${DOCKER_CONF_DIR}/transmission-v2:/config
+      - ${DOCKER_CONF_DIR}/transmission:/config
       - /volume1/data/downloads/torrents:/data/downloads/torrents
 
   caddy:
