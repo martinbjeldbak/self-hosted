@@ -31,7 +31,7 @@ handle @plex {
 
 @jackett host jackett.{$SITE_ADDRESS}
 handle @jackett {
-	reverse_proxy jackett:9117
+	reverse_proxy gluetun:9117
 
 	encode gzip
 }
@@ -52,7 +52,7 @@ handle @sonarr {
 
 @transmission host torrents.{$SITE_ADDRESS}
 handle @transmission {
-	reverse_proxy transmission:9091
+	reverse_proxy gluetun:9091
 
 	encode gzip
 }

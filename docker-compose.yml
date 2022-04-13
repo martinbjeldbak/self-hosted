@@ -1,5 +1,5 @@
 ---
-version: "3.1"
+version: "3"
 
 services:
   adguardhome:
@@ -37,13 +37,12 @@ services:
   jackett:
     image: ghcr.io/linuxserver/jackett
     container_name: jackett
+    network_mode: "service:gluetun"
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
       - AUTO_UPDATE=true
-    expose:
-      - 9117
     restart: unless-stopped
     volumes:
       - ${DOCKER_CONF_DIR}/jackett/config:/config
@@ -152,37 +151,51 @@ services:
       - ${DOCKER_CONF_DIR}/bazarr:/config
       - /volume1/data/media:/data/media
 
-  transmission:
-    image: haugene/transmission-openvpn
-    container_name: transmission
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: gluetun
+    restart: always
     cap_add:
-      - net_admin # required to modify network intrfaces
-    sysctls:
-      # see https://haugene.github.io/docker-transmission-openvpn/provider-specific/#mullvad
-      - net.ipv6.conf.all.disable_ipv6=0
+      - net_admin
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - ${DOCKER_CONF_DIR}/gluetun:/gluetun
     environment:
-      - OPENVPN_PROVIDER=MULLVAD
-      - OPENVPN_USERNAME=${MULLVAD_USERNAME}
-      - OPENVPN_PASSWORD=m
-      - OPENVPN_CONFIG=au_mel
-      - OPENVPN_OPTS=--inactive 3600 --ping 10 --ping-exit 60
-      - LOCAL_NETWORK=192.168.1.0/24
-      - TRANSMISSION_RPC_USERNAME=${TRANSMISSION_USERNAME}
-      - TRANSMISSION_RPC_PASSWORD=${TRANSMISSION_PASSWORD}
-      - TRANSMISSION_RPC_AUTHENTICATION_REQUIRED=true
-      - TRANSMISSION_DOWNLOAD_DIR=/data/downloads/torrents/completed
-      - TRANSMISSION_INCOMPLETE_DIR=/data/downloads/torrents/incomplete
-      - TRANSMISSION_WATCH_DIR=/data/downloads/torrents/watch
+      - VPN_SERVICE_PROVIDER=mullvad
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
+      - SERVER_CITIES=${GLUETUN_CITIES}
+      - FIREWALL_OUTBOUND_SUBNETS=192.168.1.0/24
+      - BLOCK_SURVEILLANCE=on
+      - BLOCK_MALICIOUS=on
+      - TZ=${TZ}
       - PUID=${PUID}
       - PGID=${PGID}
-    volumes:
-      - ${DOCKER_CONF_DIR}/transmission-openvpn:/data/transmission-home
-      - /volume1/data/downloads/torrents:/data/downloads/torrents
-    dns:
-      - 1.1.1.1
-      - 1.0.0.1
+
     expose:
-      - 9091
+      - 9091 # transmission
+      - 9117 # jackett
+    ports:
+      - 51413:51413/tcp # transmission
+      - 51413:51413/udp # transmission
+
+  transmission:
+    image: ghcr.io/linuxserver/transmission
+    container_name: transmission
+    restart: unless-stopped
+    network_mode: "service:gluetun"
+    environment:
+      - UMASK=022
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - USER=${TRANSMISSION_USERNAME}
+      - PASS=${TRANSMISSION_PASSWORD}
+    volumes:
+      - ${DOCKER_CONF_DIR}/transmission-v2:/config
+      - /volume1/data/downloads/torrents:/data/downloads/torrents
 
   caddy:
     build:
