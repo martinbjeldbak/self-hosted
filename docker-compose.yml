@@ -173,7 +173,6 @@ services:
       - TZ=${TZ}
       - PUID=${PUID}
       - PGID=${PGID}
-
     expose:
       - 9091 # transmission
       - 9117 # jackett
