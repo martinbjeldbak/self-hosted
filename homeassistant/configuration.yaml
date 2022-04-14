@@ -13,7 +13,7 @@ http:
 homeassistant:
   name: Home
   unit_system: metric
-  time_zone: Australia/Melbourne
+  time_zone: !secret tz
   latitude: !secret latitude
   longitude: !secret longitude
   currency: AUD
