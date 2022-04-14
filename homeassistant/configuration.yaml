@@ -26,11 +26,6 @@ light:
     entities:
       - light.living_room
       - light.hue_lightstrip
-  - platform: group
-    name: Bedroom
-    entities:
-      - light.martin_s_side
-      - light.nandar_s_side
 
 panel_iframe:
   nas:
