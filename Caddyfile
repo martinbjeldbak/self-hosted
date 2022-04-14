@@ -1,98 +1,105 @@
-*.{env.SITE_ADDRESS}
+*.{$SITE_ADDRESS}
 
-tls me@{env.SITE_ADDRESS} {
-  dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+tls me@{$SITE_ADDRESS} {
+	dns cloudflare {env.CLOUDFLARE_API_TOKEN}
 }
 
 log {
-  output file /data/access.log
+	output file /data/access.log
 }
 
-@dns host dns.{env.SITE_ADDRESS}
+@dns host dns.{$SITE_ADDRESS}
 handle @dns {
-  reverse_proxy adguardhome:3000
+	reverse_proxy adguardhome:3000
 
-  encode gzip
+	encode gzip
 }
 
-@homeassistant host homeassistant.{env.SITE_ADDRESS}
+@homeassistant host homeassistant.{$SITE_ADDRESS}
 handle @homeassistant {
-  reverse_proxy homeassistant:8123
+	reverse_proxy homeassistant:8123
 
-  encode gzip
+	encode gzip
 }
 
-@plex host plex.{env.SITE_ADDRESS}
+@plex host plex.{$SITE_ADDRESS}
 handle @plex {
-  reverse_proxy plex:32400
+	reverse_proxy plex:32400
 
-  encode gzip
+	encode gzip
 }
 
-@jackett host jackett.{env.SITE_ADDRESS}
+@jackett host jackett.{$SITE_ADDRESS}
 handle @jackett {
-  reverse_proxy jackett:9117
+	reverse_proxy gluetun:9117
 
-  encode gzip
+	encode gzip
 }
 
-@radarr host movies.{env.SITE_ADDRESS}
+@radarr host movies.{$SITE_ADDRESS}
 handle @radarr {
-  reverse_proxy radarr:7878
+	reverse_proxy radarr:7878
 
-  encode gzip
+	encode gzip
 }
 
-@sonarr host tv.{env.SITE_ADDRESS}
+@lidarr host music.{$SITE_ADDRESS}
+handle @lidarr {
+	reverse_proxy lidarr:8686
+
+	encode gzip
+}
+
+@sonarr host tv.{$SITE_ADDRESS}
 handle @sonarr {
-  reverse_proxy sonarr:8989
+	reverse_proxy sonarr:8989
 
-  encode gzip
+	encode gzip
 }
 
-@transmission host torrents.{env.SITE_ADDRESS}
+@transmission host torrents.{$SITE_ADDRESS}
 handle @transmission {
-  reverse_proxy transmission:9091
+	reverse_proxy gluetun:9091
 
-  encode gzip
+	encode gzip
 }
 
-@bazarr host subtitles.{env.SITE_ADDRESS}
+@bazarr host subtitles.{$SITE_ADDRESS}
 handle @bazarr {
-  reverse_proxy bazarr:6767
+	reverse_proxy bazarr:6767
 
-  encode gzip
+	encode gzip
 }
 
-@portainer host portainer.{env.SITE_ADDRESS}
+@portainer host portainer.{$SITE_ADDRESS}
 handle @portainer {
-  reverse_proxy portainer:9000
+	reverse_proxy portainer:9000
 
-  encode gzip
+	encode gzip
 }
 
-@huginn host h.{env.SITE_ADDRESS}
+@huginn host h.{$SITE_ADDRESS}
 handle @huginn {
-  reverse_proxy huginn:3000
+	reverse_proxy huginn:3000
 
-  encode gzip
+	encode gzip
 }
 
-@nas host nas.{env.SITE_ADDRESS}
+@nas host nas.{$SITE_ADDRESS}
 handle @nas {
-  reverse_proxy 192.168.1.250:5000
+	reverse_proxy 192.168.1.250:5000
 
-  encode gzip
+	encode gzip
 }
 
-@tautulli host tautulli.{env.SITE_ADDRESS}
+@tautulli host tautulli.{$SITE_ADDRESS}
 handle @tautulli {
-  reverse_proxy tautulli:8181
+	reverse_proxy tautulli:8181
 
-  encode gzip
+	encode gzip
 }
 
 # Fallback for otherwise unhandled domains
 handle {
-  abort
+	abort
 }
