@@ -1,5 +1,5 @@
 ---
-version: "3"
+version: "3.8"
 
 services:
   adguardhome:
@@ -108,6 +108,20 @@ services:
       - TZ=${TZ}
     volumes:
       - ${DOCKER_CONF_DIR}/radarr:/config
+      - /volume1/data/:/data
+
+  lidarr:
+    image: ghcr.io/linuxserver/lidarr
+    container_name: lidarr
+    expose:
+      - 8686
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${DOCKER_CONF_DIR}/lidarr:/config
       - /volume1/data/:/data
 
   sonarr:

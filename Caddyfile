@@ -43,6 +43,13 @@ handle @radarr {
 	encode gzip
 }
 
+@lidarr host music.{$SITE_ADDRESS}
+handle @lidarr {
+	reverse_proxy lidarr:8686
+
+	encode gzip
+}
+
 @sonarr host tv.{$SITE_ADDRESS}
 handle @sonarr {
 	reverse_proxy sonarr:8989
