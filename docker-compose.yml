@@ -268,6 +268,11 @@ services:
       - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
       - UN_RADARR_0_PATHS_0=/data/downloads/torrents/completed
 
+      # Lidarr config
+      - UN_LIDARR_0_URL=http://lidarr:8686
+      - UN_LIDARR_0_API_KEY=${LIDARR_API_KEY}
+      - UN_LIDARR_0_PATHS_0=/data/downloads/torrents/completed
+
     security_opt:
       - no-new-privileges:true
 
