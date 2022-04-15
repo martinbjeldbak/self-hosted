@@ -46,7 +46,6 @@ services:
     restart: unless-stopped
     volumes:
       - ${DOCKER_CONF_DIR}/jackett/config:/config
-      - /volume1/data/downloads:/downloads
 
   plex:
     image: ghcr.io/linuxserver/plex
@@ -71,7 +70,7 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/plex/database:/config
       - ${DOCKER_CONF_DIR}/plex/transcode:/transcode
-      - /volume1/data/media:/data
+      - ${DOCKER_MEDIA_DIR}:/data
     devices:
       - /dev/dri:/dev/dri # Synology w/ Intel CPU for hardware encoding
 
@@ -108,7 +107,7 @@ services:
       - TZ=${TZ}
     volumes:
       - ${DOCKER_CONF_DIR}/radarr:/config
-      - /volume1/data/:/data
+      - ${DOCKER_DATA_DIR}:/data
 
   lidarr:
     image: ghcr.io/linuxserver/lidarr
@@ -122,7 +121,7 @@ services:
       - TZ=${TZ}
     volumes:
       - ${DOCKER_CONF_DIR}/lidarr:/config
-      - /volume1/data/:/data
+      - ${DOCKER_DATA_DIR}:/data
 
   sonarr:
     image: ghcr.io/linuxserver/sonarr
@@ -136,7 +135,7 @@ services:
     restart: unless-stopped
     volumes:
       - ${DOCKER_CONF_DIR}/sonarr:/config
-      - /volume1/data/:/data
+      - ${DOCKER_DATA_DIR}:/data
 
   tautulli:
     image: tautulli/tautulli
@@ -163,7 +162,7 @@ services:
     restart: unless-stopped
     volumes:
       - ${DOCKER_CONF_DIR}/bazarr:/config
-      - /volume1/data/media:/data/media
+      - ${DOCKER_MEDIA_DIR}:/data/media
 
   gluetun:
     image: qmcgaw/gluetun
@@ -200,7 +199,6 @@ services:
     restart: unless-stopped
     network_mode: "service:gluetun"
     environment:
-      - UMASK=022
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
@@ -208,7 +206,7 @@ services:
       - PASS=${TRANSMISSION_PASSWORD}
     volumes:
       - ${DOCKER_CONF_DIR}/transmission:/config
-      - /volume1/data/downloads/torrents:/data/downloads/torrents
+      - ${DOCKER_TORRENTS_DIR}:/data/downloads/torrents
 
   caddy:
     build:
@@ -248,7 +246,7 @@ services:
     image: golift/unpackerr
     container_name: unpackerr
     volumes:
-      - /volume1/data/downloads:/data/downloads
+      - ${DOCKER_DOWNLOADS_DIR}:/data/downloads
     restart: always
     user: ${PUID}:${PGID}
     environment:
