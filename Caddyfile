@@ -1,98 +1,91 @@
 *.{$SITE_ADDRESS}
 
-tls me@{$SITE_ADDRESS} {
-	dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+tls {$TLS_EMAIL} {
+	dns cloudflare {$CLOUDFLARE_API_TOKEN}
 }
 
 log {
 	output file /data/access.log
 }
 
-@dns host dns.{$SITE_ADDRESS}
+@dns host {$HOSTNAME_DNS}
 handle @dns {
 	reverse_proxy adguardhome:3000
 
 	encode gzip
 }
 
-@homeassistant host homeassistant.{$SITE_ADDRESS}
+@homeassistant host {$HOSTNAME_HOMEASSISTANT}
 handle @homeassistant {
 	reverse_proxy homeassistant:8123
 
 	encode gzip
 }
 
-@plex host plex.{$SITE_ADDRESS}
+@plex host {$HOSTNAME_PLEX}
 handle @plex {
 	reverse_proxy plex:32400
 
 	encode gzip
 }
 
-@jackett host jackett.{$SITE_ADDRESS}
+@jackett host {$HOSTNAME_JACKETT}
 handle @jackett {
 	reverse_proxy gluetun:9117
 
 	encode gzip
 }
 
-@radarr host movies.{$SITE_ADDRESS}
+@radarr host {$HOSTNAME_RADARR}
 handle @radarr {
 	reverse_proxy radarr:7878
 
 	encode gzip
 }
 
-@lidarr host music.{$SITE_ADDRESS}
+@lidarr host {$HOSTNAME_LIDARR}
 handle @lidarr {
 	reverse_proxy lidarr:8686
 
 	encode gzip
 }
 
-@sonarr host tv.{$SITE_ADDRESS}
+@sonarr host {$HOSTNAME_SONARR}
 handle @sonarr {
 	reverse_proxy sonarr:8989
 
 	encode gzip
 }
 
-@transmission host torrents.{$SITE_ADDRESS}
+@transmission host {$HOSTNAME_TRANSMISSION}
 handle @transmission {
 	reverse_proxy gluetun:9091
 
 	encode gzip
 }
 
-@bazarr host subtitles.{$SITE_ADDRESS}
+@bazarr host {$HOSTNAME_BAZARR}
 handle @bazarr {
 	reverse_proxy bazarr:6767
 
 	encode gzip
 }
 
-@portainer host portainer.{$SITE_ADDRESS}
-handle @portainer {
-	reverse_proxy portainer:9000
-
-	encode gzip
-}
-
-@huginn host h.{$SITE_ADDRESS}
+@huginn host {$HOSTNAME_HUGINN}
 handle @huginn {
 	reverse_proxy huginn:3000
 
 	encode gzip
 }
 
-@nas host nas.{$SITE_ADDRESS}
+@nas host {$HOSTNAME_NAS}
 handle @nas {
 	reverse_proxy 192.168.1.250:5000
 
 	encode gzip
 }
 
-@tautulli host tautulli.{$SITE_ADDRESS}
+@tautulli host {$HOSTNAME_TAUTULLI}
 handle @tautulli {
 	reverse_proxy tautulli:8181
 
