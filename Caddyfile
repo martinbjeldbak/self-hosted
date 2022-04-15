@@ -92,7 +92,7 @@ handle @tautulli {
 	encode gzip
 }
 
-# Fallback for otherwise unhandled domains
+# Fallback for otherwise unhandled domains
 handle {
 	abort
 }
