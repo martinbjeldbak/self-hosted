@@ -244,21 +244,6 @@ services:
     healthcheck:
       test: ["CMD", "caddy", "version"]
 
-  # portainer:
-  #   image: portainer/portainer-ce
-  #   container_name: portainer
-  #   restart: unless-stopped
-  #   volumes:
-  #     - /etc/localtime:/etc/localtime:ro
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - ${DOCKER_CONF_DIR}/portainer:/data
-  #   expose:
-  #     - 9000
-  #   environment:
-  #     - PUID=${PUID}
-  #     - PGID=${PGID}
-  #     - TZ=${TZ}
-
   unpackerr:
     image: golift/unpackerr
     container_name: unpackerr
