@@ -46,6 +46,7 @@ services:
     restart: unless-stopped
     volumes:
       - ${DOCKER_CONF_DIR}/jackett/config:/config
+      - ${DOCKER_TORRENTS_DIR}/watch:/downloads
 
   plex:
     image: ghcr.io/linuxserver/plex
@@ -207,6 +208,7 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/transmission:/config
       - ${DOCKER_TORRENTS_DIR}:/data/downloads/torrents
+      - ${DOCKER_TORRENTS_DIR}/watch:/watch
 
   caddy:
     build:
