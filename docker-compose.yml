@@ -1,5 +1,11 @@
 ---
-version: "3.8"
+version: "3.9"
+
+x-env: &env
+  PUID: ${PUID}
+  PGID: ${PGID}
+  TZ: ${TZ}
+
 
 services:
   adguardhome:
@@ -11,9 +17,7 @@ services:
     expose:
       - 3000 # UI
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      <<: *env
     volumes:
       - ${DOCKER_CONF_DIR}/adguardhome/work:/opt/adguardhome/work
       - ${DOCKER_CONF_DIR}/adguardhome/conf:/opt/adguardhome/conf
@@ -26,9 +30,7 @@ services:
     expose:
       - 8123
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      <<: *env
     volumes:
       - ./homeassistant:/config
       - /etc/localtime:/etc/localtime:ro
@@ -39,10 +41,8 @@ services:
     container_name: jackett
     network_mode: "service:gluetun"
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - AUTO_UPDATE=true
+      <<: *env
+      AUTO_UPDATE: 'true'
     restart: unless-stopped
     volumes:
       - ${DOCKER_CONF_DIR}/jackett/config:/config
@@ -63,11 +63,9 @@ services:
     expose:
       - 32400 # access to the Plex Media Server
     environment:
-      - TZ=${TZ}
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - VERSION=docker
-      - PLEX_CLAIM=${PLEX_CLAIM}
+      VERSION: docker
+      PLEX_CLAIM: ${PLEX_CLAIM}
+      <<: *env
     volumes:
       - ${DOCKER_CONF_DIR}/plex/database:/config
       - ${DOCKER_CONF_DIR}/plex/transcode:/transcode
@@ -89,8 +87,8 @@ services:
     container_name: plex-meta-manager
     restart: unless-stopped
     environment:
-      - TZ=${TZ}
-      - PMM_TIME=02:00,15:00
+      TZ: ${TZ}
+      PMM_TIME: 02:00,15:00
     volumes:
       - ${DOCKER_CONF_DIR}/plex-meta-manager:/config
     depends_on:
@@ -103,9 +101,7 @@ services:
       - 7878
     restart: unless-stopped
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      <<: *env
     volumes:
       - ${DOCKER_CONF_DIR}/radarr:/config
       - ${DOCKER_DATA_DIR}:/data
@@ -117,9 +113,7 @@ services:
       - 8686
     restart: unless-stopped
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      <<: *env
     volumes:
       - ${DOCKER_CONF_DIR}/lidarr:/config
       - ${DOCKER_DATA_DIR}:/data
@@ -130,9 +124,7 @@ services:
     expose:
       - 8989
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      <<: *env
     restart: unless-stopped
     volumes:
       - ${DOCKER_CONF_DIR}/sonarr:/config
@@ -145,9 +137,7 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/tautulli:/config
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      <<: *env
     expose:
       - 8181
 
@@ -155,9 +145,7 @@ services:
     image: ghcr.io/linuxserver/bazarr
     container_name: bazarr
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      <<: *env
     expose:
       - 6767
     restart: unless-stopped
@@ -176,17 +164,15 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/gluetun:/gluetun
     environment:
-      - VPN_SERVICE_PROVIDER=mullvad
-      - VPN_TYPE=wireguard
-      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
-      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
-      - SERVER_CITIES=${GLUETUN_CITIES}
-      - FIREWALL_OUTBOUND_SUBNETS=192.168.1.0/24
-      - BLOCK_SURVEILLANCE=on
-      - BLOCK_MALICIOUS=on
-      - TZ=${TZ}
-      - PUID=${PUID}
-      - PGID=${PGID}
+      VPN_SERVICE_PROVIDER: mullvad
+      VPN_TYPE: wireguard
+      WIREGUARD_PRIVATE_KEY: ${WIREGUARD_PRIVATE_KEY}
+      WIREGUARD_ADDRESSES: ${WIREGUARD_ADDRESSES}
+      SERVER_CITIES: ${GLUETUN_CITIES}
+      FIREWALL_OUTBOUND_SUBNETS: 192.168.1.0/24
+      BLOCK_SURVEILLANCE: 'on'
+      BLOCK_MALICIOUS: 'on'
+      <<: *env
     expose:
       - 9091 # transmission
       - 9117 # jackett
@@ -200,11 +186,9 @@ services:
     restart: unless-stopped
     network_mode: "service:gluetun"
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - USER=${TRANSMISSION_USERNAME}
-      - PASS=${TRANSMISSION_PASSWORD}
+      USER: ${TRANSMISSION_USERNAME}
+      PASS: ${TRANSMISSION_PASSWORD}
+      <<: *env
     volumes:
       - ${DOCKER_CONF_DIR}/transmission:/config
       - ${DOCKER_TORRENTS_DIR}:/data/downloads/torrents
@@ -219,26 +203,24 @@ services:
       - 4443:443
     restart: unless-stopped
     environment:
-      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
-      - SITE_ADDRESS=${CADDY_HOSTNAME}
-      - TLS_EMAIL=${CADDY_TLS_EMAIL}
-      - HOSTNAME_DNS=${CADDY_HOSTNAME_DNS}
-      - HOSTNAME_HOMEASSISTANT=${CADDY_HOSTNAME_HOMEASSISTANT}
-      - HOSTNAME_PLEX=${CADDY_HOSTNAME_PLEX}
-      - HOSTNAME_JACKETT=${CADDY_HOSTNAME_JACKETT}
-      - HOSTNAME_RADARR=${CADDY_HOSTNAME_RADARR}
-      - HOSTNAME_LIDARR=${CADDY_HOSTNAME_LIDARR}
-      - HOSTNAME_SONARR=${CADDY_HOSTNAME_SONARR}
-      - HOSTNAME_BAZARR=${CADDY_HOSTNAME_BAZARR}
-      - HOSTNAME_HUGINN=${CADDY_HOSTNAME_HUGINN}
-      - HOSTNAME_TRANSMISSION=${CADDY_HOSTNAME_TRANSMISSION}
-      - HOSTNAME_NAS=${CADDY_HOSTNAME_NAS}
-      - HOSTNAME_TAUTULLI=${CADDY_HOSTNAME_TAUTULLI}
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
+      SITE_ADDRESS: ${CADDY_HOSTNAME}
+      TLS_EMAIL: ${CADDY_TLS_EMAIL}
+      HOSTNAME_DNS: ${CADDY_HOSTNAME_DNS}
+      HOSTNAME_HOMEASSISTANT: ${CADDY_HOSTNAME_HOMEASSISTANT}
+      HOSTNAME_PLEX: ${CADDY_HOSTNAME_PLEX}
+      HOSTNAME_JACKETT: ${CADDY_HOSTNAME_JACKETT}
+      HOSTNAME_RADARR: ${CADDY_HOSTNAME_RADARR}
+      HOSTNAME_LIDARR: ${CADDY_HOSTNAME_LIDARR}
+      HOSTNAME_SONARR: ${CADDY_HOSTNAME_SONARR}
+      HOSTNAME_BAZARR: ${CADDY_HOSTNAME_BAZARR}
+      HOSTNAME_HUGINN: ${CADDY_HOSTNAME_HUGINN}
+      HOSTNAME_TRANSMISSION: ${CADDY_HOSTNAME_TRANSMISSION}
+      HOSTNAME_NAS: ${CADDY_HOSTNAME_NAS}
+      HOSTNAME_TAUTULLI: ${CADDY_HOSTNAME_TAUTULLI}
+      <<: *env
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ${DOCKER_CONF_DIR}/caddy/config:/config
       - ${DOCKER_CONF_DIR}/caddy/data:/data
     healthcheck:
@@ -252,24 +234,22 @@ services:
     restart: always
     user: ${PUID}:${PGID}
     environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
+      <<: *env
 
       # Sonarr config
-      - UN_SONARR_0_URL=http://sonarr:8989
-      - UN_SONARR_0_API_KEY=${SONARR_API_KEY}
-      - UN_SONARR_0_PATHS_0=/data/downloads/torrents/completed
+      UN_SONARR_0_URL: http://sonarr:8989
+      UN_SONARR_0_API_KEY: ${SONARR_API_KEY}
+      UN_SONARR_0_PATHS_0: /data/downloads/torrents/completed
 
       # Radarr config
-      - UN_RADARR_0_URL=http://radarr:7878
-      - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
-      - UN_RADARR_0_PATHS_0=/data/downloads/torrents/completed
+      UN_RADARR_0_URL: http://radarr:7878
+      UN_RADARR_0_API_KEY: ${RADARR_API_KEY}
+      UN_RADARR_0_PATHS_0: /data/downloads/torrents/completed
 
       # Lidarr config
-      - UN_LIDARR_0_URL=http://lidarr:8686
-      - UN_LIDARR_0_API_KEY=${LIDARR_API_KEY}
-      - UN_LIDARR_0_PATHS_0=/data/downloads/torrents/completed
+      UN_LIDARR_0_URL: http://lidarr:8686
+      UN_LIDARR_0_API_KEY: ${LIDARR_API_KEY}
+      UN_LIDARR_0_PATHS_0: /data/downloads/torrents/completed
 
     security_opt:
       - no-new-privileges:true
@@ -281,10 +261,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro
     environment:
-      - /etc/localtime:/etc/localtime:ro
-      - WATCHTOWER_NOTIFICATIONS=shoutrrr
-      - WATCHTOWER_NOTIFICATION_URL=${DISCORD_NOTIFICATION_URL}
-      - WATCHTOWER_MONITOR_ONLY=true
+      WATCHTOWER_NOTIFICATIONS: shoutrrr
+      WATCHTOWER_NOTIFICATION_URL: ${DISCORD_NOTIFICATION_URL}
+      WATCHTOWER_MONITOR_ONLY: 'true'
     command: --schedule "0 0 3 * * ?" # run at 3am
 
   db:
@@ -294,7 +273,7 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/postgres:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
   huginn:
     build:
@@ -305,20 +284,20 @@ services:
     expose:
       - 3000
     environment:
-      - TIMEZONE=${HUGINN_TIMEZONE}
-      - EMAIL_FROM_ADDRESS=${HUGINN_EMAIL_FROM_ADDRESS}
-      - SMTP_DOMAIN=${HUGINN_SMTP_DOMAIN}
-      - SMTP_PASSWORD=${HUGINN_SMTP_PASSWORD}
-      - INVITATION_CODE=${HUGINN_INVITATION_CODE}
-      - SMTP_USER_NAME=${SMTP_USER_NAME}
-      - SMTP_SERVER=${SMTP_SERVER}
-      - SMTP_PORT=465
-      - SMTP_SSL=true
-      - SMTP_AUTHENTICATION=plain
-      - ENABLE_INSECURE_AGENTS=true # trust all users
-      - DATABASE_ADAPTER=postgresql
-      - DATABASE_USERNAME=postgres
-      - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
-      - DATABASE_HOST=db
+      TIMEZONE: ${HUGINN_TIMEZONE}
+      EMAIL_FROM_ADDRESS: ${HUGINN_EMAIL_FROM_ADDRESS}
+      SMTP_DOMAIN: ${HUGINN_SMTP_DOMAIN}
+      SMTP_PASSWORD: ${HUGINN_SMTP_PASSWORD}
+      INVITATION_CODE: ${HUGINN_INVITATION_CODE}
+      SMTP_USER_NAME: ${SMTP_USER_NAME}
+      SMTP_SERVER: ${SMTP_SERVER}
+      SMTP_PORT: 465
+      SMTP_SSL: 'true'
+      SMTP_AUTHENTICATION: plain
+      ENABLE_INSECURE_AGENTS: 'true' # trust all users
+      DATABASE_ADAPTER: postgresql
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_HOST: db
     depends_on:
       - db
