@@ -1,98 +1,92 @@
-*.{$SITE_ADDRESS}
+# Internal host, redirect set up to $NAS_IP in Adguard Home
+*.local.martinbjeldbak.com {
+  tls {$TLS_EMAIL} {
+    dns cloudflare {$CLOUDFLARE_API_TOKEN}
+  }
 
-tls {$TLS_EMAIL} {
-	dns cloudflare {$CLOUDFLARE_API_TOKEN}
-}
+  log {
+    output file /data/access-internal.log
+  }
 
-log {
-	output file /data/access.log
-}
+  @nas host nas.local.martinbjeldbak.com
+  handle @nas {
+    reverse_proxy {$NAS_IP}:5000
 
-@dns host {$HOSTNAME_DNS}
-handle @dns {
-	reverse_proxy adguardhome:3000
+    encode gzip
+  }
 
-	encode gzip
-}
+  @dns host dns.local.martinbjeldbak.com
+  handle @dns {
+    reverse_proxy adguardhome:3000
 
-@homeassistant host {$HOSTNAME_HOMEASSISTANT}
-handle @homeassistant {
-	reverse_proxy homeassistant:8123
+    encode gzip
+  }
 
-	encode gzip
-}
+  @radarr host movies.local.martinbjeldbak.com
+  handle @radarr {
+    reverse_proxy radarr:7878
 
-@plex host {$HOSTNAME_PLEX}
-handle @plex {
-	reverse_proxy plex:32400
+    encode gzip
+  }
 
-	encode gzip
-}
+  @jackett host jackett.local.martinbjeldbak.com
+  handle @jackett {
+    reverse_proxy gluetun:9117
 
-@jackett host {$HOSTNAME_JACKETT}
-handle @jackett {
-	reverse_proxy gluetun:9117
+    encode gzip
+  }
 
-	encode gzip
-}
+  @lidarr host music.local.martinbjeldbak.com
+  handle @lidarr {
+    reverse_proxy lidarr:8686
 
-@radarr host {$HOSTNAME_RADARR}
-handle @radarr {
-	reverse_proxy radarr:7878
+    encode gzip
+  }
 
-	encode gzip
-}
+  @sonarr host sonarr.local.martinbjeldbak.com
+  handle @sonarr {
+    reverse_proxy sonarr:8989
 
-@lidarr host {$HOSTNAME_LIDARR}
-handle @lidarr {
-	reverse_proxy lidarr:8686
+    encode gzip
+  }
 
-	encode gzip
-}
+  @transmission host torrents.local.martinbjeldbak.com
+  handle @transmission {
+    reverse_proxy gluetun:9091
 
-@sonarr host {$HOSTNAME_SONARR}
-handle @sonarr {
-	reverse_proxy sonarr:8989
+    encode gzip
+  }
 
-	encode gzip
-}
+  @bazarr host subtitles.local.martinbjeldbak.com
+  handle @bazarr {
+    reverse_proxy bazarr:6767
 
-@transmission host {$HOSTNAME_TRANSMISSION}
-handle @transmission {
-	reverse_proxy gluetun:9091
+    encode gzip
+  }
 
-	encode gzip
-}
+  @huginn host h.local.martinbjeldbak.com
+  handle @huginn {
+    reverse_proxy huginn:3000
 
-@bazarr host {$HOSTNAME_BAZARR}
-handle @bazarr {
-	reverse_proxy bazarr:6767
+    encode gzip
+  }
 
-	encode gzip
-}
+  @tautulli host tautulli.local.martinbjeldbak.com
+  handle @tautulli {
+    reverse_proxy tautulli:8181
 
-@huginn host {$HOSTNAME_HUGINN}
-handle @huginn {
-	reverse_proxy huginn:3000
+    encode gzip
+  }
 
-	encode gzip
-}
+  @homeassistant host homeassistant.local.martinbjeldbak.com
+  handle @homeassistant {
+    reverse_proxy homeassistant:8123
 
-@nas host {$HOSTNAME_NAS}
-handle @nas {
-	reverse_proxy 192.168.1.250:5000
+    encode gzip
+  }
 
-	encode gzip
-}
-
-@tautulli host {$HOSTNAME_TAUTULLI}
-handle @tautulli {
-	reverse_proxy tautulli:8181
-
-	encode gzip
-}
-
-# Fallback for otherwise unhandled domains
-handle {
-	abort
+  # Fallback for otherwise unhandled domains
+  handle {
+    abort
+  }
 }

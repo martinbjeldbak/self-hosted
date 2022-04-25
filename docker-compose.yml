@@ -60,8 +60,6 @@ services:
       - 32413:32413/udp # current GDM network discovery
       - 32414:32414/udp # current GDM network discovery
       - 32469:32469/tcp # access to the Plex DLNA Server
-    expose:
-      - 32400 # access to the Plex Media Server
     environment:
       VERSION: docker
       PLEX_CLAIM: ${PLEX_CLAIM}
@@ -200,24 +198,13 @@ services:
       dockerfile: caddy.Dockerfile
     container_name: caddy
     ports:
-      - 4443:443
+      - 443:443
+      - 80:80
     restart: unless-stopped
     environment:
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
-      SITE_ADDRESS: ${CADDY_HOSTNAME}
+      NAS_IP: ${STATIC_IP}
       TLS_EMAIL: ${CADDY_TLS_EMAIL}
-      HOSTNAME_DNS: ${CADDY_HOSTNAME_DNS}
-      HOSTNAME_HOMEASSISTANT: ${CADDY_HOSTNAME_HOMEASSISTANT}
-      HOSTNAME_PLEX: ${CADDY_HOSTNAME_PLEX}
-      HOSTNAME_JACKETT: ${CADDY_HOSTNAME_JACKETT}
-      HOSTNAME_RADARR: ${CADDY_HOSTNAME_RADARR}
-      HOSTNAME_LIDARR: ${CADDY_HOSTNAME_LIDARR}
-      HOSTNAME_SONARR: ${CADDY_HOSTNAME_SONARR}
-      HOSTNAME_BAZARR: ${CADDY_HOSTNAME_BAZARR}
-      HOSTNAME_HUGINN: ${CADDY_HOSTNAME_HUGINN}
-      HOSTNAME_TRANSMISSION: ${CADDY_HOSTNAME_TRANSMISSION}
-      HOSTNAME_NAS: ${CADDY_HOSTNAME_NAS}
-      HOSTNAME_TAUTULLI: ${CADDY_HOSTNAME_TAUTULLI}
       <<: *env
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
