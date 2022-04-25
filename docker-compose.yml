@@ -174,9 +174,6 @@ services:
     expose:
       - 9091 # transmission
       - 9117 # jackett
-    ports:
-      - 51413:51413/tcp # transmission
-      - 51413:51413/udp # transmission
 
   transmission:
     image: ghcr.io/linuxserver/transmission
