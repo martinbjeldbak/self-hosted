@@ -172,8 +172,8 @@ services:
       BLOCK_MALICIOUS: 'on'
       <<: *env
     expose:
-      - 9091 # transmission
-      - 9117 # jackett
+      - 9091 # transmission UI
+      - 9117 # jackett UI
 
   transmission:
     image: ghcr.io/linuxserver/transmission
