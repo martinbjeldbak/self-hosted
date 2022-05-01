@@ -6,7 +6,6 @@ x-env: &env
   PGID: ${PGID}
   TZ: ${TZ}
 
-
 services:
   adguardhome:
     image: adguard/adguardhome
@@ -285,3 +284,14 @@ services:
       DATABASE_HOST: db
     depends_on:
       - db
+
+  heimdall:
+    image: ghcr.io/linuxserver/heimdall
+    container_name: heimdall
+    restart: unless-stopped
+    expose:
+      - 80
+    environment:
+      <<: *env
+    volumes:
+      - ${DOCKER_CONF_DIR}/heimdall:/config

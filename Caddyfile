@@ -85,6 +85,13 @@
     encode gzip
   }
 
+  @dashboard host dash.local.martinbjeldbak.com
+  handle @dashboard {
+    reverse_proxy heimdall:80
+
+    encode gzip
+  }
+
   # Fallback for otherwise unhandled domains
   handle {
     abort
