@@ -22,6 +22,8 @@ services:
       - ${DOCKER_CONF_DIR}/adguardhome/conf:/opt/adguardhome/conf
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
+    logging:
+      driver: none
 
   homeassistant:
     image: ghcr.io/home-assistant/home-assistant:stable
@@ -34,6 +36,8 @@ services:
       - ./homeassistant:/config
       - /etc/localtime:/etc/localtime:ro
     restart: always
+    logging:
+      driver: none
 
   jackett:
     image: ghcr.io/linuxserver/jackett
@@ -46,6 +50,8 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/jackett/config:/config
       - ${DOCKER_TORRENTS_DIR}/watch:/downloads
+    logging:
+      driver: none
 
   plex:
     image: ghcr.io/linuxserver/plex
@@ -69,6 +75,8 @@ services:
       - ${DOCKER_MEDIA_DIR}:/data
     devices:
       - /dev/dri:/dev/dri # Synology w/ Intel CPU for hardware encoding
+    logging:
+      driver: none
 
   # NOTE: this is a once-off task and runs using cron
   plextraktsync:
@@ -78,6 +86,8 @@ services:
       - ${DOCKER_CONF_DIR}/plextraktsync:/app/config
     depends_on:
       - plex
+    logging:
+      driver: none
 
   plex-meta-manager:
     image: meisnate12/plex-meta-manager
@@ -90,6 +100,8 @@ services:
       - ${DOCKER_CONF_DIR}/plex-meta-manager:/config
     depends_on:
       - plex
+    logging:
+      driver: none
 
   radarr:
     image: ghcr.io/linuxserver/radarr
@@ -102,6 +114,8 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/radarr:/config
       - ${DOCKER_DATA_DIR}:/data
+    logging:
+      driver: none
 
   lidarr:
     image: ghcr.io/linuxserver/lidarr
@@ -114,6 +128,8 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/lidarr:/config
       - ${DOCKER_DATA_DIR}:/data
+    logging:
+      driver: none
 
   sonarr:
     image: ghcr.io/linuxserver/sonarr
@@ -126,6 +142,8 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/sonarr:/config
       - ${DOCKER_DATA_DIR}:/data
+    logging:
+      driver: none
 
   tautulli:
     image: tautulli/tautulli
@@ -137,6 +155,8 @@ services:
       <<: *env
     expose:
       - 8181
+    logging:
+      driver: none
 
   bazarr:
     image: ghcr.io/linuxserver/bazarr
@@ -149,11 +169,13 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/bazarr:/config
       - ${DOCKER_MEDIA_DIR}:/data/media
+    logging:
+      driver: none
 
   gluetun:
     image: qmcgaw/gluetun
     container_name: gluetun
-    restart: always
+    restart: unless-stopped
     cap_add:
       - net_admin
     devices:
@@ -173,6 +195,8 @@ services:
     expose:
       - 9091 # transmission UI
       - 9117 # jackett UI
+    logging:
+      driver: none
 
   transmission:
     image: ghcr.io/linuxserver/transmission
@@ -187,6 +211,8 @@ services:
       - ${DOCKER_CONF_DIR}/transmission:/config
       - ${DOCKER_TORRENTS_DIR}:/data/downloads/torrents
       - ${DOCKER_TORRENTS_DIR}/watch:/watch
+    logging:
+      driver: none
 
   caddy:
     build:
@@ -208,6 +234,8 @@ services:
       - ${DOCKER_CONF_DIR}/caddy/data:/data
     healthcheck:
       test: ["CMD", "caddy", "version"]
+    logging:
+      driver: none
 
   unpackerr:
     image: golift/unpackerr
@@ -236,6 +264,8 @@ services:
 
     security_opt:
       - no-new-privileges:true
+    logging:
+      driver: none
 
   watchtower:
     image: containrrr/watchtower
@@ -248,6 +278,8 @@ services:
       WATCHTOWER_NOTIFICATION_URL: ${DISCORD_NOTIFICATION_URL}
       WATCHTOWER_MONITOR_ONLY: 'true'
     command: --schedule "0 0 3 * * ?" # run at 3am
+    logging:
+      driver: none
 
   db:
     image: postgres:14.2-alpine
@@ -257,6 +289,8 @@ services:
       - ${DOCKER_CONF_DIR}/postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    logging:
+      driver: none
 
   huginn:
     build:
@@ -284,6 +318,8 @@ services:
       DATABASE_HOST: db
     depends_on:
       - db
+    logging:
+      driver: none
 
   heimdall:
     image: ghcr.io/linuxserver/heimdall
@@ -295,3 +331,5 @@ services:
       <<: *env
     volumes:
       - ${DOCKER_CONF_DIR}/heimdall:/config
+    logging:
+      driver: none
