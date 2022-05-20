@@ -333,3 +333,21 @@ services:
       - ${DOCKER_CONF_DIR}/heimdall:/config
     logging:
       driver: none
+
+  wireguard:
+    image: ghcr.io/linuxserver/wireguard
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    restart: unless-stopped
+    environment:
+      <<: *env
+      SERVERURL: ${WIREGUARD_SERVER_URL}
+      SERVERPORT: 51820
+      PEERS: ${WIREGUARD_PEERS}
+    volumes:
+      - ${DOCKER_CONF_DIR}/wireguard:/config
+      - /lib/modules:/lib/modules
+    ports:
+      - 51820:51820/udp
