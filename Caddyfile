@@ -1,99 +1,99 @@
-# Internal host, redirect set up to $NAS_IP in Adguard Home
+# Internal host, redirect set up to $NAS_IP in Adguard Home
 *.local.martinbjeldbak.com {
-  tls {$TLS_EMAIL} {
-    dns cloudflare {$CLOUDFLARE_API_TOKEN}
-  }
+	tls {$TLS_EMAIL} {
+		dns cloudflare {$CLOUDFLARE_API_TOKEN}
+	}
 
-  log {
-    output file /data/access-internal.log
-  }
+	log {
+		output file /data/access-internal.log
+	}
 
-  @nas host nas.local.martinbjeldbak.com
-  handle @nas {
-    reverse_proxy {$NAS_IP}:5000
+	@nas host nas.local.martinbjeldbak.com
+	handle @nas {
+		reverse_proxy {$NAS_IP}:5000
 
-    encode gzip
-  }
+		encode gzip
+	}
 
-  @dns host dns.local.martinbjeldbak.com
-  handle @dns {
-    reverse_proxy adguardhome:3000
+	@dns host dns.local.martinbjeldbak.com
+	handle @dns {
+		reverse_proxy adguardhome:3000
 
-    encode gzip
-  }
+		encode gzip
+	}
 
-  @radarr host movies.local.martinbjeldbak.com
-  handle @radarr {
-    reverse_proxy radarr:7878
+	@radarr host movies.local.martinbjeldbak.com
+	handle @radarr {
+		reverse_proxy radarr:7878
 
-    encode gzip
-  }
+		encode gzip
+	}
 
-  @jackett host jackett.local.martinbjeldbak.com
-  handle @jackett {
-    reverse_proxy gluetun:9117
+	@jackett host jackett.local.martinbjeldbak.com
+	handle @jackett {
+		reverse_proxy gluetun:9117
 
-    encode gzip
-  }
+		encode gzip
+	}
 
-  @lidarr host music.local.martinbjeldbak.com
-  handle @lidarr {
-    reverse_proxy lidarr:8686
+	@lidarr host music.local.martinbjeldbak.com
+	handle @lidarr {
+		reverse_proxy lidarr:8686
 
-    encode gzip
-  }
+		encode gzip
+	}
 
-  @sonarr host tv.local.martinbjeldbak.com
-  handle @sonarr {
-    reverse_proxy sonarr:8989
+	@sonarr host tv.local.martinbjeldbak.com
+	handle @sonarr {
+		reverse_proxy sonarr:8989
 
-    encode gzip
-  }
+		encode gzip
+	}
 
-  @transmission host torrents.local.martinbjeldbak.com
-  handle @transmission {
-    reverse_proxy gluetun:9091
+	@transmission host torrents.local.martinbjeldbak.com
+	handle @transmission {
+		reverse_proxy gluetun:9091
 
-    encode gzip
-  }
+		encode gzip
+	}
 
-  @bazarr host subtitles.local.martinbjeldbak.com
-  handle @bazarr {
-    reverse_proxy bazarr:6767
+	@bazarr host subtitles.local.martinbjeldbak.com
+	handle @bazarr {
+		reverse_proxy bazarr:6767
 
-    encode gzip
-  }
+		encode gzip
+	}
 
-  @huginn host h.local.martinbjeldbak.com
-  handle @huginn {
-    reverse_proxy huginn:3000
+	@huginn host h.local.martinbjeldbak.com
+	handle @huginn {
+		reverse_proxy huginn:3000
 
-    encode gzip
-  }
+		encode gzip
+	}
 
-  @tautulli host tautulli.local.martinbjeldbak.com
-  handle @tautulli {
-    reverse_proxy tautulli:8181
+	@tautulli host tautulli.local.martinbjeldbak.com
+	handle @tautulli {
+		reverse_proxy tautulli:8181
 
-    encode gzip
-  }
+		encode gzip
+	}
 
-  @homeassistant host homeassistant.local.martinbjeldbak.com
-  handle @homeassistant {
-    reverse_proxy homeassistant:8123
+	@homeassistant host homeassistant.local.martinbjeldbak.com
+	handle @homeassistant {
+		reverse_proxy homeassistant:8123
 
-    encode gzip
-  }
+		encode gzip
+	}
 
-  @dashboard host dash.local.martinbjeldbak.com
-  handle @dashboard {
-    reverse_proxy heimdall:80
+	@dashboard host dash.local.martinbjeldbak.com
+	handle @dashboard {
+		reverse_proxy heimdall:80
 
-    encode gzip
-  }
+		encode gzip
+	}
 
-  # Fallback for otherwise unhandled domains
-  handle {
-    abort
-  }
+	# Fallback for otherwise unhandled domains
+	handle {
+		abort
+	}
 }
