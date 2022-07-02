@@ -15,6 +15,11 @@ services:
       - 53:53/udp # plain DNS
     expose:
       - 3000 # UI
+    networks:
+      default:
+      adguard_network:
+        ipv4_address: 192.168.1.192
+
     environment:
       <<: *env
     volumes:
@@ -22,8 +27,8 @@ services:
       - ${DOCKER_CONF_DIR}/adguardhome/conf:/opt/adguardhome/conf
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
-    logging:
-      driver: none
+    # logging:
+    #   driver: none
 
   homeassistant:
     image: ghcr.io/home-assistant/home-assistant:stable
@@ -234,8 +239,8 @@ services:
       - ${DOCKER_CONF_DIR}/caddy/data:/data
     healthcheck:
       test: ["CMD", "caddy", "version"]
-    logging:
-      driver: none
+    # logging:
+    #   driver: none
 
   unpackerr:
     image: golift/unpackerr
@@ -282,7 +287,7 @@ services:
       driver: none
 
   db:
-    image: postgres:14.2-alpine
+    image: postgres:14.3-alpine
     container_name: postgres
     restart: always
     volumes:
@@ -351,3 +356,17 @@ services:
       - /lib/modules:/lib/modules
     ports:
       - 51820:51820/udp
+    # logging:
+    #   driver: none
+
+networks:
+  adguard_network:
+    driver: macvlan
+    driver_opts:
+      parent: eth0
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+          gateway: 192.168.1.1
+          ip_range: 192.168.1.192/28
+
