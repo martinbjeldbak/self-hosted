@@ -16,10 +16,10 @@ services:
     expose:
       - 3000 # UI
     networks:
-      default:
-      adguard_network:
+      macvlan:
         ipv4_address: 192.168.1.192
-
+      vlan_bridge:
+        ipv4_address: 192.168.10.192
     environment:
       <<: *env
     volumes:
@@ -35,6 +35,8 @@ services:
     container_name: homeassistant
     expose:
       - 8123
+    networks:
+      - vlan_bridge
     environment:
       <<: *env
     volumes:
@@ -70,6 +72,8 @@ services:
       - 32413:32413/udp # current GDM network discovery
       - 32414:32414/udp # current GDM network discovery
       - 32469:32469/tcp # access to the Plex DLNA Server
+    networks:
+      - vlan_bridge
     environment:
       VERSION: docker
       PLEX_CLAIM: ${PLEX_CLAIM}
@@ -86,6 +90,8 @@ services:
   # NOTE: this is a once-off task and runs using cron
   plextraktsync:
     image: ghcr.io/taxel/plextraktsync
+    networks:
+      - vlan_bridge
     container_name: plextraktsync
     volumes:
       - ${DOCKER_CONF_DIR}/plextraktsync:/app/config
@@ -96,6 +102,8 @@ services:
 
   plex-meta-manager:
     image: meisnate12/plex-meta-manager
+    networks:
+      - vlan_bridge
     container_name: plex-meta-manager
     restart: unless-stopped
     environment:
@@ -114,6 +122,8 @@ services:
     expose:
       - 7878
     restart: unless-stopped
+    networks:
+      - vlan_bridge
     environment:
       <<: *env
     volumes:
@@ -124,6 +134,8 @@ services:
 
   lidarr:
     image: ghcr.io/linuxserver/lidarr
+    networks:
+      - vlan_bridge
     container_name: lidarr
     expose:
       - 8686
@@ -138,6 +150,8 @@ services:
 
   sonarr:
     image: ghcr.io/linuxserver/sonarr
+    networks:
+      - vlan_bridge
     container_name: sonarr
     expose:
       - 8989
@@ -152,6 +166,8 @@ services:
 
   tautulli:
     image: tautulli/tautulli
+    networks:
+      - vlan_bridge
     container_name: tautulli
     restart: unless-stopped
     volumes:
@@ -165,6 +181,8 @@ services:
 
   bazarr:
     image: ghcr.io/linuxserver/bazarr
+    networks:
+      - vlan_bridge
     container_name: bazarr
     environment:
       <<: *env
@@ -179,6 +197,8 @@ services:
 
   gluetun:
     image: qmcgaw/gluetun
+    networks:
+      - vlan_bridge
     container_name: gluetun
     restart: unless-stopped
     cap_add:
@@ -227,6 +247,8 @@ services:
     ports:
       - 443:443
       - 80:80
+    networks:
+      - vlan_bridge
     restart: unless-stopped
     environment:
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
@@ -244,6 +266,8 @@ services:
 
   unpackerr:
     image: golift/unpackerr
+    networks:
+      - vlan_bridge
     container_name: unpackerr
     volumes:
       - ${DOCKER_DOWNLOADS_DIR}:/data/downloads
@@ -274,6 +298,8 @@ services:
 
   watchtower:
     image: containrrr/watchtower
+    networks:
+      - vlan_bridge
     container_name: watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -288,6 +314,8 @@ services:
 
   db:
     image: postgres:14.3-alpine
+    networks:
+      - vlan_bridge
     container_name: postgres
     restart: always
     volumes:
@@ -328,6 +356,8 @@ services:
 
   heimdall:
     image: ghcr.io/linuxserver/heimdall
+    networks:
+      - vlan_bridge
     container_name: heimdall
     restart: unless-stopped
     expose:
@@ -341,6 +371,8 @@ services:
 
   wireguard:
     image: ghcr.io/linuxserver/wireguard
+    networks:
+      - vlan_bridge
     container_name: wireguard
     cap_add:
       - NET_ADMIN
@@ -360,13 +392,24 @@ services:
     #   driver: none
 
 networks:
-  adguard_network:
+  macvlan:
+    name: docker_macvlan
     driver: macvlan
+    enable_ipv6: false
     driver_opts:
       parent: eth0
     ipam:
       config:
         - subnet: 192.168.1.0/24
+          ip_range: 192.168.1.192/27
           gateway: 192.168.1.1
-          ip_range: 192.168.1.192/28
+  vlan_bridge:
+    name: docker_vlan_bridge
+    driver: bridge
+    enable_ipv6: false
+    ipam:
+      config:
+        - subnet: 192.168.10.0/24 # subnet for all containers
+          ip_range: 192.168.10.192/27
+          gateway: 192.168.10.1
 
