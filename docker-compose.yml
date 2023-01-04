@@ -17,9 +17,9 @@ services:
       - 3000 # UI
     networks:
       macvlan:
-        ipv4_address: 192.168.1.192
+        ipv4_address: 192.168.1.200
       vlan_bridge:
-        ipv4_address: 192.168.10.192
+        ipv4_address:  172.20.0.200
     environment:
       <<: *env
     volumes:
@@ -27,24 +27,20 @@ services:
       - ${DOCKER_CONF_DIR}/adguardhome/conf:/opt/adguardhome/conf
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
-    # logging:
-    #   driver: none
 
-  homeassistant:
-    image: ghcr.io/home-assistant/home-assistant:stable
-    container_name: homeassistant
-    expose:
-      - 8123
-    networks:
-      - vlan_bridge
-    environment:
-      <<: *env
-    volumes:
-      - ./homeassistant:/config
-      - /etc/localtime:/etc/localtime:ro
-    restart: always
-    logging:
-      driver: none
+  # homeassistant:
+  #   image: ghcr.io/home-assistant/home-assistant:stable
+  #   container_name: homeassistant
+  #   expose:
+  #     - 8123
+  #   networks:
+  #     - vlan_bridge
+  #   environment:
+  #     <<: *env
+  #   volumes:
+  #     - ./homeassistant:/config
+  #     - /etc/localtime:/etc/localtime:ro
+  #   restart: always
 
   jackett:
     image: ghcr.io/linuxserver/jackett
@@ -57,8 +53,6 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/jackett/config:/config
       - ${DOCKER_TORRENTS_DIR}/watch:/downloads
-    logging:
-      driver: none
 
   plex:
     image: ghcr.io/linuxserver/plex
@@ -84,10 +78,8 @@ services:
       - ${DOCKER_MEDIA_DIR}:/data
     devices:
       - /dev/dri:/dev/dri # Synology w/ Intel CPU for hardware encoding
-    logging:
-      driver: none
 
-  # NOTE: this is a once-off task and runs using cron
+  # NOTE: this is a once-off task and runs using cron in synology "Tasks section
   plextraktsync:
     image: ghcr.io/taxel/plextraktsync
     networks:
@@ -97,8 +89,6 @@ services:
       - ${DOCKER_CONF_DIR}/plextraktsync:/app/config
     depends_on:
       - plex
-    logging:
-      driver: none
 
   plex-meta-manager:
     image: meisnate12/plex-meta-manager
@@ -108,13 +98,12 @@ services:
     restart: unless-stopped
     environment:
       TZ: ${TZ}
-      PMM_TIME: 02:00,15:00
+      PMM_TIME: 02:00
+      PMM_NO_MISSING: 'true'
     volumes:
       - ${DOCKER_CONF_DIR}/plex-meta-manager:/config
     depends_on:
       - plex
-    logging:
-      driver: none
 
   radarr:
     image: ghcr.io/linuxserver/radarr
@@ -129,8 +118,6 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/radarr:/config
       - ${DOCKER_DATA_DIR}:/data
-    logging:
-      driver: none
 
   lidarr:
     image: ghcr.io/linuxserver/lidarr
@@ -145,8 +132,6 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/lidarr:/config
       - ${DOCKER_DATA_DIR}:/data
-    logging:
-      driver: none
 
   sonarr:
     image: ghcr.io/linuxserver/sonarr
@@ -161,8 +146,6 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/sonarr:/config
       - ${DOCKER_DATA_DIR}:/data
-    logging:
-      driver: none
 
   tautulli:
     image: tautulli/tautulli
@@ -176,8 +159,6 @@ services:
       <<: *env
     expose:
       - 8181
-    logging:
-      driver: none
 
   bazarr:
     image: ghcr.io/linuxserver/bazarr
@@ -192,8 +173,6 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/bazarr:/config
       - ${DOCKER_MEDIA_DIR}:/data/media
-    logging:
-      driver: none
 
   gluetun:
     image: qmcgaw/gluetun
@@ -210,18 +189,16 @@ services:
     environment:
       VPN_SERVICE_PROVIDER: mullvad
       VPN_TYPE: wireguard
-      WIREGUARD_PRIVATE_KEY: ${WIREGUARD_PRIVATE_KEY}
-      WIREGUARD_ADDRESSES: ${WIREGUARD_ADDRESSES}
+      WIREGUARD_PRIVATE_KEY: ${GLUETUN_WIREGUARD_PRIVATE_KEY}
+      WIREGUARD_ADDRESSES: ${GLUETUN_WIREGUARD_ADDRESSES}
       SERVER_CITIES: ${GLUETUN_CITIES}
-      FIREWALL_OUTBOUND_SUBNETS: 192.168.1.0/24
-      BLOCK_SURVEILLANCE: 'on'
-      BLOCK_MALICIOUS: 'on'
+      DOT: 'off' # turn off local unbound in favor of adguardhome
+      DNS_ADDRESS: 172.20.0.200
       <<: *env
     expose:
       - 9091 # transmission UI
       - 9117 # jackett UI
-    logging:
-      driver: none
+      # - 9191 # flaresolverr
 
   transmission:
     image: ghcr.io/linuxserver/transmission
@@ -236,13 +213,12 @@ services:
       - ${DOCKER_CONF_DIR}/transmission:/config
       - ${DOCKER_TORRENTS_DIR}:/data/downloads/torrents
       - ${DOCKER_TORRENTS_DIR}/watch:/watch
-    logging:
-      driver: none
 
   caddy:
     build:
       context: .
       dockerfile: caddy.Dockerfile
+      network: host
     container_name: caddy
     ports:
       - 443:443
@@ -261,8 +237,6 @@ services:
       - ${DOCKER_CONF_DIR}/caddy/data:/data
     healthcheck:
       test: ["CMD", "caddy", "version"]
-    # logging:
-    #   driver: none
 
   unpackerr:
     image: golift/unpackerr
@@ -275,7 +249,6 @@ services:
     user: ${PUID}:${PGID}
     environment:
       <<: *env
-
       # Sonarr config
       UN_SONARR_0_URL: http://sonarr:8989
       UN_SONARR_0_API_KEY: ${SONARR_API_KEY}
@@ -290,11 +263,8 @@ services:
       UN_LIDARR_0_URL: http://lidarr:8686
       UN_LIDARR_0_API_KEY: ${LIDARR_API_KEY}
       UN_LIDARR_0_PATHS_0: /data/downloads/torrents/completed
-
     security_opt:
       - no-new-privileges:true
-    logging:
-      driver: none
 
   watchtower:
     image: containrrr/watchtower
@@ -309,30 +279,29 @@ services:
       WATCHTOWER_NOTIFICATION_URL: ${DISCORD_NOTIFICATION_URL}
       WATCHTOWER_MONITOR_ONLY: 'true'
     command: --schedule "0 0 3 * * ?" # run at 3am
-    logging:
-      driver: none
 
   db:
-    image: postgres:14.3-alpine
-    networks:
-      - vlan_bridge
+    image: postgres:14.6-alpine
     container_name: postgres
     restart: always
     volumes:
       - ${DOCKER_CONF_DIR}/postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    logging:
-      driver: none
+    networks:
+      - vlan_bridge
 
   huginn:
     build:
       context: .
       dockerfile: huginn.Dockerfile
+      network: host
     container_name: huginn
-    restart: always
+    restart: unless-stopped
     expose:
       - 3000
+    networks:
+      - vlan_bridge
     environment:
       TIMEZONE: ${HUGINN_TIMEZONE}
       EMAIL_FROM_ADDRESS: ${HUGINN_EMAIL_FROM_ADDRESS}
@@ -351,8 +320,6 @@ services:
       DATABASE_HOST: db
     depends_on:
       - db
-    logging:
-      driver: none
 
   heimdall:
     image: ghcr.io/linuxserver/heimdall
@@ -366,8 +333,6 @@ services:
       <<: *env
     volumes:
       - ${DOCKER_CONF_DIR}/heimdall:/config
-    logging:
-      driver: none
 
   wireguard:
     image: ghcr.io/linuxserver/wireguard
@@ -388,8 +353,64 @@ services:
       - /lib/modules:/lib/modules
     ports:
       - 51820:51820/udp
-    # logging:
-    #   driver: none
+
+  unificontroller:
+    image: ghcr.io/linuxserver/unifi-controller
+    container_name: unificontroller
+    restart: unless-stopped
+    networks:
+      - vlan_bridge
+    environment:
+      <<: *env
+    expose:
+      - 8443
+    ports:
+      - 8443:8443
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8080:8080
+      #- 1900:1900/udp #optional # Required for Make controller discoverable on L2 network option
+      - 8843:8843 #optional
+      - 8880:8880 #optional
+      - 6789:6789 #optional
+      - 5514:5514/udp #optional
+    volumes:
+      - ${DOCKER_CONF_DIR}/unifi-controller:/config
+
+  # Disabled as  Idon't currently have a need for flaresolverr, SportsCult not working
+  # flaresolverr:
+  #   image: ghcr.io/flaresolverr/flaresolverr
+  #   container_name: flaresolverr
+  #   network_mode: "service:gluetun"
+  #   restart: unless-stopped
+  #   environment:
+  #     TZ: ${TZ}
+
+  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr
+    container_name: recyclarr
+    restart: unless-stopped
+    user: ${PUID}:${PGID}
+    networks:
+      - vlan_bridge
+    volumes:
+      - ${DOCKER_CONF_DIR}/recyclarr:/config
+    environment:
+      <<: *env
+
+  # speedtest:
+  #   image: adolfintel/speedtest
+  #   container_name: speedtest
+  #   restart: unless-stopped
+  #   networks:
+  #     - vlan_bridge
+  #   environment:
+  #     <<: *env
+  #     TITLE: Martin's SpeedTest
+  #     PASSWORD: 1234
+  #     WEBPORT: 8445
+  #   expose:
+  #     - 8445
 
 networks:
   macvlan:
@@ -401,7 +422,6 @@ networks:
     ipam:
       config:
         - subnet: 192.168.1.0/24
-          ip_range: 192.168.1.192/27
           gateway: 192.168.1.1
   vlan_bridge:
     name: docker_vlan_bridge
@@ -409,7 +429,5 @@ networks:
     enable_ipv6: false
     ipam:
       config:
-        - subnet: 192.168.10.0/24 # subnet for all containers
-          ip_range: 192.168.10.192/27
-          gateway: 192.168.10.1
-
+        - subnet: 172.20.0.0/24 # subnet for all containers
+          gateway: 172.20.0.1

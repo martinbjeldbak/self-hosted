@@ -1,4 +1,3 @@
-# Internal host, redirect set up to $NAS_IP in Adguard Home
 *.local.martinbjeldbak.com {
 	tls {$TLS_EMAIL} {
 		dns cloudflare {$CLOUDFLARE_API_TOKEN}
@@ -92,7 +91,33 @@
 		encode gzip
 	}
 
-	# Fallback for otherwise unhandled domains
+	@unifi host unifi.local.martinbjeldbak.com
+	handle @unifi {
+		reverse_proxy https://unificontroller:8443 {
+			transport http {
+				tls_insecure_skip_verify
+			}
+		}
+
+		encode gzip
+	}
+
+	@router host router.local.martinbjeldbak.com
+	handle @router {
+		reverse_proxy 192.168.1.1:80
+
+		encode gzip
+	}
+
+	@speedtest host speedtest.local.martinbjeldbak.com
+	handle @speedtest {
+      reverse_proxy speedtest:8445
+
+		encode gzip
+	}
+
+	# Fallback for otherwise unhandled domains
+
 	handle {
 		abort
 	}
