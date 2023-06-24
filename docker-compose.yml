@@ -28,19 +28,24 @@ services:
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
 
-  # homeassistant:
-  #   image: ghcr.io/home-assistant/home-assistant:stable
-  #   container_name: homeassistant
-  #   expose:
-  #     - 8123
-  #   networks:
-  #     - vlan_bridge
-  #   environment:
-  #     <<: *env
-  #   volumes:
-  #     - ./homeassistant:/config
-  #     - /etc/localtime:/etc/localtime:ro
-  #   restart: always
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: homeassistant
+    ports:
+      # Homekit ports https://www.home-assistant.io/integrations/homekit/#firewall
+      - "5353:5353"
+      - "21063:21063"
+    expose:
+      - 8123 # UI
+    networks:
+      - vlan_bridge
+    dns: 172.20.0.200 # IP Address of adguardhome - can't get it to resolve otherwise. https://serverfault.com/a/1033495
+    environment:
+      <<: *env
+    volumes:
+      - ./homeassistant:/config
+      - /etc/localtime:/etc/localtime:ro
+    restart: always
 
   jackett:
     image: ghcr.io/linuxserver/jackett
@@ -79,26 +84,27 @@ services:
     devices:
       - /dev/dri:/dev/dri # Synology w/ Intel CPU for hardware encoding
 
-  # NOTE: this is a once-off task and runs using cron in synology "Tasks section
+  # NOTE: this is a once-off task and runs using cron in synology "Tasks" section
   plextraktsync:
-    image: ghcr.io/taxel/plextraktsync
+    image: ghcr.io/taxel/plextraktsync:0.26
+    command: sync
+    container_name: plextraktsync
     networks:
       - vlan_bridge
-    container_name: plextraktsync
     volumes:
       - ${DOCKER_CONF_DIR}/plextraktsync:/app/config
     depends_on:
       - plex
 
+  # NOTE: this is a once-off task and runs using cron in synology "Tasks" section
   plex-meta-manager:
     image: meisnate12/plex-meta-manager
+    command: --run
     networks:
       - vlan_bridge
     container_name: plex-meta-manager
-    restart: unless-stopped
+    restart: never
     environment:
-      TZ: ${TZ}
-      PMM_TIME: 02:00
       PMM_NO_MISSING: 'true'
     volumes:
       - ${DOCKER_CONF_DIR}/plex-meta-manager:/config
@@ -119,19 +125,20 @@ services:
       - ${DOCKER_CONF_DIR}/radarr:/config
       - ${DOCKER_DATA_DIR}:/data
 
-  lidarr:
-    image: ghcr.io/linuxserver/lidarr
-    networks:
-      - vlan_bridge
-    container_name: lidarr
-    expose:
-      - 8686
-    restart: unless-stopped
-    environment:
-      <<: *env
-    volumes:
-      - ${DOCKER_CONF_DIR}/lidarr:/config
-      - ${DOCKER_DATA_DIR}:/data
+  # lidarr makes so many DNS requests - going to disable as mostly unused anyway
+  # lidarr:
+  #   image: ghcr.io/linuxserver/lidarr
+  #   networks:
+  #     - vlan_bridge
+  #   container_name: lidarr
+  #   expose:
+  #     - 8686
+  #   restart: unless-stopped
+  #   environment:
+  #     <<: *env
+  #   volumes:
+  #     - ${DOCKER_CONF_DIR}/lidarr:/config
+  #     - ${DOCKER_DATA_DIR}:/data
 
   sonarr:
     image: ghcr.io/linuxserver/sonarr
@@ -198,7 +205,7 @@ services:
     expose:
       - 9091 # transmission UI
       - 9117 # jackett UI
-      # - 9191 # flaresolverr
+      - 8191 # flaresolverr
 
   transmission:
     image: ghcr.io/linuxserver/transmission
@@ -238,33 +245,33 @@ services:
     healthcheck:
       test: ["CMD", "caddy", "version"]
 
-  unpackerr:
-    image: golift/unpackerr
-    networks:
-      - vlan_bridge
-    container_name: unpackerr
-    volumes:
-      - ${DOCKER_DOWNLOADS_DIR}:/data/downloads
-    restart: always
-    user: ${PUID}:${PGID}
-    environment:
-      <<: *env
-      # Sonarr config
-      UN_SONARR_0_URL: http://sonarr:8989
-      UN_SONARR_0_API_KEY: ${SONARR_API_KEY}
-      UN_SONARR_0_PATHS_0: /data/downloads/torrents/completed
+  # unpackerr:
+  #   image: golift/unpackerr
+  #   networks:
+  #     - vlan_bridge
+  #   container_name: unpackerr
+  #   volumes:
+  #     - ${DOCKER_DOWNLOADS_DIR}:/data/downloads
+  #   restart: always
+  #   user: ${PUID}:${PGID}
+  #   environment:
+  #     <<: *env
+  #     # Sonarr config
+  #     UN_SONARR_0_URL: http://sonarr:8989
+  #     UN_SONARR_0_API_KEY: ${SONARR_API_KEY}
+  #     UN_SONARR_0_PATHS_0: /data/downloads/torrents/completed
 
-      # Radarr config
-      UN_RADARR_0_URL: http://radarr:7878
-      UN_RADARR_0_API_KEY: ${RADARR_API_KEY}
-      UN_RADARR_0_PATHS_0: /data/downloads/torrents/completed
+  #     # Radarr config
+  #     UN_RADARR_0_URL: http://radarr:7878
+  #     UN_RADARR_0_API_KEY: ${RADARR_API_KEY}
+  #     UN_RADARR_0_PATHS_0: /data/downloads/torrents/completed
 
-      # Lidarr config
-      UN_LIDARR_0_URL: http://lidarr:8686
-      UN_LIDARR_0_API_KEY: ${LIDARR_API_KEY}
-      UN_LIDARR_0_PATHS_0: /data/downloads/torrents/completed
-    security_opt:
-      - no-new-privileges:true
+  #     # Lidarr config
+  #     UN_LIDARR_0_URL: http://lidarr:8686
+  #     UN_LIDARR_0_API_KEY: ${LIDARR_API_KEY}
+  #     UN_LIDARR_0_PATHS_0: /data/downloads/torrents/completed
+  #   security_opt:
+  #     - no-new-privileges:true
 
   watchtower:
     image: containrrr/watchtower
@@ -377,14 +384,13 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/unifi-controller:/config
 
-  # Disabled as  Idon't currently have a need for flaresolverr, SportsCult not working
-  # flaresolverr:
-  #   image: ghcr.io/flaresolverr/flaresolverr
-  #   container_name: flaresolverr
-  #   network_mode: "service:gluetun"
-  #   restart: unless-stopped
-  #   environment:
-  #     TZ: ${TZ}
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr
+    container_name: flaresolverr
+    network_mode: "service:gluetun"
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ}
 
   recyclarr:
     image: ghcr.io/recyclarr/recyclarr
@@ -397,6 +403,16 @@ services:
       - ${DOCKER_CONF_DIR}/recyclarr:/config
     environment:
       <<: *env
+      RECYCLARR_CREATE_CONFIG: "true"
+      CRON_SCHEDULE: "@daily"
+
+  # https://community.home-assistant.io/t/using-homekit-component-inside-docker/45409/41
+  mdns-repeater:
+    image: angelnu/mdns_repeater
+    network_mode: host
+    environment:
+      - hostNIC=eth0
+      - dockerNIC=docker-a5e9846c
 
   # speedtest:
   #   image: adolfintel/speedtest

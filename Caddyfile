@@ -1,3 +1,20 @@
+*.martinbjeldbak.com {
+	tls {$TLS_EMAIL} {
+		dns cloudflare {$CLOUDFLARE_API_TOKEN}
+	}
+
+	log {
+		output file /data/access-external.log
+	}
+
+	@pterodactyl host panel.martinbjeldbak.com
+	handle @pterodactyl {
+		reverse_proxy panel:80
+
+		encode gzip
+	}
+}
+
 *.local.martinbjeldbak.com {
 	tls {$TLS_EMAIL} {
 		dns cloudflare {$CLOUDFLARE_API_TOKEN}
@@ -91,6 +108,13 @@
 		encode gzip
 	}
 
+	@pterodactyl host panel.martinbjeldbak.com
+	handle @pterodactyl {
+		reverse_proxy panel:80
+
+		encode gzip
+	}
+
 	@unifi host unifi.local.martinbjeldbak.com
 	handle @unifi {
 		reverse_proxy https://unificontroller:8443 {
@@ -109,14 +133,28 @@
 		encode gzip
 	}
 
-	@speedtest host speedtest.local.martinbjeldbak.com
-	handle @speedtest {
-      reverse_proxy speedtest:8445
+	@pterodactyllocal host panel.local.martinbjeldbak.com
+	handle @pterodactyllocal {
+		reverse_proxy panel:80
 
 		encode gzip
 	}
 
-	# Fallback for otherwise unhandled domains
+	@pterodactylmartin host node-martin.local.martinbjeldbak.com
+	handle @pterodactylmartin {
+		reverse_proxy 192.168.1.14:443
+
+		encode gzip
+	}
+
+	@speedtest host speedtest.local.martinbjeldbak.com
+	handle @speedtest {
+		reverse_proxy speedtest:8445
+
+		encode gzip
+	}
+
+	# Fallback for otherwise unhandled domains
 
 	handle {
 		abort
