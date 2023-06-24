@@ -4,7 +4,7 @@ default_config:
 
 http:
   trusted_proxies:
-    - 172.0.0.0/10 # Docker network
+    - 172.20.0.0/24
   use_x_forwarded_for: true
   ip_ban_enabled: true
   login_attempts_threshold: 5
@@ -27,43 +27,11 @@ light:
       - light.living_room
       - light.hue_lightstrip
 
-panel_iframe:
-  nas:
-    title: 'NAS'
-    url: !secret nas_url
-    icon: 'mdi:cloud'
-  transmission:
-    title: 'Transmission'
-    url: !secret transmission_url
-    icon: 'mdi:progress-download'
-  plex:
-    title: 'Plex'
-    url: !secret plex_url
-    icon: 'mdi:plex'
-  adguard:
-    title: 'AdGuard'
-    url: !secret adguard_url
-    icon: 'mdi:download'
-  sonarr:
-    title: 'Sonarrr'
-    url: !secret sonarr_url
-    icon: 'mdi:television-box'
-  radarr:
-    title: 'Radarr'
-    url: !secret radarr_url
-    icon: 'mdi:filmstrip'
-  jackett:
-    title: 'Jackett'
-    url: !secret jackett_url
-    icon: 'mdi:hanger'
-  bazarr:
-    title: 'Bazarr'
-    url: !secret bazarr_url
-    icon: 'mdi:closed-caption'
+logger:
+  default: info
 
-spotify:
-  client_id: !secret spotifyclientid
-  client_secret: !secret spotifyclientsecret
+homekit:
+  advertise_ip: "192.168.1.250"
 
 sensor:
   - platform: systemmonitor
@@ -73,10 +41,6 @@ sensor:
       - type: memory_free
       - type: load_1m
       - type: load_15m
-
-  - platform: radarr
-    api_key: !secret radarr_api_key
-    days: 31
 
 group: !include groups.yaml
 automation: !include automations.yaml
