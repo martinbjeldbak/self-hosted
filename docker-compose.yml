@@ -13,8 +13,6 @@ services:
     ports:
       - 53:53/tcp # plain DNS
       - 53:53/udp # plain DNS
-    expose:
-      - 3000 # UI
     networks:
       macvlan:
         ipv4_address: 192.168.1.200
@@ -95,6 +93,8 @@ services:
       - ${DOCKER_CONF_DIR}/plextraktsync:/app/config
     depends_on:
       - plex
+    environment:
+      <<: *env
 
   # NOTE: this is a once-off task and runs using cron in synology "Tasks" section
   plex-meta-manager:
@@ -103,7 +103,7 @@ services:
     networks:
       - vlan_bridge
     container_name: plex-meta-manager
-    restart: never
+    restart: "no"
     environment:
       PMM_NO_MISSING: 'true'
     volumes:
@@ -200,7 +200,8 @@ services:
       WIREGUARD_ADDRESSES: ${GLUETUN_WIREGUARD_ADDRESSES}
       SERVER_CITIES: ${GLUETUN_CITIES}
       DOT: 'off' # turn off local unbound in favor of adguardhome
-      DNS_ADDRESS: 172.20.0.200
+      # DNS_ADDRESS: 172.20.0.200 # TODO: try disable this and DNS_KEEP_NAMESERVER on, see https://github.com/qdm12/gluetun-wiki/blob/3c3cfccf06045767d50d58efae22fbafe95b2ab2/setup/options/dns.md?plain=1#L9
+      DNS_KEEP_NAMESERVER: on
       <<: *env
     expose:
       - 9091 # transmission UI
@@ -362,7 +363,7 @@ services:
       - 51820:51820/udp
 
   unificontroller:
-    image: ghcr.io/linuxserver/unifi-controller
+    image: ghcr.io/linuxserver/unifi-controller:latest
     container_name: unificontroller
     restart: unless-stopped
     networks:
@@ -376,7 +377,7 @@ services:
       - 3478:3478/udp
       - 10001:10001/udp
       - 8080:8080
-      #- 1900:1900/udp #optional # Required for Make controller discoverable on L2 network option
+      # - 1900:1900/udp #optional # Required for Make controller discoverable on L2 network option. NOTE: already in use
       - 8843:8843 #optional
       - 8880:8880 #optional
       - 6789:6789 #optional
@@ -408,11 +409,12 @@ services:
 
   # https://community.home-assistant.io/t/using-homekit-component-inside-docker/45409/41
   mdns-repeater:
+    container_name: mdns_repeater
     image: angelnu/mdns_repeater
     network_mode: host
     environment:
-      - hostNIC=eth0
-      - dockerNIC=docker-a5e9846c
+      hostNIC: eth0
+      dockerNIC: docker-a5e9846c
 
   # speedtest:
   #   image: adolfintel/speedtest
