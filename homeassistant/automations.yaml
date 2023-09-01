@@ -1,2 +1,72 @@
----
-[ ]
+- id: '1687322185169'
+  alias: Turn off air purifier
+  description: ''
+  trigger:
+  - platform: time
+    at: 09:00:00
+  condition: []
+  action:
+  - type: turn_off
+    device_id: a974d5ae993c3a8ac8fe4b666c2ff223
+    entity_id: fan.mi_air_purifier_3h
+    domain: fan
+  mode: single
+- id: '1687322354221'
+  alias: Turn on Air Purifier
+  description: Before bed
+  trigger:
+  - platform: time
+    at: '22:00:00'
+  condition:
+  - condition: device
+    device_id: 3689b8cb31ba6f23d3de3ea764896d00
+    domain: device_tracker
+    entity_id: f44d19bd56b5aa74f707ce10d390926f
+    type: is_home
+  action:
+  - type: turn_on
+    device_id: a974d5ae993c3a8ac8fe4b666c2ff223
+    entity_id: fan.mi_air_purifier_3h
+    domain: fan
+  mode: single
+- id: '1687613174907'
+  alias: Plex off lights when watching tv at night
+  description: ''
+  trigger:
+  - platform: device
+    device_id: ac2cebc503b95c6c65837616b96292dc
+    domain: media_player
+    entity_id: media_player.plex_plex_for_apple_tv_apple_tv
+    type: playing
+  condition:
+  - condition: sun
+    after: sunset
+    after_offset: -01:00:00
+  action:
+  - service: light.turn_off
+    data:
+      transition: 10
+    target:
+      area_id: living_room
+  mode: single
+- id: '1687613224875'
+  alias: Plex Movie paused at night
+  description: ''
+  trigger:
+  - platform: device
+    device_id: ac2cebc503b95c6c65837616b96292dc
+    domain: media_player
+    entity_id: media_player.plex_plex_for_apple_tv_apple_tv
+    type: paused
+  condition:
+  - condition: time
+    after: '17:00:00'
+  - condition: sun
+    after: sunset
+    after_offset: -01:00:00
+  action:
+  - service: scene.turn_on
+    target:
+      entity_id: scene.living_room_movie_paused
+    metadata: {}
+  mode: single
