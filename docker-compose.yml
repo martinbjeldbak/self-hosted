@@ -342,26 +342,6 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/heimdall:/config
 
-  wireguard:
-    image: ghcr.io/linuxserver/wireguard
-    networks:
-      - vlan_bridge
-    container_name: wireguard
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
-    restart: unless-stopped
-    environment:
-      <<: *env
-      SERVERURL: ${WIREGUARD_SERVER_URL}
-      SERVERPORT: 51820
-      PEERS: ${WIREGUARD_PEERS}
-    volumes:
-      - ${DOCKER_CONF_DIR}/wireguard:/config
-      - /lib/modules:/lib/modules
-    ports:
-      - 51820:51820/udp
-
   unificontroller:
     image: ghcr.io/linuxserver/unifi-controller:latest
     container_name: unificontroller
@@ -408,13 +388,13 @@ services:
       CRON_SCHEDULE: "@daily"
 
   # https://community.home-assistant.io/t/using-homekit-component-inside-docker/45409/41
-  mdns-repeater:
-    container_name: mdns_repeater
-    image: angelnu/mdns_repeater
-    network_mode: host
-    environment:
-      hostNIC: eth0
-      dockerNIC: docker-a5e9846c
+mdns-repeater:
+  container_name: mdns_repeater
+  image: angelnu/mdns_repeater
+  network_mode: host
+  environment:
+    hostNIC: eth0
+    dockerNIC: docker-a5e9846c
 
   # speedtest:
   #   image: adolfintel/speedtest
