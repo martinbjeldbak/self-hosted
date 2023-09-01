@@ -9,7 +9,6 @@ http:
   ip_ban_enabled: true
   login_attempts_threshold: 5
 
-
 homeassistant:
   name: Home
   unit_system: metric
@@ -20,18 +19,27 @@ homeassistant:
   internal_url: !secret external_url
   external_url: !secret external_url
 
-light:
-  - platform: group
-    name: Living Room
-    entities:
-      - light.living_room
-      - light.hue_lightstrip
+# light:
+#   - platform: group
+#     name: Living Room
+#     entities:
+#       - light.living_room
+#       - light.hue_lightstrip
 
 logger:
   default: info
 
 homekit:
   advertise_ip: "192.168.1.250"
+  filter:
+    include_domains:
+      - sensor
+      - fan
+    include_entities:
+      - switch.string_lights
+  entity_config:
+    fan.mi_air_purifier_3h:
+      name: Air Purifier
 
 sensor:
   - platform: systemmonitor
@@ -41,6 +49,12 @@ sensor:
       - type: memory_free
       - type: load_1m
       - type: load_15m
+
+adaptive_lighting:
+  lights:
+    - light.living_room_floorlamp
+    - light.martin_desk_lightstrip
+    - light.tv_lightstrip
 
 group: !include groups.yaml
 automation: !include automations.yaml
