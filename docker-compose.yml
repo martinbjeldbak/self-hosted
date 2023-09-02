@@ -84,7 +84,7 @@ services:
 
   # NOTE: this is a once-off task and runs using cron in synology "Tasks" section
   plextraktsync:
-    image: ghcr.io/taxel/plextraktsync:0.26
+    image: ghcr.io/taxel/plextraktsync:0.27.2
     command: sync
     container_name: plextraktsync
     networks:
@@ -389,7 +389,7 @@ services:
 
   # https://community.home-assistant.io/t/using-homekit-component-inside-docker/45409/41
   mdns-repeater:
-    container_name: mdns_repeater
+    container_name: mdns-repeater
     image: angelnu/mdns_repeater
     network_mode: host
     environment:
@@ -409,6 +409,27 @@ services:
   #     WEBPORT: 8445
   #   expose:
   #     - 8445
+
+  # NOTE: this is a once-off task and runs using cron in synology "Tasks" section
+  adguardhome-sync:
+    image: ghcr.io/bakito/adguardhome-sync
+    container_name: adguardhome-sync
+    command: run
+    environment:
+      LOG_LEVEL: "info"
+      ORIGIN_URL: "http://192.168.1.1:3000"
+      ORIGIN_USERNAME: ${ADGUARD_HOME_ORIGIN_USERNAME}
+      ORIGIN_PASSWORD: ${ADGUARD_HOME_ORIGIN_PASSWORD}
+      REPLICA_URL: "http://adguardhome:3000"
+      REPLICA_USERNAME: ${ADGUARD_HOME_REPLICA_USERNAME}
+      REPLICA_PASSWORD: ${ADGUARD_HOME_REPLICA_PASSWORD}
+      CRON: "" # run only once (will trigger via Synology tasks)
+      RUNONSTART: true
+      API_PORT: 0 # Disable sync API server
+    restart: unless-stopped
+    networks:
+      - vlan_bridge
+      - macvlan
 
 networks:
   macvlan:
