@@ -36,8 +36,9 @@ services:
     expose:
       - 8123 # UI
     networks:
-      - vlan_bridge
-    dns: 172.20.0.200 # IP Address of adguardhome - can't get it to resolve otherwise. https://serverfault.com/a/1033495
+      vlan_bridge:
+      macvlan:
+        ipv4_address: 192.168.1.201 # enable homekit & WOL functionality
     environment:
       <<: *env
     volumes:
@@ -386,29 +387,6 @@ services:
       <<: *env
       RECYCLARR_CREATE_CONFIG: "true"
       CRON_SCHEDULE: "@daily"
-
-  # https://community.home-assistant.io/t/using-homekit-component-inside-docker/45409/41
-  mdns-repeater:
-    container_name: mdns-repeater
-    image: angelnu/mdns_repeater
-    network_mode: host
-    environment:
-      hostNIC: eth0
-      dockerNIC: docker-a5e9846c
-
-  # speedtest:
-  #   image: adolfintel/speedtest
-  #   container_name: speedtest
-  #   restart: unless-stopped
-  #   networks:
-  #     - vlan_bridge
-  #   environment:
-  #     <<: *env
-  #     TITLE: Martin's SpeedTest
-  #     PASSWORD: 1234
-  #     WEBPORT: 8445
-  #   expose:
-  #     - 8445
 
   # NOTE: this is a once-off task and runs using cron in synology "Tasks" section
   adguardhome-sync:

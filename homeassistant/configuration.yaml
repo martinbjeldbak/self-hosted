@@ -9,6 +9,18 @@ http:
   ip_ban_enabled: true
   login_attempts_threshold: 5
 
+wake_on_lan:
+
+opnsense:
+  url: !secret opnsense_api_url
+  api_key: !secret opnsense_key
+  api_secret: !secret opnsense_secret
+  
+switch:
+  - platform: wake_on_lan
+    name: !secret n_work_laptop
+    mac: !secret n_work_laptop_mac
+
 homeassistant:
   name: Home
   unit_system: metric
@@ -19,18 +31,10 @@ homeassistant:
   internal_url: !secret external_url
   external_url: !secret external_url
 
-# light:
-#   - platform: group
-#     name: Living Room
-#     entities:
-#       - light.living_room
-#       - light.hue_lightstrip
-
 logger:
   default: info
 
 homekit:
-  advertise_ip: "192.168.1.250"
   filter:
     include_domains:
       - sensor
