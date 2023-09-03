@@ -33,6 +33,13 @@
 
 	@dns host dns.local.martinbjeldbak.com
 	handle @dns {
+		reverse_proxy 192.168.1.1:3000
+
+		encode gzip
+	}
+
+	@dns2 host dns2.local.martinbjeldbak.com
+	handle @dns2 {
 		reverse_proxy adguardhome:3000
 
 		encode gzip
@@ -126,7 +133,7 @@
 		encode gzip
 	}
 
-	@router host router.local.martinbjeldbak.com
+	@router host opnsense.local.martinbjeldbak.com
 	handle @router {
 		reverse_proxy https://192.168.1.1:443 {
 			transport http {
