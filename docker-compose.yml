@@ -407,7 +407,6 @@ services:
     restart: unless-stopped
     networks:
       - vlan_bridge
-      - macvlan
 
 networks:
   macvlan:
