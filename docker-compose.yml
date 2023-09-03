@@ -404,6 +404,7 @@ services:
       CRON: "" # run only once (will trigger via Synology tasks)
       RUNONSTART: true
       API_PORT: 0 # Disable sync API server
+      FEATURES_DNS_SERVERCONFIG: false # replica needs to point to Unbound on router IP, not localhost
     restart: unless-stopped
     networks:
       - vlan_bridge
