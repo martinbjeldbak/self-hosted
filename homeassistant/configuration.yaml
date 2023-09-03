@@ -11,10 +11,10 @@ http:
 
 wake_on_lan:
 
-opnsense:
-  url: !secret opnsense_api_url
-  api_key: !secret opnsense_key
-  api_secret: !secret opnsense_secret
+# opnsense:
+#   url: !secret opnsense_api_url
+#   api_key: !secret opnsense_key
+#   api_secret: !secret opnsense_secret
   
 switch:
   - platform: wake_on_lan
