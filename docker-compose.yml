@@ -15,9 +15,9 @@ services:
       - 53:53/udp # plain DNS
     networks:
       macvlan:
-        ipv4_address: 192.168.1.200
+        ipv4_address: 192.168.10.15
       vlan_bridge:
-        ipv4_address:  172.20.0.200
+        ipv4_address:  172.20.0.98
     environment:
       <<: *env
     volumes:
@@ -38,7 +38,7 @@ services:
     networks:
       vlan_bridge:
       macvlan:
-        ipv4_address: 192.168.1.201 # enable homekit & WOL functionality
+        ipv4_address: 192.168.10.16 # enable homekit & WOL functionality
     environment:
       <<: *env
     volumes:
@@ -63,6 +63,7 @@ services:
     container_name: plex
     restart: unless-stopped
     ports:
+      # Source: https://support.plex.tv/articles/201543147-what-network-ports-do-i-need-to-allow-through-my-firewall/
       #- 1900:1900/udp   # access to the Plex DLNA Server # NOTE: already in use
       - 32400:32400/tcp # access to the Plex Media Server
       - 32410:32410/udp # current GDM network discovery
@@ -156,7 +157,7 @@ services:
       - ${DOCKER_DATA_DIR}:/data
 
   tautulli:
-    image: tautulli/tautulli
+    image: ghcr.io/linuxserver/tautulli:latest
     networks:
       - vlan_bridge
     container_name: tautulli
@@ -166,7 +167,7 @@ services:
     environment:
       <<: *env
     expose:
-      - 8181
+      - 8181 # UI
 
   bazarr:
     image: ghcr.io/linuxserver/bazarr
@@ -247,33 +248,33 @@ services:
     healthcheck:
       test: ["CMD", "caddy", "version"]
 
-  # unpackerr:
-  #   image: golift/unpackerr
-  #   networks:
-  #     - vlan_bridge
-  #   container_name: unpackerr
-  #   volumes:
-  #     - ${DOCKER_DOWNLOADS_DIR}:/data/downloads
-  #   restart: always
-  #   user: ${PUID}:${PGID}
-  #   environment:
-  #     <<: *env
-  #     # Sonarr config
-  #     UN_SONARR_0_URL: http://sonarr:8989
-  #     UN_SONARR_0_API_KEY: ${SONARR_API_KEY}
-  #     UN_SONARR_0_PATHS_0: /data/downloads/torrents/completed
+  unpackerr:
+    image: golift/unpackerr
+    networks:
+      - vlan_bridge
+    container_name: unpackerr
+    volumes:
+      - ${DOCKER_DOWNLOADS_DIR}:/data/downloads
+    restart: always
+    user: ${PUID}:${PGID}
+    environment:
+      <<: *env
+      # Sonarr config
+      UN_SONARR_0_URL: http://sonarr:8989
+      UN_SONARR_0_API_KEY: ${SONARR_API_KEY}
+      UN_SONARR_0_PATHS_0: /data/downloads/torrents/completed
 
-  #     # Radarr config
-  #     UN_RADARR_0_URL: http://radarr:7878
-  #     UN_RADARR_0_API_KEY: ${RADARR_API_KEY}
-  #     UN_RADARR_0_PATHS_0: /data/downloads/torrents/completed
+      # Radarr config
+      UN_RADARR_0_URL: http://radarr:7878
+      UN_RADARR_0_API_KEY: ${RADARR_API_KEY}
+      UN_RADARR_0_PATHS_0: /data/downloads/torrents/completed
 
-  #     # Lidarr config
-  #     UN_LIDARR_0_URL: http://lidarr:8686
-  #     UN_LIDARR_0_API_KEY: ${LIDARR_API_KEY}
-  #     UN_LIDARR_0_PATHS_0: /data/downloads/torrents/completed
-  #   security_opt:
-  #     - no-new-privileges:true
+      # Lidarr config
+      UN_LIDARR_0_URL: http://lidarr:8686
+      UN_LIDARR_0_API_KEY: ${LIDARR_API_KEY}
+      UN_LIDARR_0_PATHS_0: /data/downloads/torrents/completed
+    security_opt:
+      - no-new-privileges:true
 
   watchtower:
     image: containrrr/watchtower
@@ -343,29 +344,6 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/heimdall:/config
 
-  unificontroller:
-    image: ghcr.io/linuxserver/unifi-controller:latest
-    container_name: unificontroller
-    restart: unless-stopped
-    networks:
-      - vlan_bridge
-    environment:
-      <<: *env
-    expose:
-      - 8443
-    ports:
-      - 8443:8443
-      - 3478:3478/udp
-      - 10001:10001/udp
-      - 8080:8080
-      # - 1900:1900/udp #optional # Required for Make controller discoverable on L2 network option. NOTE: already in use
-      - 8843:8843 #optional
-      - 8880:8880 #optional
-      - 6789:6789 #optional
-      - 5514:5514/udp #optional
-    volumes:
-      - ${DOCKER_CONF_DIR}/unifi-controller:/config
-
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr
     container_name: flaresolverr
@@ -405,7 +383,6 @@ services:
       RUNONSTART: true
       API_PORT: 0 # Disable sync API server
       FEATURES_DNS_SERVERCONFIG: false # replica needs to point to Unbound on router IP, not localhost
-    restart: unless-stopped
     networks:
       - vlan_bridge
 
@@ -418,8 +395,8 @@ networks:
       parent: eth0
     ipam:
       config:
-        - subnet: 192.168.1.0/24
-          gateway: 192.168.1.1
+        - subnet: 192.168.10.0/24
+          gateway: 192.168.10.1
   vlan_bridge:
     name: docker_vlan_bridge
     driver: bridge
