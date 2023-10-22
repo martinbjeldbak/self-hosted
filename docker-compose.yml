@@ -44,6 +44,7 @@ services:
     volumes:
       - ./homeassistant:/config
       - /etc/localtime:/etc/localtime:ro
+      - ${DOCKER_CONF_DIR}/homeassistant/cameras:/cameras
     restart: always
 
   jackett:
@@ -383,6 +384,83 @@ services:
       RUNONSTART: true
       API_PORT: 0 # Disable sync API server
       FEATURES_DNS_SERVERCONFIG: false # replica needs to point to Unbound on router IP, not localhost
+    networks:
+      - vlan_bridge
+  mqtt:
+    image: emqx/emqx:latest
+    container_name: mqtt
+    restart: unless-stopped
+    ports:
+      - 1883:1883 # tcp
+      - 8083:8083 # ws
+      - 8084:8084 # wss
+      - 8883:8883 # ssl
+      - 18083:18083 # web UI
+    volumes:
+      - ${DOCKER_CONF_DIR}/emqx/data:/opt/emqx/data
+      - ${DOCKER_CONF_DIR}/emqx/etc:/opt/emqx/etc
+      - ${DOCKER_CONF_DIR}/emqx/log:/opt/emqx/log
+    networks:
+      - vlan_bridge
+
+  # scrypted:
+  #   image: koush/scrypted:latest
+  #   container_name: scrypted
+  #   restart: unless-stopped
+  #   logging:
+  #       driver: "json-file"
+  #       options:
+  #           max-size: "10m"
+  #           max-file: "10"
+  #   devices:
+  #     - /dev/dri:/dev/dri # for intel hwaccel, needs to be updated for your hardware
+  #   volumes:
+  #     - ${DOCKER_CONF_DIR}/scrypted/database:/server/volume
+  #     - ${DOCKER_CONF_DIR}/scrypted/nvr:/nvr
+  #     - /var/run/dbus:/var/run/dbus
+  #     - /var/run/avahi-daemon/socket:/var/run/avahi-daemon/socket      
+  #   environment:
+  #     SCRYPTED_NVR_VOLUME: /nvr
+  #   ports:
+  #     - 11080:11080
+  #   expose:
+  #     - 11080
+  #   networks:
+  #     vlan_bridge:
+  #     macvlan:
+  #       ipv4_address: 192.168.10.17 # enable homekit & WOL functionality
+  frigate:
+    image: ghcr.io/blakeblackshear/frigate:stable
+    container_name: frigate
+    restart: unless-stopped
+    shm_size: "64mb"
+    devices:
+      - /dev/dri:/dev/dri # for intel hwaccel, needs to be updated for your hardware
+    privileged: true # https://docs.frigate.video/configuration/hardware_acceleration/#intel-based-cpus
+    environment:
+      FRIGATE_MQTT_USER: ${FRIGATE_MQTT_USER}
+      FRIGATE_MQTT_PASSWORD: ${FRIGATE_MQTT_PASSWORD}
+      FRIGATE_EUFY_INDOOR_RTSP_USER: ${FRIGATE_EUFY_INDOOR_RTSP_USER}
+      FRIGATE_EUFY_INDOOR_RTSP_PASSWORD: ${FRIGATE_EUFY_INDOOR_RTSP_PASSWORD}
+      FRIGATE_EUFY_PAN_TILT_RTSP_USER: ${FRIGATE_EUFY_PAN_TILT_RTSP_USER}
+      FRIGATE_EUFY_PAN_TILT_RTSP_PASSWORD: ${FRIGATE_EUFY_PAN_TILT_RTSP_PASSWORD}
+      LIBVA_DRIVER_NAME: i965 # we have J4125 https://docs.frigate.video/configuration/hardware_acceleration/#intel-based-cpus
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${DOCKER_CONF_DIR}/frigate/config.yml:/config/config.yml
+      - ${DOCKER_CONF_DIR}/frigate/storage:/media/frigate
+      - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+    ports:
+      - "5050:5000" # WebUI
+      - "8554:8554" # RTSP feeds
+      - "8555:8555/tcp" # WebRTC over tcp
+      - "8555:8555/udp" # WebRTC over udp
+      - "1984:1984" # webRTC
+    expose:
+      - 5000 # WebUI
     networks:
       - vlan_bridge
 
