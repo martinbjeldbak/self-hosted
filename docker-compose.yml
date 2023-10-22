@@ -87,7 +87,7 @@ services:
 
   # NOTE: this is a once-off task and runs using cron in synology "Tasks" section
   plextraktsync:
-    image: ghcr.io/taxel/plextraktsync:0.27.2
+    image: ghcr.io/taxel/plextraktsync:0.27.10
     command: sync
     container_name: plextraktsync
     networks:
