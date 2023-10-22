@@ -9,17 +9,40 @@ http:
   ip_ban_enabled: true
   login_attempts_threshold: 5
 
-wake_on_lan:
-
 # opnsense:
-#   url: !secret opnsense_api_url
-#   api_key: !secret opnsense_key
-#   api_secret: !secret opnsense_secret
-  
+#   url: https://192.168.1.1/api
+#   api_key: !secret opnsense_user
+#   api_secret: !secret opnsense_key
+#   verify_ssl: false
+#   tracker_interfaces:
+#     - USER
+
+rest_command:
+  wake_nandar_work_laptop:
+      url: 'https://192.168.1.1/api/wol/wol/set'
+      verify_ssl: false
+      method: POST
+      payload: '{"wake":{"interface": "opt3","mac": "80:fa:5b:90:f0:fd"}}'
+      content_type:  'application/json'
+      username: !secret opnsense_user
+      password: !secret opnsense_key
+
 switch:
-  - platform: wake_on_lan
-    name: !secret n_work_laptop
-    mac: !secret n_work_laptop_mac
+  - platform: template
+    switches:
+      nandar_work_laptop:
+        unique_id: nandar_work_laptop
+        friendly_name: "Nandar's Work Laptop"
+        value_template: "{{ is_state('binary_sensor.nandar_s_work_laptop', 'on') }}" 
+        turn_on:
+          service: rest_command.wake_nandar_work_laptop
+        turn_off: # Added as required, no way to wake-off-lan without running script
+        icon_template: >-
+          {% if is_state('binary_sensor.nandar_s_work_laptop', 'on') %}
+            mdi:laptop
+          {% else %}
+            mdi:laptop-off
+          {% endif %}
 
 homeassistant:
   name: Home
@@ -30,11 +53,14 @@ homeassistant:
   currency: AUD
   internal_url: !secret external_url
   external_url: !secret external_url
+  allowlist_external_dirs:
+    - "/cameras"
 
 logger:
   default: info
 
 homekit:
+  advertise_ip: "192.168.10.16"
   filter:
     include_domains:
       - sensor
@@ -44,6 +70,19 @@ homekit:
   entity_config:
     fan.mi_air_purifier_3h:
       name: Air Purifier
+    camera.eufy_indoor_2k:
+      linked_motion_sensor: binary_sensor.eufy_indoor_2k_motion
+      support_audio: True
+    camera.camera.eufy_indoor_pan_tilt:
+      linked_motion_sensor: binary_sensor.eufy_indoor_pan_tilt_motion
+      support_audio: True
+
+binary_sensor:
+  - platform: ping
+    host: 192.168.20.15
+    name: "Nandar's Work Laptop"
+    count: 2
+    scan_interval: 30
 
 sensor:
   - platform: systemmonitor
@@ -55,10 +94,9 @@ sensor:
       - type: load_15m
 
 adaptive_lighting:
+  min_brightness: 5
   lights:
-    - light.living_room_floorlamp
-    - light.martin_desk_lightstrip
-    - light.tv_lightstrip
+    - light.living_room_lights
 
 group: !include groups.yaml
 automation: !include automations.yaml

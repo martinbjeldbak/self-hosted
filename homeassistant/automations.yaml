@@ -70,3 +70,122 @@
       entity_id: scene.living_room_movie_paused
     metadata: {}
   mode: single
+- id: '1694783062795'
+  alias: Hue Dimmer Nandar Laptop WOL
+  description: WOL integration to turn on Nandar's laptop via Hue Dimmer switch
+  trigger:
+  - platform: state
+    entity_id:
+    - event.hue_dimmer_switch_button_2
+    attribute: event_type
+    to: long_release
+  condition: []
+  action:
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id: switch.nandar_work_laptop
+  mode: single
+- id: '1694784402214'
+  alias: Hue Dimmer Turn on living room
+  description: Living room lights
+  trigger:
+  - platform: state
+    entity_id:
+    - event.hue_dimmer_switch_button_1
+    attribute: event_type
+    to: short_release
+  condition: []
+  action:
+  - service: light.turn_on
+    data: {}
+    target:
+      entity_id: light.living_room_lights
+  mode: single
+- id: '1694784530273'
+  alias: Hue Dimmer turn off living room
+  description: Living room lights
+  trigger:
+  - platform: state
+    entity_id:
+    - event.hue_dimmer_switch_button_4
+  condition: []
+  action:
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id: light.living_room_lights
+  mode: single
+- id: '1694785112288'
+  alias: 'Adaptive lighting: reset manual_control after 1 hour'
+  description: 'Source: https://github.com/basnijholt/adaptive-lighting/tree/5cd060a37c2cdad3c7e266b937dc50e4b1c79711#robot-automation-examples'
+  trigger:
+  - platform: event
+    event_type: adaptive_lighting.manual_control
+  action:
+  - delay: 01:00:00
+  - condition: template
+    value_template: '{{ light in state_attr(switch, ''manual_control'') }}'
+  - service: adaptive_lighting.set_manual_control
+    data:
+      entity_id: '{{ switch }}'
+      lights: '{{ light }}'
+      manual_control: false
+  mode: parallel
+  variables:
+    light: '{{ trigger.event.data.entity_id }}'
+    switch: '{{ trigger.event.data.switch }}'
+- id: '1694785300713'
+  alias: 'Hue Dimmer: Increase brightness'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - event.hue_dimmer_switch_button_2
+    attribute: event_type
+    to: short_release
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      brightness_step_pct: 20
+    target:
+      entity_id: light.living_room_lights
+  mode: single
+- id: '1694785348532'
+  alias: 'Hue Dimmer: Decrease brightness'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - event.hue_dimmer_switch_button_3
+    attribute: event_type
+    from: short_release
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      brightness_step_pct: -20
+    target:
+      entity_id: light.living_room_lights
+  mode: single
+- id: '1694785593921'
+  alias: 'Hue Dimmer: Apply adaptive lightning'
+  description: Long press on on button
+  trigger:
+  - platform: state
+    entity_id:
+    - event.hue_dimmer_switch_button_1
+    attribute: event_type
+    to: long_release
+  condition: []
+  action:
+  - service: adaptive_lighting.apply
+    data:
+      entity_id: switch.adaptive_lighting_adapt_brightness_default
+      lights:
+      - light.living_room_lights
+      adapt_color: true
+      adapt_brightness: true
+      turn_on_lights: true
+  mode: single
