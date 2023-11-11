@@ -189,7 +189,7 @@ services:
     networks:
       - vlan_bridge
     container_name: gluetun
-    restart: unless-stopped
+    restart: always
     cap_add:
       - net_admin
     devices:
@@ -210,7 +210,10 @@ services:
       - 9091 # transmission UI
       - 9117 # jackett UI
       - 8191 # flaresolverr
-
+    labels:
+      - com.centurylinklabs.watchtower.enable=false
+    security_opt:
+      - no-new-privileges:true
   transmission:
     image: ghcr.io/linuxserver/transmission
     container_name: transmission
@@ -249,33 +252,33 @@ services:
     healthcheck:
       test: ["CMD", "caddy", "version"]
 
-  unpackerr:
-    image: golift/unpackerr
-    networks:
-      - vlan_bridge
-    container_name: unpackerr
-    volumes:
-      - ${DOCKER_DOWNLOADS_DIR}:/data/downloads
-    restart: always
-    user: ${PUID}:${PGID}
-    environment:
-      <<: *env
-      # Sonarr config
-      UN_SONARR_0_URL: http://sonarr:8989
-      UN_SONARR_0_API_KEY: ${SONARR_API_KEY}
-      UN_SONARR_0_PATHS_0: /data/downloads/torrents/completed
+  # unpackerr:
+  #   image: golift/unpackerr
+  #   networks:
+  #     - vlan_bridge
+  #   container_name: unpackerr
+  #   volumes:
+  #     - ${DOCKER_DOWNLOADS_DIR}:/data/downloads
+  #   restart: always
+  #   user: ${PUID}:${PGID}
+  #   environment:
+  #     <<: *env
+  #     # Sonarr config
+  #     UN_SONARR_0_URL: http://sonarr:8989
+  #     UN_SONARR_0_API_KEY: ${SONARR_API_KEY}
+  #     UN_SONARR_0_PATHS_0: /data/downloads/torrents/completed
 
-      # Radarr config
-      UN_RADARR_0_URL: http://radarr:7878
-      UN_RADARR_0_API_KEY: ${RADARR_API_KEY}
-      UN_RADARR_0_PATHS_0: /data/downloads/torrents/completed
+  #     # Radarr config
+  #     UN_RADARR_0_URL: http://radarr:7878
+  #     UN_RADARR_0_API_KEY: ${RADARR_API_KEY}
+  #     UN_RADARR_0_PATHS_0: /data/downloads/torrents/completed
 
-      # Lidarr config
-      UN_LIDARR_0_URL: http://lidarr:8686
-      UN_LIDARR_0_API_KEY: ${LIDARR_API_KEY}
-      UN_LIDARR_0_PATHS_0: /data/downloads/torrents/completed
-    security_opt:
-      - no-new-privileges:true
+  #     # Lidarr config
+  #     UN_LIDARR_0_URL: http://lidarr:8686
+  #     UN_LIDARR_0_API_KEY: ${LIDARR_API_KEY}
+  #     UN_LIDARR_0_PATHS_0: /data/downloads/torrents/completed
+  #   security_opt:
+  #     - no-new-privileges:true
 
   watchtower:
     image: containrrr/watchtower
@@ -288,9 +291,11 @@ services:
     environment:
       WATCHTOWER_NOTIFICATIONS: shoutrrr
       WATCHTOWER_NOTIFICATION_URL: ${DISCORD_NOTIFICATION_URL}
-      WATCHTOWER_MONITOR_ONLY: 'true'
-    command: --schedule "0 0 3 * * ?" # run at 3am
-
+      WATCHTOWER_REMOVE_VOLUMES: true
+      WATCHTOWER_CLEANUP: true
+      WATCHTOWER_INCLUDE_STOPPED: true
+      WATCHTOWER_REVIVE_STOPPED: true
+      WATCHTOWER_SCHEDULE: 0 0 2 * * *
   db:
     image: postgres:14.6-alpine
     container_name: postgres
@@ -386,83 +391,56 @@ services:
       FEATURES_DNS_SERVERCONFIG: false # replica needs to point to Unbound on router IP, not localhost
     networks:
       - vlan_bridge
-  mqtt:
-    image: emqx/emqx:latest
-    container_name: mqtt
-    restart: unless-stopped
-    ports:
-      - 1883:1883 # tcp
-      - 8083:8083 # ws
-      - 8084:8084 # wss
-      - 8883:8883 # ssl
-      - 18083:18083 # web UI
-    volumes:
-      - ${DOCKER_CONF_DIR}/emqx/data:/opt/emqx/data
-      - ${DOCKER_CONF_DIR}/emqx/etc:/opt/emqx/etc
-      - ${DOCKER_CONF_DIR}/emqx/log:/opt/emqx/log
-    networks:
-      - vlan_bridge
-
-  # scrypted:
-  #   image: koush/scrypted:latest
-  #   container_name: scrypted
+  # mqtt:
+  #   image: emqx/emqx:latest
+  #   container_name: mqtt
   #   restart: unless-stopped
-  #   logging:
-  #       driver: "json-file"
-  #       options:
-  #           max-size: "10m"
-  #           max-file: "10"
+  #   ports:
+  #     - 1883:1883 # tcp
+  #     - 8083:8083 # ws
+  #     - 8084:8084 # wss
+  #     - 8883:8883 # ssl
+  #     - 18083:18083 # web UI
+  #   volumes:
+  #     - ${DOCKER_CONF_DIR}/emqx/data:/opt/emqx/data
+  #     - ${DOCKER_CONF_DIR}/emqx/etc:/opt/emqx/etc
+  #     - ${DOCKER_CONF_DIR}/emqx/log:/opt/emqx/log
+  #   networks:
+  #     - vlan_bridge
+  # frigate:
+  #   image: ghcr.io/blakeblackshear/frigate:stable
+  #   container_name: frigate
+  #   restart: unless-stopped
+  #   shm_size: "64mb"
   #   devices:
   #     - /dev/dri:/dev/dri # for intel hwaccel, needs to be updated for your hardware
-  #   volumes:
-  #     - ${DOCKER_CONF_DIR}/scrypted/database:/server/volume
-  #     - ${DOCKER_CONF_DIR}/scrypted/nvr:/nvr
-  #     - /var/run/dbus:/var/run/dbus
-  #     - /var/run/avahi-daemon/socket:/var/run/avahi-daemon/socket      
+  #   privileged: true # https://docs.frigate.video/configuration/hardware_acceleration/#intel-based-cpus
   #   environment:
-  #     SCRYPTED_NVR_VOLUME: /nvr
+  #     FRIGATE_MQTT_USER: ${FRIGATE_MQTT_USER}
+  #     FRIGATE_MQTT_PASSWORD: ${FRIGATE_MQTT_PASSWORD}
+  #     FRIGATE_EUFY_INDOOR_RTSP_USER: ${FRIGATE_EUFY_INDOOR_RTSP_USER}
+  #     FRIGATE_EUFY_INDOOR_RTSP_PASSWORD: ${FRIGATE_EUFY_INDOOR_RTSP_PASSWORD}
+  #     FRIGATE_EUFY_PAN_TILT_RTSP_USER: ${FRIGATE_EUFY_PAN_TILT_RTSP_USER}
+  #     FRIGATE_EUFY_PAN_TILT_RTSP_PASSWORD: ${FRIGATE_EUFY_PAN_TILT_RTSP_PASSWORD}
+  #     LIBVA_DRIVER_NAME: i965 # we have J4125 https://docs.frigate.video/configuration/hardware_acceleration/#intel-based-cpus
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - ${DOCKER_CONF_DIR}/frigate/config.yml:/config/config.yml
+  #     - ${DOCKER_CONF_DIR}/frigate/storage:/media/frigate
+  #     - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
+  #       target: /tmp/cache
+  #       tmpfs:
+  #         size: 1000000000
   #   ports:
-  #     - 11080:11080
+  #     - "5050:5000" # WebUI
+  #     - "8554:8554" # RTSP feeds
+  #     - "8555:8555/tcp" # WebRTC over tcp
+  #     - "8555:8555/udp" # WebRTC over udp
+  #     - "1984:1984" # webRTC
   #   expose:
-  #     - 11080
+  #     - 5000 # WebUI
   #   networks:
-  #     vlan_bridge:
-  #     macvlan:
-  #       ipv4_address: 192.168.10.17 # enable homekit & WOL functionality
-  frigate:
-    image: ghcr.io/blakeblackshear/frigate:stable
-    container_name: frigate
-    restart: unless-stopped
-    shm_size: "64mb"
-    devices:
-      - /dev/dri:/dev/dri # for intel hwaccel, needs to be updated for your hardware
-    privileged: true # https://docs.frigate.video/configuration/hardware_acceleration/#intel-based-cpus
-    environment:
-      FRIGATE_MQTT_USER: ${FRIGATE_MQTT_USER}
-      FRIGATE_MQTT_PASSWORD: ${FRIGATE_MQTT_PASSWORD}
-      FRIGATE_EUFY_INDOOR_RTSP_USER: ${FRIGATE_EUFY_INDOOR_RTSP_USER}
-      FRIGATE_EUFY_INDOOR_RTSP_PASSWORD: ${FRIGATE_EUFY_INDOOR_RTSP_PASSWORD}
-      FRIGATE_EUFY_PAN_TILT_RTSP_USER: ${FRIGATE_EUFY_PAN_TILT_RTSP_USER}
-      FRIGATE_EUFY_PAN_TILT_RTSP_PASSWORD: ${FRIGATE_EUFY_PAN_TILT_RTSP_PASSWORD}
-      LIBVA_DRIVER_NAME: i965 # we have J4125 https://docs.frigate.video/configuration/hardware_acceleration/#intel-based-cpus
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - ${DOCKER_CONF_DIR}/frigate/config.yml:/config/config.yml
-      - ${DOCKER_CONF_DIR}/frigate/storage:/media/frigate
-      - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
-        target: /tmp/cache
-        tmpfs:
-          size: 1000000000
-    ports:
-      - "5050:5000" # WebUI
-      - "8554:8554" # RTSP feeds
-      - "8555:8555/tcp" # WebRTC over tcp
-      - "8555:8555/udp" # WebRTC over udp
-      - "1984:1984" # webRTC
-    expose:
-      - 5000 # WebUI
-    networks:
-      - vlan_bridge
+  #     - vlan_bridge
 
 networks:
   macvlan:
