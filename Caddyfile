@@ -116,20 +116,6 @@
 	}
 
 	
-	@frigate host frigate.local.martinbjeldbak.com
-	handle @frigate {
-		reverse_proxy frigate:5000
-
-		encode gzip
-	}
-
-	@mqtt host mqtt.local.martinbjeldbak.com
-	handle @mqtt {
-		reverse_proxy mqtt:18083
-
-		encode gzip
-	}
-
 	@pterodactyl host panel.martinbjeldbak.com
 	handle @pterodactyl {
 		reverse_proxy panel:80

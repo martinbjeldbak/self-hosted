@@ -17,6 +17,17 @@ http:
 #   tracker_interfaces:
 #     - USER
 
+sensor:
+   - platform: epsonworkforce
+     host: 192.168.30.17
+     monitored_conditions:
+     - black
+     - photoblack
+     - yellow
+     - magenta
+     - cyan
+     - clean
+
 rest_command:
   wake_nandar_work_laptop:
       url: 'https://192.168.1.1/api/wol/wol/set'
@@ -33,7 +44,7 @@ switch:
       nandar_work_laptop:
         unique_id: nandar_work_laptop
         friendly_name: "Nandar's Work Laptop"
-        value_template: "{{ is_state('binary_sensor.nandar_s_work_laptop', 'on') }}" 
+        value_template: "{{ is_state('binary_sensor.nandar_s_work_laptop', 'on') }}"
         turn_on:
           service: rest_command.wake_nandar_work_laptop
         turn_off: # Added as required, no way to wake-off-lan without running script
@@ -70,12 +81,6 @@ homekit:
   entity_config:
     fan.mi_air_purifier_3h:
       name: Air Purifier
-    camera.eufy_indoor_2k:
-      linked_motion_sensor: binary_sensor.eufy_indoor_2k_motion
-      support_audio: True
-    camera.camera.eufy_indoor_pan_tilt:
-      linked_motion_sensor: binary_sensor.eufy_indoor_pan_tilt_motion
-      support_audio: True
 
 binary_sensor:
   - platform: ping
