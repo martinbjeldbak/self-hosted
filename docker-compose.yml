@@ -44,7 +44,6 @@ services:
     volumes:
       - ./homeassistant:/config
       - /etc/localtime:/etc/localtime:ro
-      - ./homeassistant/cameras:/cameras
     restart: always
 
   plex:
@@ -217,7 +216,7 @@ services:
 
   caddy:
     build:
-      context: ./reverse-proxy
+      context: .
       dockerfile: caddy.Dockerfile
       network: host
     container_name: caddy
@@ -295,10 +294,7 @@ services:
       - vlan_bridge
 
   huginn:
-    build:
-      context: .
-      dockerfile: huginn.Dockerfile
-      network: host
+    image: ghcr.io/huginn/huginn
     container_name: huginn
     restart: unless-stopped
     expose:
