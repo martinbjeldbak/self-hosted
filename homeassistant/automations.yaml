@@ -101,6 +101,14 @@
     data: {}
     target:
       entity_id: light.living_room_lights
+  - service: adaptive_lighting.apply
+    data:
+      entity_id: switch.adaptive_lighting_adapt_brightness_default
+      lights:
+      - light.living_room_lights
+      adapt_color: true
+      adapt_brightness: true
+      turn_on_lights: true
   mode: single
 - id: '1694784530273'
   alias: Hue Dimmer turn off living room
@@ -188,4 +196,93 @@
       adapt_color: true
       adapt_brightness: true
       turn_on_lights: true
+  mode: single
+- id: '1698202098549'
+  alias: Frigate Notifications (0.12.0.1)
+  description: ''
+  use_blueprint:
+    path: SgtBatten/Stable.yaml
+    input:
+      camera: camera.eufy_indoor_pan_tilt
+      notify_device: 3689b8cb31ba6f23d3de3ea764896d00
+      base_url: https://homeassistant.local.martinbjeldbak.com
+      title: Living Room Camera notification
+      update_thumbnail: true
+      ios_live_view: true
+      tv_transparency: 0%
+      tv: false
+- id: '1698202385595'
+  alias: Camera Upstairs camera notification
+  description: 'Source: https://docs.frigate.video/guides/ha_notifications/'
+  use_blueprint:
+    path: SgtBatten/Stable.yaml
+    input:
+      camera: camera.eufy_indoor_pan_tilt
+      notify_device: 3689b8cb31ba6f23d3de3ea764896d00
+      base_url: https://homeassistant.local.martinbjeldbak.com
+      title: Someone detected on upstairs camera
+      update_thumbnail: true
+      ios_live_view: false
+- id: '1698288161573'
+  alias: Camera middle
+  description: 'Source: https://docs.frigate.video/guides/ha_notifications/'
+  use_blueprint:
+    path: SgtBatten/Stable.yaml
+    input:
+      camera: camera.eufy_indoor_2k
+      notify_device: 3689b8cb31ba6f23d3de3ea764896d00
+      base_url: https://homeassistant.local.martinbjeldbak.com
+      title: Someone detected on middle camera
+      update_thumbnail: true
+      ios_live_view: false
+- id: '1704424503348'
+  alias: Notify on high CO2 levels
+  description: ''
+  trigger:
+  - type: carbon_dioxide
+    platform: device
+    device_id: 4d9c607685d2fb9bf51b4c55ab3c1a50
+    entity_id: ed0a51483b5d909800a6c5140ea41d2a
+    domain: sensor
+    above: 1000
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+  condition: []
+  action:
+  - service: notify.mobile_app_dagobah
+    metadata: {}
+    data:
+      message: CO2 levels are high at {{states("sensor.aranet4_20b7d_carbon_dioxide")
+        }} ppm
+      title: CO2 Levels High
+  - service: notify.email_using_fastmail
+    metadata: {}
+    data:
+      message: CO2 levels are high at {{states("sensor.aranet4_20b7d_carbon_dioxide")
+        }}ppm. See details here:<a href="https://homeassistant.local.martinbjeldbak.com/history?entity_id=sensor.aranet4_20b7d_carbon_dioxide">here</a>
+      title: CO2 levels high
+  mode: single
+- id: '1704424867342'
+  alias: Aranet low battery notification
+  description: Notify on low battery
+  trigger:
+  - type: battery_level
+    platform: device
+    device_id: 4d9c607685d2fb9bf51b4c55ab3c1a50
+    entity_id: 8cbb96637c2ea92e52ad0b387bf1c7b6
+    domain: sensor
+    below: 10
+    for:
+      hours: 0
+      minutes: 2
+      seconds: 0
+  condition: []
+  action:
+  - service: notify.mobile_app_dagobah
+    metadata: {}
+    data:
+      message: Aranet battery is below 10%
+      title: Aranet battery low
   mode: single

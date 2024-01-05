@@ -16,6 +16,18 @@ http:
 #   tracker_interfaces:
 #     - USER
 
+notify:
+  - name: "Email using Fastmail"
+    platform: smtp
+    sender: homeassistant@martinbjeldbak.com
+    recipient: me@martinbjeldbak.com
+    server: !secret smtp_server
+    port: 465 # SSL
+    username: !secret smtp_username
+    password: !secret smtp_password
+    encryption: tls
+    sender_name: Martin's Home Assistant
+
 sensor:
    - platform: epsonworkforce
      host: 192.168.30.17
