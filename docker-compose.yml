@@ -21,8 +21,8 @@ services:
     environment:
       <<: *env
     volumes:
-      - ${DOCKER_CONF_DIR}/adguardhome/work:/opt/adguardhome/work
-      - ${DOCKER_CONF_DIR}/adguardhome/conf:/opt/adguardhome/conf
+      - ./adguardhome/work:/opt/adguardhome/work
+      - ./adguardhome/conf:/opt/adguardhome/conf
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
 
@@ -44,7 +44,7 @@ services:
     volumes:
       - ./homeassistant:/config
       - /etc/localtime:/etc/localtime:ro
-      - ${DOCKER_CONF_DIR}/homeassistant/cameras:/cameras
+      - ./homeassistant/cameras:/cameras
     restart: always
 
   plex:
@@ -67,8 +67,8 @@ services:
       PLEX_CLAIM: ${PLEX_CLAIM}
       <<: *env
     volumes:
-      - ${DOCKER_CONF_DIR}/plex/database:/config
-      - ${DOCKER_CONF_DIR}/plex/transcode:/transcode
+      - ./plex/database:/config
+      - ./plex/transcode:/transcode
       - ${DOCKER_MEDIA_DIR}:/data
     devices:
       - /dev/dri:/dev/dri # Synology w/ Intel CPU for hardware encoding
@@ -81,7 +81,7 @@ services:
     networks:
       - vlan_bridge
     volumes:
-      - ${DOCKER_CONF_DIR}/plextraktsync:/app/config
+      - ./plextraktsync:/app/config
     depends_on:
       - plex
     environment:
@@ -98,7 +98,7 @@ services:
     environment:
       PMM_NO_MISSING: 'true'
     volumes:
-      - ${DOCKER_CONF_DIR}/plex-meta-manager:/config
+      - ./plex-meta-manager:/config
     depends_on:
       - plex
 
@@ -113,7 +113,7 @@ services:
     environment:
       <<: *env
     volumes:
-      - ${DOCKER_CONF_DIR}/radarr:/config
+      - ./radarr:/config
       - ${DOCKER_DATA_DIR}:/data
 
   # lidarr makes so many DNS requests - going to disable as mostly unused anyway
@@ -128,7 +128,7 @@ services:
   #   environment:
   #     <<: *env
   #   volumes:
-  #     - ${DOCKER_CONF_DIR}/lidarr:/config
+  #     - ./lidarr:/config
   #     - ${DOCKER_DATA_DIR}:/data
 
   sonarr:
@@ -142,7 +142,7 @@ services:
       <<: *env
     restart: unless-stopped
     volumes:
-      - ${DOCKER_CONF_DIR}/sonarr:/config
+      - ./sonarr:/config
       - ${DOCKER_DATA_DIR}:/data
 
   tautulli:
@@ -152,7 +152,7 @@ services:
     container_name: tautulli
     restart: unless-stopped
     volumes:
-      - ${DOCKER_CONF_DIR}/tautulli:/config
+      - ./tautulli:/config
     environment:
       <<: *env
     expose:
@@ -169,7 +169,7 @@ services:
       - 6767
     restart: unless-stopped
     volumes:
-      - ${DOCKER_CONF_DIR}/bazarr:/config
+      - ./bazarr:/config
       - ${DOCKER_MEDIA_DIR}:/data/media
 
   gluetun:
@@ -183,7 +183,7 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     volumes:
-      - ${DOCKER_CONF_DIR}/gluetun:/gluetun
+      - ./gluetun:/gluetun
     environment:
       VPN_SERVICE_PROVIDER: mullvad
       VPN_TYPE: wireguard
@@ -211,13 +211,13 @@ services:
       PASS: ${TRANSMISSION_PASSWORD}
       <<: *env
     volumes:
-      - ${DOCKER_CONF_DIR}/transmission:/config
+      - ./transmission:/config
       - ${DOCKER_TORRENTS_DIR}:/data/downloads/torrents
       - ${DOCKER_TORRENTS_DIR}/watch:/watch
 
   caddy:
     build:
-      context: .
+      context: ./reverse-proxy
       dockerfile: caddy.Dockerfile
       network: host
     container_name: caddy
@@ -234,8 +234,8 @@ services:
       <<: *env
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - ${DOCKER_CONF_DIR}/caddy/config:/config
-      - ${DOCKER_CONF_DIR}/caddy/data:/data
+      - ./caddy/config:/config
+      - ./caddy/data:/data
     healthcheck:
       test: ["CMD", "caddy", "version"]
 
@@ -288,7 +288,7 @@ services:
     container_name: postgres
     restart: always
     volumes:
-      - ${DOCKER_CONF_DIR}/postgres:/var/lib/postgresql/data
+      - ./postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     networks:
@@ -335,7 +335,7 @@ services:
     environment:
       <<: *env
     volumes:
-      - ${DOCKER_CONF_DIR}/heimdall:/config
+      - ./heimdall:/config
 
   prowlarr:
     image: ghcr.io/linuxserver/prowlarr:latest
@@ -345,7 +345,7 @@ services:
     environment:
       <<: *env
     volumes:
-      - ${DOCKER_CONF_DIR}/prowlarr:/config
+      - ./prowlarr:/config
 
   recyclarr:
     image: ghcr.io/recyclarr/recyclarr
@@ -355,7 +355,7 @@ services:
     networks:
       - vlan_bridge
     volumes:
-      - ${DOCKER_CONF_DIR}/recyclarr:/config
+      - ./recyclarr:/config
     environment:
       <<: *env
       RECYCLARR_CREATE_CONFIG: "true"
@@ -393,7 +393,7 @@ services:
     container_name: esphome
     image: ghcr.io/esphome/esphome
     volumes:
-      - ${DOCKER_CONF_DIR}/esphome/config:/config
+      - ./esphome/config:/config
       - /etc/localtime:/etc/localtime:ro
     restart: always
     privileged: true
@@ -415,7 +415,7 @@ services:
     volumes:
       # Setting the web portal URL is not supported using env variables,
       # mount volume and manually set in config
-      - ${DOCKER_CONF_DIR}/epicgames-freegames/config:/usr/app/config
+      - ./epicgames-freegames/config:/usr/app/config
     environment:
       <<: *env
       EMAIL: ${SMTP_USER_NAME}
@@ -442,7 +442,7 @@ services:
   #   expose:
   #     - 3000
   #   volumes:
-  #     - ${DOCKER_CONF_DIR}/homepage:/config
+  #     - ./homepage:/config
   #     - /var/run/docker.sock:/var/run/docker.sock:ro
   #   restart: unless-stopped
 

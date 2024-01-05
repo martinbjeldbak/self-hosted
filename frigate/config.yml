@@ -1,0 +1,92 @@
+mqtt:
+  host: mqtt
+  user: "{FRIGATE_MQTT_USER}"
+  password: "{FRIGATE_MQTT_PASSWORD}"
+
+ffmpeg:
+  hwaccel_args: preset-vaapi
+
+detectors:
+  ov:
+    type: openvino
+    device: AUTO
+    model:
+      path: /openvino-model/ssdlite_mobilenet_v2.xml
+
+birdseye:
+  enabled: True
+  mode: continuous
+
+model:
+  width: 300
+  height: 300
+  input_tensor: nhwc
+  input_pixel_format: bgr
+  labelmap_path: /openvino-model/coco_91cl_bkgr.txt
+
+objects:
+  track:
+    - person
+    - cat
+
+timestamp_style:
+  position: "tl"
+  effect: shadow
+
+ui:
+  live_mode: webrtc
+
+record:
+  enabled: true
+  retain:
+    days: 7
+    mode: motion
+  events:
+    retain:
+      default: 14
+      mode: active_objects
+
+snapshots:
+  enabled: true
+  retain:
+    default: 10
+
+go2rtc:
+  streams:
+    eufy_indoor_2k:
+      - rtsp://{FRIGATE_EUFY_INDOOR_RTSP_USER}:{FRIGATE_EUFY_INDOOR_RTSP_PASSWORD}@192.168.50.10/live0
+      - "ffmpeg:eufy_indoor_2k#audio=opus" # <- copy of the stream which transcodes audio to the missing codec
+    eufy_indoor_pan_tilt:
+      - rtsp://{FRIGATE_EUFY_PAN_TILT_RTSP_USER}:{FRIGATE_EUFY_PAN_TILT_RTSP_PASSWORD}@192.168.50.11/live0
+      - "ffmpeg:eufy_indoor_pan_tilt#audio=opus" # <- copy of the stream which transcodes audio to the missing codec
+  webrtc:
+    candidates:
+      - 192.168.10.10:8555
+      - stun:8555
+
+cameras:
+  eufy_indoor_2k:
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/eufy_indoor_2k
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
+            - record
+    detect:
+      width: 1920
+      height: 1080
+  eufy_indoor_pan_tilt:
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/eufy_indoor_pan_tilt
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
+            - record
+    detect:
+      width: 1920
+      height: 1080
+
+telemetry:
+  version_check: false # watchtower will watch versions

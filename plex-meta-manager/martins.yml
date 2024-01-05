@@ -1,0 +1,55 @@
+collections:
+  The Lord of the Rings Extended Editions:
+    plex_all: true
+    filters:
+      # Src: https://github.com/meisnate12/Plex-Meta-Manager-Configs/blob/b16bfc9e5dda2d7d5625dbce2826bfdfea3cf971/PMM/overlays/special_release.yml#L88
+      filepath.regex:
+        - '(?<=[0-9]{4}[)}>\]]\s).*\bExtended\b'
+      title: The Lord of the Rings
+
+  The Lord of the Rings: # try to override existing collection to get rid of extended
+    plex_all: true
+    filters:
+      filepath.regex:
+        - '(?<=[0-9]{4}[)}>\]]\s).*\bTheatrical\b'
+      title: The Lord of the Rings
+
+  The Hobbit Extended Editions:
+    plex_all: true
+    filters:
+      filepath.regex:
+        - '(?<=[0-9]{4}[)}>\]]\s).*\bExtended\b'
+      title: The Hobbit
+
+  # 2022-08-11 NOTE: Might have to manually collection first, still unsure
+  The Hobbit:
+    plex_all: true
+    filters:
+      filepath.regex:
+        - '(?<=[0-9]{4}[)}>\]]\s).*\bTheatrical\b'
+      title: The Hobbit
+
+  Middle Earth Extended Editions:
+    plex_all: true
+    filters:
+      filepath.regex:
+        - '(?<=[0-9]{4}[)}>\]]\s).*\bExtended\b'
+      title.regex: '(?i)\b(The Lord of the Rings)|(The Hobbit)\b'
+
+  # 2022-08-11 NOTE: Might have to manually collection first, still unsure
+  Middle Earth:
+    plex_all: true
+    filters:
+      filepath.regex:
+        - '(?<=[0-9]{4}[)}>\]]\s).*\bTheatrical\b'
+      title.regex: '(?i)\b(The Lord of the Rings)|(The Hobbit)\b'
+
+  Star Wars the Complete Collection:
+    trakt_list:
+      - https://trakt.tv/users/darkman1498/lists/star-wars
+    collection_order: custom
+    sync_mode: sync
+    radarr_add_missing: true
+    radarr_add_existing: true
+    radarr_monitor: true
+    radarr_quality: Ultra-HD
