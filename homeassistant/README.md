@@ -5,7 +5,7 @@ This repository contains a backup of my Home Assistant configuration.
 
 Home assistant is installed via [hass.io](https://www.home-assistant.io/hassio/) on a Raspberry Pi 3 Model B connected to my home network.
 
-## Home Assitant Integrations
+## Home Assistant Integrations
 
 I have the following integrations set up via the UI
 
@@ -21,14 +21,4 @@ I have the following integrations set up via the UI
 
 ## Home Assistant Custom Components
 
-I am also using [HACS](https://hacs.xyz) for improved Apple TV support, among other addons.
-
-## Hass.io Addons
-
-On the hass.io superviser side of things, I have the following add-ons installed via the UI
-
-* AdGuard Home, configured with many blocklists
-* Terminal & SSH
-* CEC Scanner
-
-Everything is backed up via the hass.io snapshot feature.
+I am also using [HACS](https://hacs.xyz) for improved Apple TV support, TP-Link Tapo integration, among other addons.
