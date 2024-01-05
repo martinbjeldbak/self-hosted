@@ -9,7 +9,6 @@ http:
   ip_ban_enabled: true
   login_attempts_threshold: 5
 
-# opnsense:
 #   url: https://192.168.1.1/api
 #   api_key: !secret opnsense_user
 #   api_secret: !secret opnsense_key
@@ -88,15 +87,6 @@ binary_sensor:
     name: "Nandar's Work Laptop"
     count: 2
     scan_interval: 30
-
-sensor:
-  - platform: systemmonitor
-    resources:
-      - type: disk_use_percent
-        arg: /
-      - type: memory_free
-      - type: load_1m
-      - type: load_15m
 
 adaptive_lighting:
   min_brightness: 5

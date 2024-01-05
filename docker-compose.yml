@@ -47,18 +47,6 @@ services:
       - ${DOCKER_CONF_DIR}/homeassistant/cameras:/cameras
     restart: always
 
-  jackett:
-    image: ghcr.io/linuxserver/jackett
-    container_name: jackett
-    network_mode: "service:gluetun"
-    environment:
-      <<: *env
-      AUTO_UPDATE: 'true'
-    restart: unless-stopped
-    volumes:
-      - ${DOCKER_CONF_DIR}/jackett/config:/config
-      - ${DOCKER_TORRENTS_DIR}/watch:/downloads
-
   plex:
     image: ghcr.io/linuxserver/plex
     container_name: plex
@@ -208,8 +196,7 @@ services:
       <<: *env
     expose:
       - 9091 # transmission UI
-      - 9117 # jackett UI
-      - 8191 # flaresolverr
+      - 9696 # Prowlarr
     labels:
       - com.centurylinklabs.watchtower.enable=false
     security_opt:
@@ -350,13 +337,15 @@ services:
     volumes:
       - ${DOCKER_CONF_DIR}/heimdall:/config
 
-  flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr
-    container_name: flaresolverr
+  prowlarr:
+    image: ghcr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
     network_mode: "service:gluetun"
     restart: unless-stopped
     environment:
-      TZ: ${TZ}
+      <<: *env
+    volumes:
+      - ${DOCKER_CONF_DIR}/prowlarr:/config
 
   recyclarr:
     image: ghcr.io/recyclarr/recyclarr
@@ -391,6 +380,71 @@ services:
       FEATURES_DNS_SERVERCONFIG: false # replica needs to point to Unbound on router IP, not localhost
     networks:
       - vlan_bridge
+
+  acestream-http-proxy:
+    image: ghcr.io/martinbjeldbak/acestream-http-proxy
+    container_name: acestream-http-proxy
+    ports:
+      - 6878:80
+    networks:
+      - vlan_bridge
+
+  esphome:
+    container_name: esphome
+    image: ghcr.io/esphome/esphome
+    volumes:
+      - ${DOCKER_CONF_DIR}/esphome/config:/config
+      - /etc/localtime:/etc/localtime:ro
+    restart: always
+    privileged: true
+    expose:
+      - 6052 # UI
+    environment:
+      USERNAME: esphome
+      PASSWORD: ${ESPHOME_PASSWORD}
+      ESPHOME_DASHBOARD_USE_PING: true
+    networks:
+      - vlan_bridge
+
+  epicgames-freegames:
+    image: ghcr.io/claabs/epicgames-freegames-node
+    container_name: epicgames-freegames
+    restart: unless-stopped
+    expose:
+      - 3000
+    volumes:
+      # Setting the web portal URL is not supported using env variables,
+      # mount volume and manually set in config
+      - ${DOCKER_CONF_DIR}/epicgames-freegames/config:/usr/app/config
+    environment:
+      <<: *env
+      EMAIL: ${SMTP_USER_NAME}
+      SMTP_HOST: ${SMTP_SERVER}
+      SMTP_PORT: 465
+      EMAIL_SENDER_ADDRESS: epicgames@martinbjeldbak.com
+      EMAIL_SENDER_NAME: Epic Games Captcha
+      EMAIL_RECIPIENT_ADDRESS: ${SMTP_USER_NAME}
+      SMTP_SECURE: true
+      SMTP_USERNAME: ${SMTP_USER_NAME}
+      SMTP_PASSWORD: ${HUGINN_SMTP_PASSWORD}
+      RUN_ON_STARTUP: true
+      RUN_ONCE: true
+    networks:
+      - vlan_bridge
+
+  # homepage:
+  #   image: ghcr.io/gethomepage/homepage:latest
+  #   container_name: homepage
+  #   networks:
+  #     - vlan_bridge
+  #   environment:
+  #     <<: *env
+  #   expose:
+  #     - 3000
+  #   volumes:
+  #     - ${DOCKER_CONF_DIR}/homepage:/config
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #   restart: unless-stopped
 
 networks:
   macvlan:

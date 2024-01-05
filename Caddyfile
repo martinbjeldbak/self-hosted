@@ -52,9 +52,9 @@
 		encode gzip
 	}
 
-	@jackett host jackett.local.martinbjeldbak.com
-	handle @jackett {
-		reverse_proxy gluetun:9117
+	@prowlarr host prowlarr.local.martinbjeldbak.com
+	handle @prowlarr {
+		reverse_proxy gluetun:9696
 
 		encode gzip
 	}
@@ -115,7 +115,6 @@
 		encode gzip
 	}
 
-	
 	@pterodactyl host panel.martinbjeldbak.com
 	handle @pterodactyl {
 		reverse_proxy panel:80
@@ -166,9 +165,28 @@
 		encode gzip
 	}
 
+	@elmbot host elmbot.local.martinbjeldbak.com
+	handle @elmbot {
+		reverse_proxy elmbot:54377
+
+		encode gzip
+	}
+
+	@esphome host esphome.local.martinbjeldbak.com
+	handle @esphome {
+		reverse_proxy esphome:6052
+
+		encode gzip
+	}
+
+	@epicgames host epicgames.local.martinbjeldbak.com
+	handle @epicgames {
+		reverse_proxy epicgames-freegames:3000
+
+		encode gzip
+	}
+
 	# Fallback for otherwise unhandled domains
-
-
 	handle {
 		abort
 	}
