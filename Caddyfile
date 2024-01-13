@@ -186,6 +186,13 @@
 		encode gzip
 	}
 
+	@plex host plex.local.martinbjeldbak.com
+	handle @plex {
+		reverse_proxy plex:32400
+
+		encode gzip
+	}
+
 	# Fallback for otherwise unhandled domains
 	handle {
 		abort
