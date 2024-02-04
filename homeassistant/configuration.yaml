@@ -85,6 +85,7 @@ homekit:
     include_domains:
       - sensor
       - fan
+      - climate
     include_entities:
       - switch.string_lights
   entity_config:
@@ -107,3 +108,13 @@ group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
+
+smartir:
+climate:
+  - platform: smartir
+    name: Living room AC
+    unique_id: living_room_ac
+    device_code: 1135 # source: https://github.com/smartHomeHub/SmartIR/blob/master/docs/CLIMATE.md#available-codes-for-climate-devices
+    controller_data: remote.living_room_broadlink
+    temperature_sensor: sensor.living_room_broadlink_temperature
+    humidity_sensor: sensor.living_room_broadlink_humidity
