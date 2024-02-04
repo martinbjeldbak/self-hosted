@@ -4,6 +4,7 @@ excluded-libraries:
 - Private
 - Family Holidays
 - Hjemmevideoer
+- Anime # just One Pace for now, dont want Trakt getting confused
 logging:
   append: true
   debug: false
