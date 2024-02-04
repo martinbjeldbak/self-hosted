@@ -193,6 +193,13 @@
 		encode gzip
 	}
 
+	@invidious host invidious.local.martinbjeldbak.com
+	handle @invidious {
+		reverse_proxy invidious:3000
+
+		encode gzip
+	}
+
 	# Fallback for otherwise unhandled domains
 	handle {
 		abort

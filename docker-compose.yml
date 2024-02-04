@@ -77,8 +77,6 @@ services:
     image: ghcr.io/taxel/plextraktsync
     command: sync
     container_name: plextraktsync
-    networks:
-      - vlan_bridge
     volumes:
       - ./plextraktsync:/app/config
     depends_on:
@@ -371,9 +369,9 @@ services:
       REPLICA_USERNAME: ${ADGUARD_HOME_REPLICA_USERNAME}
       REPLICA_PASSWORD: ${ADGUARD_HOME_REPLICA_PASSWORD}
       CRON: "" # run only once (will trigger via Synology tasks)
-      RUNONSTART: true
+      RUN_ON_START: true
       API_PORT: 0 # Disable sync API server
-      FEATURES_DNS_SERVERCONFIG: false # replica needs to point to Unbound on router IP, not localhost
+      FEATURES_DNS_SERVER_CONFIG: false # replica needs to point to Unbound on router IP, not localhost
     networks:
       - vlan_bridge
 
@@ -428,6 +426,37 @@ services:
     networks:
       - vlan_bridge
 
+  invidious:
+    container_name: invidious
+    image: quay.io/invidious/invidious:latest
+    restart: unless-stopped
+    expose:
+      - 3000
+    environment:
+      INVIDIOUS_CONFIG: |
+        database_url: postgres://postgres:PASSWORD@db:5432/postgres
+        check_tables: true
+        hmac_key: KEY
+        admins: ["martinbjeldbak"]
+        domain: invidious.local.martinbjeldbak.com
+        use_innertube_for_captions: true
+        default_user_preferences:
+          region: AU
+          captions: ["English", "Danish", "Burmese"]
+          save_player_pos: true
+    healthcheck:
+      test: wget -nv --tries=1 --spider http://127.0.0.1:3000/api/v1/comments/jNQXAC9IVRw || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 2
+    logging:
+      options:
+        max-size: "1G"
+        max-file: "4"
+    depends_on:
+      - db
+    networks:
+      - vlan_bridge
   # homepage:
   #   image: ghcr.io/gethomepage/homepage:latest
   #   container_name: homepage
