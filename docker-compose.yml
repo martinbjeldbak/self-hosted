@@ -37,6 +37,7 @@ services:
       - 8123 # UI
     networks:
       vlan_bridge:
+        ipv4_address: 172.20.0.201 # static ip for NUT. Allowlisted on Synology NAS
       macvlan:
         ipv4_address: 192.168.10.16 # enable homekit & WOL functionality
     environment:
@@ -77,6 +78,8 @@ services:
     image: ghcr.io/taxel/plextraktsync
     command: sync
     container_name: plextraktsync
+    networks:
+      - vlan_bridge    
     volumes:
       - ./plextraktsync:/app/config
     depends_on:
@@ -403,7 +406,6 @@ services:
   epicgames-freegames:
     image: ghcr.io/claabs/epicgames-freegames-node
     container_name: epicgames-freegames
-    restart: unless-stopped
     expose:
       - 3000
     volumes:
@@ -434,11 +436,12 @@ services:
       - 3000
     environment:
       INVIDIOUS_CONFIG: |
-        database_url: postgres://postgres:PASSWORD@db:5432/postgres
+        database_url: postgres://postgres:kba.tft.DRE8tnt4cvy@db:5432/postgres
         check_tables: true
-        hmac_key: KEY
+        hmac_key: CK2jJrAvaeeQABNXdCD7
         admins: ["martinbjeldbak"]
         domain: invidious.local.martinbjeldbak.com
+        external_port: 443
         use_innertube_for_captions: true
         default_user_preferences:
           region: AU
@@ -457,6 +460,61 @@ services:
       - db
     networks:
       - vlan_bridge
+
+  scrypted:
+    container_name: scrypted
+    restart: unless-stopped
+    image: ghcr.io/koush/scrypted
+    environment:
+      SCRYPTED_NVR_VOLUME: /nvr
+      SCRYPTED_WEBHOOK_UPDATE_AUTHORIZATION: Bearer ${SCRYPTED_BEARER_TOKEN}
+      SCRYPTED_WEBHOOK_UPDATE: http://localhost:10444/v1/update
+    volumes:
+      - ./scrypted/nvr:/nvr
+      - /var/run/dbus:/var/run/dbus
+      - /var/run/avahi-daemon/socket:/var/run/avahi-daemon/socket
+      - ./scrypted/volume:/server/volume
+    logging:
+        driver: "json-file"
+        options:
+            max-size: "10m"
+            max-file: "10"
+    labels:
+        - "com.centurylinklabs.watchtower.scope=scrypted"
+    networks:
+      macvlan:
+        ipv4_address: 192.168.10.17
+      vlan_bridge:
+    expose:
+      - 10443 # scrypted https
+      - 11080 # scrypted http (used by Caddy)
+      - 31797 # homekit port Pan/Tilt
+
+  overseerr:
+    container_name: overseerr
+    image: sctx/overseerr
+    restart: unless-stopped
+    environment:
+      <<: *env
+    networks:
+      - vlan_bridge
+    expose:
+      - 5055
+    volumes:
+      - ./overseerr/config:/app/config
+
+  plex-auto-languages:
+    image: remirigal/plex-auto-languages
+    container_name: plex-auto-languages
+    environment:
+      <<: *env
+      PLEX_TOKEN: ${PLEX_TOKEN}
+      PLEX_URL: http://plex:32400
+    networks:
+      - vlan_bridge      
+    volumes:
+      - ./plex-auto-languages/config:/config
+
   # homepage:
   #   image: ghcr.io/gethomepage/homepage:latest
   #   container_name: homepage

@@ -200,6 +200,20 @@
 		encode gzip
 	}
 
+	@scrypted host scrypted.local.martinbjeldbak.com
+	handle @scrypted {
+		reverse_proxy scrypted:11080
+
+		encode gzip
+	}
+
+	@request host request.local.martinbjeldbak.com
+	handle @request {
+		reverse_proxy overseerr:5055
+
+		encode gzip
+	}
+
 	# Fallback for otherwise unhandled domains
 	handle {
 		abort
