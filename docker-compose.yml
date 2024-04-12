@@ -406,6 +406,7 @@ services:
   epicgames-freegames:
     image: ghcr.io/claabs/epicgames-freegames-node
     container_name: epicgames-freegames
+    restart: unless-stopped
     expose:
       - 3000
     volumes:
@@ -424,7 +425,7 @@ services:
       SMTP_USERNAME: ${SMTP_USER_NAME}
       SMTP_PASSWORD: ${HUGINN_SMTP_PASSWORD}
       RUN_ON_STARTUP: true
-      RUN_ONCE: true
+      CRON_SCHEDULE: 0 0,6,12,18 * * * # (every six hours)
     networks:
       - vlan_bridge
 
@@ -471,8 +472,6 @@ services:
       SCRYPTED_WEBHOOK_UPDATE: http://localhost:10444/v1/update
     volumes:
       - ./scrypted/nvr:/nvr
-      - /var/run/dbus:/var/run/dbus
-      - /var/run/avahi-daemon/socket:/var/run/avahi-daemon/socket
       - ./scrypted/volume:/server/volume
     logging:
         driver: "json-file"
