@@ -1,0 +1,8 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/latest/configs/settings
+
+theme: dark
+color: slate
+providers:
+  openweathermap: {{HOMEPAGE_VAR_OPENWEATHERMAP_API_KEY}}

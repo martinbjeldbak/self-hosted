@@ -1,6 +1,4 @@
 ---
-version: "3.9"
-
 x-env: &env
   PUID: ${PUID}
   PGID: ${PGID}
@@ -13,6 +11,8 @@ services:
     ports:
       - 53:53/tcp # plain DNS
       - 53:53/udp # plain DNS
+    expose:
+      - 3000
     networks:
       macvlan:
         ipv4_address: 192.168.10.15
@@ -197,6 +197,7 @@ services:
     expose:
       - 9091 # transmission UI
       - 9696 # Prowlarr
+      - 8000 # http control server, used by homepage
     labels:
       - com.centurylinklabs.watchtower.enable=false
     security_opt:
@@ -224,6 +225,8 @@ services:
     ports:
       - 443:443
       - 80:80
+    expose:
+      - 2019 # admin port
     networks:
       - vlan_bridge
     restart: unless-stopped
@@ -275,6 +278,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro
+    expose:
+      - 8080 # https://containrrr.dev/watchtower/metrics/
     environment:
       WATCHTOWER_NOTIFICATIONS: shoutrrr
       WATCHTOWER_NOTIFICATION_URL: ${DISCORD_NOTIFICATION_URL}
@@ -283,6 +288,8 @@ services:
       WATCHTOWER_INCLUDE_STOPPED: true
       WATCHTOWER_REVIVE_STOPPED: true
       WATCHTOWER_SCHEDULE: 0 0 2 * * *
+      WATCHTOWER_HTTP_API_METRICS: true
+      WATCHTOWER_HTTP_API_TOKEN: ${WATCHTOWER_API_TOKEN}
   db:
     image: postgres:14.6-alpine
     container_name: postgres
@@ -320,19 +327,6 @@ services:
       DATABASE_HOST: db
     depends_on:
       - db
-
-  heimdall:
-    image: ghcr.io/linuxserver/heimdall
-    networks:
-      - vlan_bridge
-    container_name: heimdall
-    restart: unless-stopped
-    expose:
-      - 80
-    environment:
-      <<: *env
-    volumes:
-      - ./heimdall:/config
 
   prowlarr:
     image: ghcr.io/linuxserver/prowlarr:latest
@@ -397,8 +391,6 @@ services:
     expose:
       - 6052 # UI
     environment:
-      USERNAME: esphome
-      PASSWORD: ${ESPHOME_PASSWORD}
       ESPHOME_DASHBOARD_USE_PING: true
     networks:
       - vlan_bridge
@@ -514,19 +506,62 @@ services:
     volumes:
       - ./plex-auto-languages/config:/config
 
-  # homepage:
-  #   image: ghcr.io/gethomepage/homepage:latest
-  #   container_name: homepage
-  #   networks:
-  #     - vlan_bridge
-  #   environment:
-  #     <<: *env
-  #   expose:
-  #     - 3000
-  #   volumes:
-  #     - ./homepage:/config
-  #     - /var/run/docker.sock:/var/run/docker.sock:ro
-  #   restart: unless-stopped
+  homepage:
+    image: ghcr.io/gethomepage/homepage
+    container_name: homepage
+    expose:
+      - 3000
+    networks:
+      - vlan_bridge     
+    volumes:
+      - ./homepage/config:/app/config
+    environment:
+      <<: *env
+      HOMEPAGE_VAR_SONARR_API_KEY: ${SONARR_API_KEY}
+      HOMEPAGE_VAR_PLEX_TOKEN: ${PLEX_TOKEN}
+      HOMEPAGE_VAR_TAUTULLI_API_KEY: ${TAUTULLI_API_KEY}
+      HOMEPAGE_VAR_HOMEASSISTANT_ACCESS_TOKEN: ${HOMEASSISTANT_ACCESS_TOKEN}
+      HOMEPAGE_VAR_OPENWEATHERMAP_API_KEY: ${OPENWEATHERMAP_API_KEY}
+      HOMEPAGE_VAR_ADGUARD_HOME_ORIGIN_USERNAME: ${ADGUARD_HOME_ORIGIN_USERNAME}
+      HOMEPAGE_VAR_ADGUARD_HOME_ORIGIN_PASSWORD: ${ADGUARD_HOME_ORIGIN_PASSWORD}
+      HOMEPAGE_VAR_ADGUARD_HOME_REPLICA_USERNAME: ${ADGUARD_HOME_REPLICA_USERNAME}
+      HOMEPAGE_VAR_ADGUARD_HOME_REPLICA_PASSWORD: ${ADGUARD_HOME_REPLICA_PASSWORD}
+      HOMEPAGE_VAR_BAZARR_API_KEY: ${BAZARR_API_KEY}
+      HOMEPAGE_VAR_CROWDSEC_USERNAME: ${CROWDSEC_USERNAME}
+      HOMEPAGE_VAR_CROWDSEC_PASSWORD: ${CROWDSEC_PASSWORD}
+      HOMEPAGE_VAR_SYNOLOGY_STATS_USERNAME: ${SYNOLOGY_STATS_USERNAME}
+      HOMEPAGE_VAR_SYNOLOGY_STATS_PASSWORD: ${SYNOLOGY_STATS_PASSWORD}
+      HOMEPAGE_VAR_OPNSENSE_HOMEPAGE_USERNAME: ${OPNSENSE_HOMEPAGE_USERNAME}
+      HOMEPAGE_VAR_OPNSENSE_HOMEPAGE_PASSWORD: ${OPNSENSE_HOMEPAGE_PASSWORD}
+      HOMEPAGE_VAR_OVERSEERR_API_KEY: ${OVERSEERR_API_KEY}
+      HOMEPAGE_VAR_PROWLARR_API_KEY: ${PROWLARR_API_KEY}
+      HOMEPAGE_VAR_RADARR_API_KEY: ${RADARR_API_KEY}
+      HOMEPAGE_VAR_TAILSCALE_DEVICE_ID: ${TAILSCALE_DEVICE_ID}
+      HOMEPAGE_VAR_TAILSCALE_API_KEY: ${TAILSCALE_API_KEY}
+      HOMEPAGE_VAR_TRANSMISSION_USERNAME: ${TRANSMISSION_USERNAME}
+      HOMEPAGE_VAR_TRANSMISSION_PASSWORD: ${TRANSMISSION_PASSWORD}
+      HOMEPAGE_VAR_UNIFI_USERNAME: ${UNIFI_USERNAME}
+      HOMEPAGE_VAR_UNIFI_PASSWORD: ${UNIFI_PASSWORD}
+      HOMEPAGE_VAR_UPTIME_ROBOT_HOME_INTERNET_API_KEY: ${UPTIME_ROBOT_HOME_INTERNET_API_KEY}
+      HOMEPAGE_VAR_WATCHTOWER_API_TOKEN: ${WATCHTOWER_API_TOKEN}
+    restart: unless-stopped
+
+  dockerproxy:
+    image: ghcr.io/tecnativa/docker-socket-proxy
+    container_name: dockerproxy
+    environment:
+      - CONTAINERS=1 # Allow access to viewing containers
+      - SERVICES=1 # Allow access to viewing services (necessary when using Docker Swarm)
+      - TASKS=1 # Allow access to viewing tasks (necessary when using Docker Swarm)
+      - POST=0 # Disallow any POST operations (effectively read-only)
+    networks:
+      - vlan_bridge     
+    expose:
+      - 2375
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Mounted as read-only
+    restart: unless-stopped
+
 
 networks:
   macvlan:

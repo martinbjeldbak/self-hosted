@@ -1,3 +1,7 @@
+{
+	admin 0.0.0.0:2019
+}
+
 *.martinbjeldbak.com {
 	tls {$TLS_EMAIL} {
 		dns cloudflare {$CLOUDFLARE_API_TOKEN}
@@ -108,13 +112,6 @@
 		encode gzip
 	}
 
-	@dashboard host dash.local.martinbjeldbak.com
-	handle @dashboard {
-		reverse_proxy heimdall:80
-
-		encode gzip
-	}
-
 	@pterodactyl host panel.martinbjeldbak.com
 	handle @pterodactyl {
 		reverse_proxy panel:80
@@ -210,6 +207,13 @@
 	@request host request.local.martinbjeldbak.com
 	handle @request {
 		reverse_proxy overseerr:5055
+
+		encode gzip
+	}
+
+	@homepage host homepage.local.martinbjeldbak.com
+	handle @homepage {
+		reverse_proxy homepage:3000
 
 		encode gzip
 	}
