@@ -5,6 +5,7 @@ default_config:
 http:
   trusted_proxies:
     - 172.20.0.0/24
+
   use_x_forwarded_for: true
   ip_ban_enabled: true
   login_attempts_threshold: 5
@@ -50,6 +51,12 @@ rest_command:
       password: !secret opnsense_key
 
 switch:
+  - platform: broadlink
+    mac: E8:16:56:7D:9B:AA
+    switches:
+      - name: Longfan
+        command_on: JgDIACoOKg8NKSkOKBAMKgwrDCoNKg0oDikq5ikPKQ8MKygQKA8NKgwqDSoMKwwqDCopAAEKKg4qDg0pKg4qDg0pDikNKgwqDSoMKirmKQ8pDg0qKQ4pDg0qDSkNKgwqDCoNKigAAQooDygPDCsnDikODSoNKQ0pDSoMKgwqKOYpDigODikpDigPDSkMKg0qDCoNKgwqKAABCygOKQ4NKSkOKQ4NKQ4pDSkNKgwqDSoo5ikPKQ4NKSkOKQ4NKgwqDCoNKgwqDCsnAA0F
+        command_off: JgDIACoOKg8NKSkOKBAMKgwrDCoNKg0oDikq5ikPKQ8MKygQKA8NKgwqDSoMKwwqDCopAAEKKg4qDg0pKg4qDg0pDikNKgwqDSoMKirmKQ8pDg0qKQ4pDg0qDSkNKgwqDCoNKigAAQooDygPDCsnDikODSoNKQ0pDSoMKgwqKOYpDigODikpDigPDSkMKg0qDCoNKgwqKAABCygOKQ4NKSkOKQ4NKQ4pDSkNKgwqDSoo5ikPKQ4NKSkOKQ4NKgwqDCoNKgwqDCsnAA0F
   - platform: template
     switches:
       nandar_work_laptop:
@@ -88,6 +95,7 @@ homekit:
       - climate
     include_entities:
       - switch.string_lights
+      - switch.longfan
   entity_config:
     fan.mi_air_purifier_3h:
       name: Air Purifier
@@ -100,9 +108,6 @@ binary_sensor:
     scan_interval: 30
 
 adaptive_lighting:
-  min_brightness: 5
-  lights:
-    - light.living_room_lights
 
 group: !include groups.yaml
 automation: !include automations.yaml

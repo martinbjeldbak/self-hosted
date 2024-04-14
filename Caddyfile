@@ -155,13 +155,6 @@
 		encode gzip
 	}
 
-	@speedtest host speedtest.local.martinbjeldbak.com
-	handle @speedtest {
-		reverse_proxy speedtest:8445
-
-		encode gzip
-	}
-
 	@elmbot host elmbot.local.martinbjeldbak.com
 	handle @elmbot {
 		reverse_proxy elmbot:54377
@@ -214,6 +207,20 @@
 	@homepage host homepage.local.martinbjeldbak.com
 	handle @homepage {
 		reverse_proxy homepage:3000
+
+		encode gzip
+	}
+
+	@speedtest host speedtest.local.martinbjeldbak.com
+	handle @speedtest {
+		reverse_proxy speedtest-tracker:80
+
+		encode gzip
+	}
+
+	@peanut host peanut-eaton-5e-1100i.local.martinbjeldbak.com
+	handle @peanut {
+		reverse_proxy peanut-eaton-5e-1100i:8080
 
 		encode gzip
 	}

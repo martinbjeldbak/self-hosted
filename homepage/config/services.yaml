@@ -1,135 +1,4 @@
 ---
-- DNS:
-    - Adguard Home:
-        icon: adguard-home.svg
-        href: "https://dns.local.martinbjeldbak.com"
-        description: main dns
-        ping: dns.local.martinbjeldbak.com
-        widget:
-            type: adguard
-            url: "https://dns.local.martinbjeldbak.com"
-            username: {{HOMEPAGE_VAR_ADGUARD_HOME_ORIGIN_USERNAME}}
-            password: {{HOMEPAGE_VAR_ADGUARD_HOME_ORIGIN_PASSWORD}}
-    - Adguard Home Replica:
-        icon: adguard-home.svg
-        href: "https://dns2.local.martinbjeldbak.com"
-        description: secondary dns
-        server: localdocker
-        container: adguardhome
-        widget:
-            type: adguard
-            url: http://adguardhome:3000
-            username: {{HOMEPAGE_VAR_ADGUARD_HOME_REPLICA_USERNAME}}
-            password: {{HOMEPAGE_VAR_ADGUARD_HOME_REPLICA_PASSWORD}}
-
-- Home Automation:
-    - Calendar:
-        widget:
-            type: calendar
-            integrations:
-                - type: sonarr
-                  service_group: Media
-                  service_name: Sonarr
-                - type: radarr
-                  service_group: Media
-                  service_name: Radarr
-    - Home Assistant:
-        icon: home-assistant.svg
-        href: "https://homeassistant.local.martinbjeldbak.com"
-        description: homeassistant
-        server: localdocker
-        container: homeassistant
-        widget:
-            type: homeassistant
-            url: http://homeassistant:8123
-            key: {{HOMEPAGE_VAR_HOMEASSISTANT_ACCESS_TOKEN}}
-    - Scrypted:
-        icon: https://www.scrypted.app/images/web_hi_res_512.png
-        href: "https://scrypted.local.martinbjeldbak.com"
-        description: cameras
-        server: localdocker
-        container: scrypted
-    - ESPHome:
-        icon: esphome.svg
-        description: esp32 configuration
-        server: localdocker
-        container: esphome
-        widget:
-            type: esphome
-            url: http://esphome:6052
-    - Watchtower:
-        icon: watchtower.svg
-        description: docker updates
-        server: localdocker
-        container: watchtower
-        widget:
-            type: watchtower
-            url: http://watchtower:8080
-            key: {{HOMEPAGE_VAR_WATCHTOWER_API_TOKEN}}
-
-- Network:
-    - Caddy:
-        icon: caddy.png
-        description: web server
-        server: localdocker
-        container: caddy
-        widget:
-            type: caddy
-            url: http://caddy:2019
-    - Crowdsec:
-        icon: crowdsec.svg
-        description: ids/ips
-        ping: 192.168.1.1
-        widget:
-            type: crowdsec
-            url: http://192.168.1.1:8089
-            username: {{HOMEPAGE_VAR_CROWDSEC_USERNAME}}
-            password: {{HOMEPAGE_VAR_CROWDSEC_PASSWORD}}
-    - Gluetun:
-        icon: gluetun.svg
-        description: vpn
-        server: localdocker
-        container: gluetun
-        widget:
-            type: gluetun
-            url: http://gluetun:8000
-    - OPNSense:
-        icon: opnsense.svg
-        description: firewall and router
-        href: https://opnsense.local.martinbjeldbak.com/
-        ping: 192.168.1.1
-        widget:
-            type: opnsense
-            url: https://192.168.1.1
-            username: {{HOMEPAGE_VAR_OPNSENSE_HOMEPAGE_USERNAME}}
-            password: {{HOMEPAGE_VAR_OPNSENSE_HOMEPAGE_PASSWORD}}
-    - Tailscale Alderaan:
-        icon: tailscale.svg
-        description: mesh network
-        href: "https://login.tailscale.com"
-        widget:
-            type: tailscale
-            deviceid: {{HOMEPAGE_VAR_TAILSCALE_DEVICE_ID}}
-            key: {{HOMEPAGE_VAR_TAILSCALE_API_KEY}}
-    - Unifi:
-        icon: unifi.svg
-        description: network infra
-        href: "https://unifi.local.martinbjeldbak.com"
-        ping: unifi.local.martinbjeldbak.com
-        widget:
-            type: unifi
-            url: https://unifi.local.martinbjeldbak.com
-            username: {{HOMEPAGE_VAR_UNIFI_USERNAME}}
-            password: {{HOMEPAGE_VAR_UNIFI_PASSWORD}}
-    - Uptime Robot Home Internet:
-        icon: "https://uptimerobot.com/assets/ico/favicon.ico"
-        description: uptime monitoring
-        href: "https://dashboard.uptimerobot.com/monitors/796218287"
-        widget:
-            type: uptimerobot
-            url: https://api.uptimerobot.com
-            key: {{HOMEPAGE_VAR_UPTIME_ROBOT_HOME_INTERNET_API_KEY}}
-
 - Media:
     - Plex:
         icon: plex.svg
@@ -144,7 +13,7 @@
     - Tautulli:
         icon: tautulli.svg
         href: "https://tautulli.local.martinbjeldbak.com"
-        description: plex stats
+        description: plex monitoring and history database
         server: localdocker
         container: tautulli
         widget:
@@ -183,7 +52,7 @@
             volume: volume_3
     - Overseerr:
         icon: overseerr.svg
-        description: requests
+        description: plex media requests
         href: "https://request.local.martinbjeldbak.com"
         server: localdocker
         container: overseerr
@@ -222,3 +91,157 @@
             url: http://gluetun:9091
             username: {{HOMEPAGE_VAR_TRANSMISSION_USERNAME}}
             password: {{HOMEPAGE_VAR_TRANSMISSION_PASSWORD}}
+
+- Releases:
+    - Calendar:
+        description: tv and movie releases
+        widget:
+            type: calendar
+            integrations:
+                - type: sonarr
+                  service_group: Media
+                  service_name: Sonarr
+                - type: radarr
+                  service_group: Media
+                  service_name: Radarr
+
+- AdGuard:
+    - AdGuard Home:
+        icon: adguard-home.svg
+        href: "https://dns.local.martinbjeldbak.com"
+        description: main dns
+        ping: dns.local.martinbjeldbak.com
+        widget:
+            type: adguard
+            url: "https://dns.local.martinbjeldbak.com"
+            username: {{HOMEPAGE_VAR_ADGUARD_HOME_ORIGIN_USERNAME}}
+            password: {{HOMEPAGE_VAR_ADGUARD_HOME_ORIGIN_PASSWORD}}
+    - AdGuard Home Replica:
+        icon: adguard-home.svg
+        href: "https://dns2.local.martinbjeldbak.com"
+        description: secondary dns
+        server: localdocker
+        container: adguardhome
+        widget:
+            type: adguard
+            url: http://adguardhome:3000
+            username: {{HOMEPAGE_VAR_ADGUARD_HOME_REPLICA_USERNAME}}
+            password: {{HOMEPAGE_VAR_ADGUARD_HOME_REPLICA_PASSWORD}}
+
+- Home Automation:
+    - Home Assistant:
+        icon: home-assistant.svg
+        href: "https://homeassistant.local.martinbjeldbak.com"
+        description: homeassistant
+        server: localdocker
+        container: homeassistant
+        widget:
+            type: homeassistant
+            url: http://homeassistant:8123
+            key: {{HOMEPAGE_VAR_HOMEASSISTANT_ACCESS_TOKEN}}
+    - Scrypted:
+        icon: https://www.scrypted.app/images/web_hi_res_512.png
+        href: "https://scrypted.local.martinbjeldbak.com"
+        description: cameras
+        server: localdocker
+        container: scrypted
+    - ESPHome:
+        icon: esphome.svg
+        href: "https://esphome.local.martinbjeldbak.com"
+        description: esp32 configuration
+        server: localdocker
+        container: esphome
+        widget:
+            type: esphome
+            url: http://esphome:6052
+    - Watchtower:
+        icon: watchtower.svg
+        description: docker updates
+        server: localdocker
+        container: watchtower
+        widget:
+            type: watchtower
+            url: http://watchtower:8080
+            key: {{HOMEPAGE_VAR_WATCHTOWER_API_TOKEN}}
+    - Peanut Eaton 5E 1100i:
+        icon: peanut.svg
+        href: "https://peanut-eaton-5e-1100i.local.martinbjeldbak.com"
+        description: ups monitoring
+        server: localdocker
+        container: peanut-eaton-5e-1100i
+        widget:
+            type: peanut
+            url: http://peanut-eaton-5e-1100i:8080
+            key: ups
+
+
+- Network:
+    - OPNSense:
+        icon: opnsense.svg
+        description: firewall and router
+        href: https://opnsense.local.martinbjeldbak.com/
+        ping: 192.168.1.1
+        widget:
+            type: opnsense
+            url: https://192.168.1.1
+            username: {{HOMEPAGE_VAR_OPNSENSE_HOMEPAGE_USERNAME}}
+            password: {{HOMEPAGE_VAR_OPNSENSE_HOMEPAGE_PASSWORD}}
+    - Crowdsec:
+        icon: crowdsec.svg
+        description: ids/ips
+        ping: 192.168.1.1
+        widget:
+            type: crowdsec
+            url: http://192.168.1.1:8089
+            username: {{HOMEPAGE_VAR_CROWDSEC_USERNAME}}
+            password: {{HOMEPAGE_VAR_CROWDSEC_PASSWORD}}
+    - Unifi:
+        icon: unifi.svg
+        description: network infra
+        href: "https://unifi.local.martinbjeldbak.com"
+        ping: unifi.local.martinbjeldbak.com
+        widget:
+            type: unifi
+            url: https://unifi.local.martinbjeldbak.com
+            username: {{HOMEPAGE_VAR_UNIFI_USERNAME}}
+            password: {{HOMEPAGE_VAR_UNIFI_PASSWORD}}
+    - Caddy:
+        icon: caddy.png
+        description: web server
+        server: localdocker
+        container: caddy
+        widget:
+            type: caddy
+            url: http://caddy:2019
+    - Gluetun:
+        icon: gluetun.svg
+        description: vpn
+        server: localdocker
+        container: gluetun
+        widget:
+            type: gluetun
+            url: http://gluetun:8000
+    - Tailscale Alderaan:
+        icon: tailscale.svg
+        description: mesh network
+        href: "https://login.tailscale.com"
+        widget:
+            type: tailscale
+            deviceid: {{HOMEPAGE_VAR_TAILSCALE_DEVICE_ID}}
+            key: {{HOMEPAGE_VAR_TAILSCALE_API_KEY}}
+    - Uptime Robot Home Internet:
+        icon: "https://uptimerobot.com/assets/ico/favicon.ico"
+        description: uptime monitoring
+        href: "https://dashboard.uptimerobot.com/monitors/796218287"
+        widget:
+            type: uptimerobot
+            url: https://api.uptimerobot.com
+            key: {{HOMEPAGE_VAR_UPTIME_ROBOT_HOME_INTERNET_API_KEY}}
+    - Speedtest Tracker:
+        icon: "https://speedtest.local.martinbjeldbak.com/img/speedtest-tracker-icon.png"
+        href: "https://speedtest.local.martinbjeldbak.com"
+        server: localdocker
+        container: speedtest-tracker
+        widget:
+            type: speedtest
+            url: http://speedtest-tracker

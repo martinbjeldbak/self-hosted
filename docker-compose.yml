@@ -562,6 +562,43 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro # Mounted as read-only
     restart: unless-stopped
 
+  speedtest-tracker:
+    container_name: speedtest-tracker
+    image: lscr.io/linuxserver/speedtest-tracker
+    environment:
+      <<: *env
+      DB_CONNECTION: sqlite
+      MAIL_MAILER: smtp
+      MAIL_HOST: ${SMTP_SERVER}
+      MAIL_PORT: 465
+      MAIL_USERNAME: ${SMTP_USER_NAME}
+      MAIL_PASSWORD: ${HUGINN_SMTP_PASSWORD}
+      MAIL_ENCRYPTION: 'ssl'
+      MAIL_FROM_ADDRESS: "speedtest-tracker@martinbjeldbak.com"
+      MAIL_FROM_NAME: "Speedtest Tracker"
+    expose:
+      - 80 # http
+      - 443 # https
+    restart: unless-stopped
+    networks:
+      - vlan_bridge     
+    volumes:
+      - ./speedtest-tracker/config:/config
+
+  peanut-eaton-5e-1100i:
+    image: brandawg93/peanut
+    container_name: peanut-eaton-5e-1100i
+    restart: unless-stopped
+    expose:
+      - 8080 # web UI
+    networks:
+      vlan_bridge:
+        ipv4_address: 172.20.0.202 # static ip for NUT. Allowlisted on Synology NAS
+    environment:
+      NUT_HOST: 172.20.0.1
+      NUT_PORT: 3493
+      WEB_PORT: 8080
+
 
 networks:
   macvlan:

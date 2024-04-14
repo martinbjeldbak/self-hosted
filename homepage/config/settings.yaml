@@ -6,3 +6,7 @@ theme: dark
 color: slate
 providers:
   openweathermap: {{HOMEPAGE_VAR_OPENWEATHERMAP_API_KEY}}
+layout:
+  Media:
+    style: row
+    columns: 4

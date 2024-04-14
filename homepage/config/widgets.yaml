@@ -8,7 +8,7 @@
     disk: /
 
 - search:
-    provider: duckduckgo
+    provider: [duckduckgo, google]
     target: _blank
 
 - openweathermap:
@@ -18,8 +18,12 @@
     units: metric
     provider: openweathermap
     cache: 5
+    format:
+        maximumFractionDigits: 1
 
 - datetime:
     text_size: xl
+    locale: da
     format:
         timeStyle: short
+        hourCycle: h23

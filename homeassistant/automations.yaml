@@ -18,11 +18,14 @@
   - platform: time
     at: '22:00:00'
   condition:
-  - condition: device
-    device_id: 3689b8cb31ba6f23d3de3ea764896d00
-    domain: device_tracker
-    entity_id: f44d19bd56b5aa74f707ce10d390926f
-    type: is_home
+  - condition: or
+    conditions:
+    - condition: zone
+      entity_id: person.martin_madsen
+      zone: zone.home
+    - condition: zone
+      entity_id: person.nandar
+      zone: zone.home
   action:
   - type: turn_on
     device_id: a974d5ae993c3a8ac8fe4b666c2ff223
@@ -34,9 +37,9 @@
   description: ''
   trigger:
   - platform: device
-    device_id: ac2cebc503b95c6c65837616b96292dc
+    device_id: f196d9f15d0b393d82a9b7945b6cc269
     domain: media_player
-    entity_id: media_player.plex_plex_for_apple_tv_apple_tv
+    entity_id: e1137ef10ecb8f6ba5e2d71968e84f8d
     type: playing
   condition:
   - condition: sun
@@ -54,13 +57,11 @@
   description: ''
   trigger:
   - platform: device
-    device_id: ac2cebc503b95c6c65837616b96292dc
+    device_id: f196d9f15d0b393d82a9b7945b6cc269
     domain: media_player
-    entity_id: media_player.plex_plex_for_apple_tv_apple_tv
+    entity_id: e1137ef10ecb8f6ba5e2d71968e84f8d
     type: paused
   condition:
-  - condition: time
-    after: '17:00:00'
   - condition: sun
     after: sunset
     after_offset: -01:00:00
@@ -97,18 +98,40 @@
     to: short_release
   condition: []
   action:
-  - service: light.turn_on
-    data: {}
-    target:
-      entity_id: light.living_room_lights
-  - service: adaptive_lighting.apply
+  - parallel:
+    - service: adaptive_lighting.apply
+      data:
+        adapt_color: true
+        adapt_brightness: true
+        turn_on_lights: true
+        entity_id: switch.adaptive_lighting_living_room
+    - service: climate.turn_on
+      metadata: {}
+      data: {}
+      target:
+        entity_id: climate.living_room_ac
+  - if:
+    - condition: numeric_state
+      entity_id: sensor.living_room_broadlink_temperature
+      above: 24
+    then:
+    - service: climate.set_hvac_mode
+      target: {}
+      data:
+        hvac_mode: cool
+    else:
+    - service: climate.set_hvac_mode
+      target:
+        entity_id:
+        - climate.living_room_ac
+      data:
+        hvac_mode: dry
+  - service: climate.set_fan_mode
+    metadata: {}
     data:
-      entity_id: switch.adaptive_lighting_adapt_brightness_default
-      lights:
-      - light.living_room_lights
-      adapt_color: true
-      adapt_brightness: true
-      turn_on_lights: true
+      fan_mode: highest
+    target:
+      entity_id: climate.living_room_ac
   mode: single
 - id: '1694784530273'
   alias: Hue Dimmer turn off living room
@@ -119,16 +142,22 @@
     - event.hue_dimmer_switch_button_4
   condition: []
   action:
-  - service: light.turn_off
-    data: {}
-    target:
-      entity_id: light.living_room_lights
+  - parallel:
+    - service: light.turn_off
+      data: {}
+      target:
+        area_id: living_room
+    - service: climate.turn_off
+      metadata: {}
+      data: {}
+      target:
+        entity_id: climate.living_room_ac
   mode: single
 - id: '1694785112288'
   alias: 'Adaptive lighting: reset manual_control after 1 hour'
   description: 'Source: https://github.com/basnijholt/adaptive-lighting/tree/5cd060a37c2cdad3c7e266b937dc50e4b1c79711#robot-automation-examples'
   trigger:
-  - platform: event
+    platform: event
     event_type: adaptive_lighting.manual_control
   action:
   - delay: 01:00:00
@@ -158,7 +187,11 @@
     data:
       brightness_step_pct: 20
     target:
-      entity_id: light.living_room_lights
+      area_id: living_room
+  - service: adaptive_lighting.set_manual_control
+    data:
+      manual_control: true
+      entity_id: switch.adaptive_lighting_living_room
   mode: single
 - id: '1694785348532'
   alias: 'Hue Dimmer: Decrease brightness'
@@ -175,94 +208,11 @@
     data:
       brightness_step_pct: -20
     target:
-      entity_id: light.living_room_lights
-  mode: single
-- id: '1694785593921'
-  alias: 'Hue Dimmer: Apply adaptive lightning'
-  description: Long press on on button
-  trigger:
-  - platform: state
-    entity_id:
-    - event.hue_dimmer_switch_button_1
-    attribute: event_type
-    to: long_release
-  condition: []
-  action:
-  - service: adaptive_lighting.apply
+      area_id: living_room
+  - service: adaptive_lighting.set_manual_control
     data:
-      entity_id: switch.adaptive_lighting_adapt_brightness_default
-      lights:
-      - light.living_room_lights
-      adapt_color: true
-      adapt_brightness: true
-      turn_on_lights: true
-  mode: single
-- id: '1698202098549'
-  alias: Frigate Notifications (0.12.0.1)
-  description: ''
-  use_blueprint:
-    path: SgtBatten/Stable.yaml
-    input:
-      camera: camera.eufy_indoor_pan_tilt
-      notify_device: 3689b8cb31ba6f23d3de3ea764896d00
-      base_url: https://homeassistant.local.martinbjeldbak.com
-      title: Living Room Camera notification
-      update_thumbnail: true
-      ios_live_view: true
-      tv_transparency: 0%
-      tv: false
-- id: '1698202385595'
-  alias: Camera Upstairs camera notification
-  description: 'Source: https://docs.frigate.video/guides/ha_notifications/'
-  use_blueprint:
-    path: SgtBatten/Stable.yaml
-    input:
-      camera: camera.eufy_indoor_pan_tilt
-      notify_device: 3689b8cb31ba6f23d3de3ea764896d00
-      base_url: https://homeassistant.local.martinbjeldbak.com
-      title: Someone detected on upstairs camera
-      update_thumbnail: true
-      ios_live_view: false
-- id: '1698288161573'
-  alias: Camera middle
-  description: 'Source: https://docs.frigate.video/guides/ha_notifications/'
-  use_blueprint:
-    path: SgtBatten/Stable.yaml
-    input:
-      camera: camera.eufy_indoor_2k
-      notify_device: 3689b8cb31ba6f23d3de3ea764896d00
-      base_url: https://homeassistant.local.martinbjeldbak.com
-      title: Someone detected on middle camera
-      update_thumbnail: true
-      ios_live_view: false
-- id: '1704424503348'
-  alias: Notify on high CO2 levels
-  description: ''
-  trigger:
-  - type: carbon_dioxide
-    platform: device
-    device_id: 4d9c607685d2fb9bf51b4c55ab3c1a50
-    entity_id: ed0a51483b5d909800a6c5140ea41d2a
-    domain: sensor
-    above: 1000
-    for:
-      hours: 0
-      minutes: 1
-      seconds: 0
-  condition: []
-  action:
-  - service: notify.mobile_app_dagobah
-    metadata: {}
-    data:
-      message: CO2 levels are high at {{states("sensor.aranet4_20b7d_carbon_dioxide")
-        }} ppm
-      title: CO2 Levels High
-  - service: notify.email_using_fastmail
-    metadata: {}
-    data:
-      message: CO2 levels are high at {{states("sensor.aranet4_20b7d_carbon_dioxide")
-        }}ppm. See details here:<a href="https://homeassistant.local.martinbjeldbak.com/history?entity_id=sensor.aranet4_20b7d_carbon_dioxide">here</a>
-      title: CO2 levels high
+      manual_control: true
+      entity_id: switch.adaptive_lighting_living_room
   mode: single
 - id: '1704424867342'
   alias: Aranet low battery notification
@@ -285,4 +235,17 @@
     data:
       message: Aranet battery is below 10%
       title: Aranet battery low
+  mode: single
+- id: '1709210255854'
+  alias: Longfan Oscilate after turn on
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - switch.longfan
+  condition: []
+  action:
+  - service: script.longfan_oscillate
+    metadata: {}
+    data: {}
   mode: single

@@ -1,0 +1,46 @@
+# Source: https://www.home-assistant.io/integrations/broadlink/#learning-commands
+longfan_on:
+  sequence:
+      - service: remote.send_command
+        target:
+          entity_id: remote.broadlink_rm4_mini_bedroom
+        data:
+          device: longfan
+          command:
+            - power
+            - oscillate
+longfan_power:
+  sequence:
+      - service: remote.send_command
+        target:
+          entity_id: remote.broadlink_rm4_mini_bedroom
+        data:
+          device: longfan
+          command: power
+longfan_speed:
+  sequence:
+      - service: remote.send_command
+        target:
+          entity_id: remote.broadlink_rm4_mini_bedroom
+        data:
+          device: longfan
+          command: speed
+longfan_oscillate:
+  sequence:
+      - service: remote.send_command
+        target:
+          entity_id: remote.broadlink_rm4_mini_bedroom
+        data:
+          device: longfan
+          command: oscillate
+learn_longfan_commands:
+  sequence:
+    - service: remote.learn_command
+      target:
+        entity_id: remote.broadlink_rm4_mini_bedroom
+      data:
+        device: longfan
+        command:
+          - power
+          - speed
+          - oscillate
