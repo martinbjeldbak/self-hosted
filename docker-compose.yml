@@ -599,6 +599,60 @@ services:
       NUT_PORT: 3493
       WEB_PORT: 8080
 
+  influxdb:
+    image: influxdb:2.2
+    expose:
+      - 8086
+    volumes:
+      - ./influxdb:/var/lib/influxdb2
+    networks:
+      - vlan_bridge     
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/health"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+  scrutiny-web:
+    image: ghcr.io/analogj/scrutiny:master-web
+    expose:
+      - 8080 # web ui
+    volumes:
+      - ./scrutiny/config:/opt/scrutiny/config
+    networks:
+      - vlan_bridge     
+    environment:
+      SCRUTINY_WEB_INFLUXDB_HOST: 'influxdb'
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 10s
+  scrutiny-collector:
+    image: ghcr.io/analogj/scrutiny:master-collector
+    cap_add:
+      - SYS_RAWIO
+      - SYS_ADMIN
+    volumes:
+      - '/run/udev:/run/udev:ro'
+      - ./scrutiny/config:/opt/scrutiny/config
+    networks:
+      - vlan_bridge     
+    environment:
+      COLLECTOR_API_ENDPOINT: 'http://scrutiny-web:8080'
+      COLLECTOR_HOST_ID: 'synology-ds-920'
+    depends_on:
+      scrutiny-web:
+        condition: service_healthy
+    devices:
+      - "/dev/nvme0n1"
+      - "/dev/sata1"
+      - "/dev/sata2"
+      - "/dev/sata3"
+      - "/dev/sata4"
 
 networks:
   macvlan:

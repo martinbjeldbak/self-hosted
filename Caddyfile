@@ -225,6 +225,13 @@
 		encode gzip
 	}
 
+	@scrutiny host scrutiny.local.martinbjeldbak.com
+	handle @scrutiny {
+		reverse_proxy scrutiny-web:8080
+
+		encode gzip
+	}
+
 	# Fallback for otherwise unhandled domains
 	handle {
 		abort

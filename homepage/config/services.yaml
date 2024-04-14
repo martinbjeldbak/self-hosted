@@ -173,6 +173,15 @@
             type: peanut
             url: http://peanut-eaton-5e-1100i:8080
             key: ups
+    - Scrutiny:
+        icon: scrutiny.svg
+        href: "https://scrutiny.local.martinbjeldbak.com"
+        description: s.m.a.r.t. tools
+        server: localdocker
+        container: scrutiny-web
+        widget:
+            type: scrutiny
+            url: http://scrutiny-web:8080
 
 
 - Network:

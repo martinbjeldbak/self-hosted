@@ -1,0 +1,21 @@
+# Version
+#
+# version specifies the version of this configuration file schema, not
+# the scrutiny binary. There is only 1 version available at the moment
+version: 1
+
+# This block allows you to override/customize the settings for devices detected by
+# Scrutiny via `smartctl --scan`
+# See the "--device=TYPE" section of https://linux.die.net/man/8/smartctl
+# type can be a 'string' or a 'list'
+devices:
+  - device: /dev/nvme0n1
+    type: auto
+  - device: /dev/sata1
+    type: sat
+  - device: /dev/sata2
+    type: sat
+  - device: /dev/sata3
+    type: sat
+  - device: /dev/sata4
+    type: sat
