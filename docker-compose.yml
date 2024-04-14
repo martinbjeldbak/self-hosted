@@ -18,6 +18,7 @@ services:
         ipv4_address: 192.168.10.15
       vlan_bridge:
         ipv4_address:  172.20.0.98
+      backend: # for access from sync
     environment:
       <<: *env
     volumes:
@@ -62,6 +63,7 @@ services:
       - 32469:32469/tcp # access to the Plex DLNA Server
     networks:
       - vlan_bridge
+      - backend
     environment:
       VERSION: docker
       PLEX_CLAIM: ${PLEX_CLAIM}
@@ -79,7 +81,7 @@ services:
     command: sync
     container_name: plextraktsync
     networks:
-      - vlan_bridge    
+      - backend
     volumes:
       - ./plextraktsync:/app/config
     depends_on:
@@ -92,7 +94,7 @@ services:
     image: meisnate12/plex-meta-manager
     command: --run
     networks:
-      - vlan_bridge
+      - backend
     container_name: plex-meta-manager
     restart: "no"
     environment:
@@ -110,31 +112,18 @@ services:
     restart: unless-stopped
     networks:
       - vlan_bridge
+      - backend
     environment:
       <<: *env
     volumes:
       - ./radarr:/config
       - ${DOCKER_DATA_DIR}:/data
 
-  # lidarr makes so many DNS requests - going to disable as mostly unused anyway
-  # lidarr:
-  #   image: ghcr.io/linuxserver/lidarr
-  #   networks:
-  #     - vlan_bridge
-  #   container_name: lidarr
-  #   expose:
-  #     - 8686
-  #   restart: unless-stopped
-  #   environment:
-  #     <<: *env
-  #   volumes:
-  #     - ./lidarr:/config
-  #     - ${DOCKER_DATA_DIR}:/data
-
   sonarr:
     image: ghcr.io/linuxserver/sonarr
     networks:
       - vlan_bridge
+      - backend
     container_name: sonarr
     expose:
       - 8989
@@ -202,6 +191,7 @@ services:
       - com.centurylinklabs.watchtower.enable=false
     security_opt:
       - no-new-privileges:true
+
   transmission:
     image: ghcr.io/linuxserver/transmission
     container_name: transmission
@@ -242,38 +232,10 @@ services:
     healthcheck:
       test: ["CMD", "caddy", "version"]
 
-  # unpackerr:
-  #   image: golift/unpackerr
-  #   networks:
-  #     - vlan_bridge
-  #   container_name: unpackerr
-  #   volumes:
-  #     - ${DOCKER_DOWNLOADS_DIR}:/data/downloads
-  #   restart: always
-  #   user: ${PUID}:${PGID}
-  #   environment:
-  #     <<: *env
-  #     # Sonarr config
-  #     UN_SONARR_0_URL: http://sonarr:8989
-  #     UN_SONARR_0_API_KEY: ${SONARR_API_KEY}
-  #     UN_SONARR_0_PATHS_0: /data/downloads/torrents/completed
-
-  #     # Radarr config
-  #     UN_RADARR_0_URL: http://radarr:7878
-  #     UN_RADARR_0_API_KEY: ${RADARR_API_KEY}
-  #     UN_RADARR_0_PATHS_0: /data/downloads/torrents/completed
-
-  #     # Lidarr config
-  #     UN_LIDARR_0_URL: http://lidarr:8686
-  #     UN_LIDARR_0_API_KEY: ${LIDARR_API_KEY}
-  #     UN_LIDARR_0_PATHS_0: /data/downloads/torrents/completed
-  #   security_opt:
-  #     - no-new-privileges:true
-
   watchtower:
     image: containrrr/watchtower
     networks:
-      - vlan_bridge
+      - backend
     container_name: watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -290,6 +252,7 @@ services:
       WATCHTOWER_SCHEDULE: 0 0 2 * * *
       WATCHTOWER_HTTP_API_METRICS: true
       WATCHTOWER_HTTP_API_TOKEN: ${WATCHTOWER_API_TOKEN}
+
   db:
     image: postgres:14.6-alpine
     container_name: postgres
@@ -299,7 +262,7 @@ services:
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     networks:
-      - vlan_bridge
+      - backend
 
   huginn:
     image: ghcr.io/huginn/huginn
@@ -309,6 +272,7 @@ services:
       - 3000
     networks:
       - vlan_bridge
+      - backend
     environment:
       TIMEZONE: ${HUGINN_TIMEZONE}
       EMAIL_FROM_ADDRESS: ${HUGINN_EMAIL_FROM_ADDRESS}
@@ -344,7 +308,7 @@ services:
     restart: unless-stopped
     user: ${PUID}:${PGID}
     networks:
-      - vlan_bridge
+      - backend
     volumes:
       - ./recyclarr:/config
     environment:
@@ -365,12 +329,12 @@ services:
       REPLICA_URL: "http://adguardhome:3000"
       REPLICA_USERNAME: ${ADGUARD_HOME_REPLICA_USERNAME}
       REPLICA_PASSWORD: ${ADGUARD_HOME_REPLICA_PASSWORD}
-      CRON: "" # run only once (will trigger via Synology tasks)
+      CRON: "" # run only once (triggers via Synology tasks)
       RUN_ON_START: true
       API_PORT: 0 # Disable sync API server
       FEATURES_DNS_SERVER_CONFIG: false # replica needs to point to Unbound on router IP, not localhost
     networks:
-      - vlan_bridge
+      - backend
 
   acestream-http-proxy:
     image: ghcr.io/martinbjeldbak/acestream-http-proxy
@@ -419,7 +383,7 @@ services:
       RUN_ON_STARTUP: true
       CRON_SCHEDULE: 0 0,6,12,18 * * * # (every six hours)
     networks:
-      - vlan_bridge
+      - backend
 
   invidious:
     container_name: invidious
@@ -453,6 +417,7 @@ services:
       - db
     networks:
       - vlan_bridge
+      - backend
 
   scrypted:
     container_name: scrypted
@@ -502,7 +467,7 @@ services:
       PLEX_TOKEN: ${PLEX_TOKEN}
       PLEX_URL: http://plex:32400
     networks:
-      - vlan_bridge      
+      - backend
     volumes:
       - ./plex-auto-languages/config:/config
 
@@ -513,6 +478,7 @@ services:
       - 3000
     networks:
       - vlan_bridge     
+      - backend
     volumes:
       - ./homepage/config:/app/config
     environment:
@@ -555,7 +521,7 @@ services:
       - TASKS=1 # Allow access to viewing tasks (necessary when using Docker Swarm)
       - POST=0 # Disallow any POST operations (effectively read-only)
     networks:
-      - vlan_bridge     
+      - backend
     expose:
       - 2375
     volumes:
@@ -606,12 +572,13 @@ services:
     volumes:
       - ./influxdb:/var/lib/influxdb2
     networks:
-      - vlan_bridge     
+      - backend
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8086/health"]
       interval: 5s
       timeout: 10s
       retries: 20
+
   scrutiny-web:
     image: ghcr.io/analogj/scrutiny:master-web
     expose:
@@ -620,6 +587,7 @@ services:
       - ./scrutiny/config:/opt/scrutiny/config
     networks:
       - vlan_bridge     
+      - backend
     environment:
       SCRUTINY_WEB_INFLUXDB_HOST: 'influxdb'
     depends_on:
@@ -631,6 +599,7 @@ services:
       timeout: 10s
       retries: 20
       start_period: 10s
+
   scrutiny-collector:
     image: ghcr.io/analogj/scrutiny:master-collector
     cap_add:
@@ -640,7 +609,7 @@ services:
       - '/run/udev:/run/udev:ro'
       - ./scrutiny/config:/opt/scrutiny/config
     networks:
-      - vlan_bridge     
+      - backend
     environment:
       COLLECTOR_API_ENDPOINT: 'http://scrutiny-web:8080'
       COLLECTOR_HOST_ID: 'synology-ds-920'
@@ -655,6 +624,7 @@ services:
       - "/dev/sata4"
 
 networks:
+  backend:
   macvlan:
     name: docker_macvlan
     driver: macvlan
