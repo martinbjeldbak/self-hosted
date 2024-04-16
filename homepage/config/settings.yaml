@@ -10,3 +10,6 @@ layout:
   Media:
     style: row
     columns: 4
+  Network:
+    style: row
+    columns: 4

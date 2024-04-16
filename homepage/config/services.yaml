@@ -105,6 +105,54 @@
                   service_group: Media
                   service_name: Radarr
 
+- Applications:
+    - Paperless-ngx:
+        icon: paperless-ngx.svg
+        href: "https://paperless.local.martinbjeldbak.com"
+        description: document storage
+        server: localdocker
+        container: paperless
+        widget:
+            type: paperlessngx
+            url: http://paperless:8000
+            key: {{HOMEPAGE_VAR_PAPERLESS_KEY}}
+    - Watchtower:
+        icon: watchtower.svg
+        description: docker updates
+        server: localdocker
+        container: watchtower
+        widget:
+            type: watchtower
+            url: http://watchtower:8080
+            key: {{HOMEPAGE_VAR_WATCHTOWER_API_TOKEN}}
+    - Peanut Eaton 5E 1100i:
+        icon: peanut.svg
+        href: "https://peanut-eaton-5e-1100i.local.martinbjeldbak.com"
+        description: ups monitoring
+        server: localdocker
+        container: peanut-eaton-5e-1100i
+        widget:
+            type: peanut
+            url: http://peanut-eaton-5e-1100i:8080
+            key: ups
+    - Scrutiny:
+        icon: scrutiny.svg
+        href: "https://scrutiny.local.martinbjeldbak.com"
+        description: s.m.a.r.t. tools
+        server: localdocker
+        container: scrutiny-web
+        widget:
+            type: scrutiny
+            url: http://scrutiny-web:8080
+    - Speedtest Tracker:
+        icon: "https://speedtest.local.martinbjeldbak.com/img/speedtest-tracker-icon.png"
+        href: "https://speedtest.local.martinbjeldbak.com"
+        server: localdocker
+        container: speedtest-tracker
+        widget:
+            type: speedtest
+            url: http://speedtest-tracker
+
 - AdGuard:
     - AdGuard Home:
         icon: adguard-home.svg
@@ -154,34 +202,6 @@
         widget:
             type: esphome
             url: http://esphome:6052
-    - Watchtower:
-        icon: watchtower.svg
-        description: docker updates
-        server: localdocker
-        container: watchtower
-        widget:
-            type: watchtower
-            url: http://watchtower:8080
-            key: {{HOMEPAGE_VAR_WATCHTOWER_API_TOKEN}}
-    - Peanut Eaton 5E 1100i:
-        icon: peanut.svg
-        href: "https://peanut-eaton-5e-1100i.local.martinbjeldbak.com"
-        description: ups monitoring
-        server: localdocker
-        container: peanut-eaton-5e-1100i
-        widget:
-            type: peanut
-            url: http://peanut-eaton-5e-1100i:8080
-            key: ups
-    - Scrutiny:
-        icon: scrutiny.svg
-        href: "https://scrutiny.local.martinbjeldbak.com"
-        description: s.m.a.r.t. tools
-        server: localdocker
-        container: scrutiny-web
-        widget:
-            type: scrutiny
-            url: http://scrutiny-web:8080
 
 
 - Network:
@@ -246,11 +266,3 @@
             type: uptimerobot
             url: https://api.uptimerobot.com
             key: {{HOMEPAGE_VAR_UPTIME_ROBOT_HOME_INTERNET_API_KEY}}
-    - Speedtest Tracker:
-        icon: "https://speedtest.local.martinbjeldbak.com/img/speedtest-tracker-icon.png"
-        href: "https://speedtest.local.martinbjeldbak.com"
-        server: localdocker
-        container: speedtest-tracker
-        widget:
-            type: speedtest
-            url: http://speedtest-tracker
