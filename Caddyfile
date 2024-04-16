@@ -232,6 +232,13 @@
 		encode gzip
 	}
 
+	@paperless host paperless.local.martinbjeldbak.com
+	handle @paperless {
+		reverse_proxy paperless:8000
+
+		encode gzip
+	}
+
 	# Fallback for otherwise unhandled domains
 	handle {
 		abort

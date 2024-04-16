@@ -510,6 +510,7 @@ services:
       HOMEPAGE_VAR_UNIFI_PASSWORD: ${UNIFI_PASSWORD}
       HOMEPAGE_VAR_UPTIME_ROBOT_HOME_INTERNET_API_KEY: ${UPTIME_ROBOT_HOME_INTERNET_API_KEY}
       HOMEPAGE_VAR_WATCHTOWER_API_TOKEN: ${WATCHTOWER_API_TOKEN}
+      HOMEPAGE_VAR_PAPERLESS_KEY: ${PAPERLESS_KEY}
     restart: unless-stopped
 
   dockerproxy:
@@ -533,6 +534,7 @@ services:
     image: lscr.io/linuxserver/speedtest-tracker
     environment:
       <<: *env
+      APP_URL: https://speedtest.local.martinbjeldbak.com
       DB_CONNECTION: sqlite
       MAIL_MAILER: smtp
       MAIL_HOST: ${SMTP_SERVER}
@@ -565,12 +567,13 @@ services:
       NUT_PORT: 3493
       WEB_PORT: 8080
 
-  influxdb:
+  scrutiny-influxdb:
     image: influxdb:2.2
+    container_name: scrutiny-influxdb
     expose:
       - 8086
     volumes:
-      - ./influxdb:/var/lib/influxdb2
+      - ./scrutiny/influxdb:/var/lib/influxdb2
     networks:
       - backend
     healthcheck:
@@ -581,6 +584,7 @@ services:
 
   scrutiny-web:
     image: ghcr.io/analogj/scrutiny:master-web
+    container_name: scrutiny-web
     expose:
       - 8080 # web ui
     volumes:
@@ -589,9 +593,9 @@ services:
       - vlan_bridge     
       - backend
     environment:
-      SCRUTINY_WEB_INFLUXDB_HOST: 'influxdb'
+      SCRUTINY_WEB_INFLUXDB_HOST: 'scrutiny-influxdb'
     depends_on:
-      influxdb:
+      scrutiny-influxdb:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
@@ -602,6 +606,7 @@ services:
 
   scrutiny-collector:
     image: ghcr.io/analogj/scrutiny:master-collector
+    container_name: scrutiny-collector
     cap_add:
       - SYS_RAWIO
       - SYS_ADMIN
@@ -622,6 +627,64 @@ services:
       - "/dev/sata2"
       - "/dev/sata3"
       - "/dev/sata4"
+
+  paperless:
+    container_name: paperless
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    restart: unless-stopped
+    networks:
+      - vlan_bridge
+      - backend
+    expose:
+      - 8000 # UI
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      - paperless-postgres
+      - paperless-redis
+    volumes:
+      - ./paperless/paperless:/usr/src/paperless/data # container data
+      - ./paperless/paperless:/usr/src/paperless/media # documents
+      - ./paperless/paperless:/usr/src/paperless/export # backups
+      - ${PAPERLESS_INBOX_PATH}:/usr/src/paperless/consume # watch folder
+    environment:
+      USERMAP_UID: $PUID
+      USERMAP_GID: $PGID
+      PAPERLESS_URL: https://paperless.local.martinbjeldbak.com
+      PAPERLESS_TIME_ZONE: $TZ
+      PAPERLESS_OCR_LANGUAGES: dan
+      PAPERLESS_OCR_LANGUAGE: dan+eng
+      PAPERLESS_ENABLE_UPDATE_CHECK: "true"
+      PAPERLESS_REDIS: redis://paperless-redis:6379
+      PAPERLESS_DBHOST: paperless-postgres
+      PAPERLESS_DBNAME: paperless
+      PAPERLESS_DBUSER: paperless
+      PAPERLESS_DBPASS: $PAPERLESS_POSTGRES_PASSWORD
+      PAPERLESS_FILENAME_FORMAT: "{created_year}/{correspondent}/{created} {title}"
+      # PAPERLESS_ADMIN_USER: martinbjeldbak # required on first run only
+      # PAPERLESS_ADMIN_PASSWORD: asdf
+
+  paperless-postgres:
+    container_name: paperless-postgres
+    image: postgres:16
+    restart: unless-stopped
+    networks:
+      - backend
+    volumes:
+      - ./paperless/postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD: $PAPERLESS_POSTGRES_PASSWORD
+
+  paperless-redis:
+    image: redis:7-alpine
+    container_name: paperless-redis
+    restart: unless-stopped
+    volumes:
+      - ./paperless/redis:/data
+    networks:
+      - backend
+
 
 networks:
   backend:
