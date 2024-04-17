@@ -16,7 +16,7 @@ services:
     networks:
       macvlan:
         ipv4_address: 192.168.10.15
-      vlan_bridge:
+      frontend:
         ipv4_address:  172.20.0.98
       backend: # for access from sync
     environment:
@@ -37,7 +37,7 @@ services:
     expose:
       - 8123 # UI
     networks:
-      vlan_bridge:
+      frontend:
         ipv4_address: 172.20.0.201 # static ip for NUT. Allowlisted on Synology NAS
       macvlan:
         ipv4_address: 192.168.10.16 # enable homekit & WOL functionality
@@ -62,7 +62,7 @@ services:
       - 32414:32414/udp # current GDM network discovery
       - 32469:32469/tcp # access to the Plex DLNA Server
     networks:
-      - vlan_bridge
+      - frontend
       - backend
     environment:
       VERSION: docker
@@ -111,7 +111,7 @@ services:
       - 7878
     restart: unless-stopped
     networks:
-      - vlan_bridge
+      - frontend
       - backend
     environment:
       <<: *env
@@ -122,7 +122,7 @@ services:
   sonarr:
     image: ghcr.io/linuxserver/sonarr
     networks:
-      - vlan_bridge
+      - frontend
       - backend
     container_name: sonarr
     expose:
@@ -137,7 +137,7 @@ services:
   tautulli:
     image: ghcr.io/linuxserver/tautulli:latest
     networks:
-      - vlan_bridge
+      - frontend
     container_name: tautulli
     restart: unless-stopped
     volumes:
@@ -150,7 +150,7 @@ services:
   bazarr:
     image: ghcr.io/linuxserver/bazarr
     networks:
-      - vlan_bridge
+      - frontend
     container_name: bazarr
     environment:
       <<: *env
@@ -164,7 +164,7 @@ services:
   gluetun:
     image: qmcgaw/gluetun
     networks:
-      - vlan_bridge
+      - frontend
     container_name: gluetun
     restart: always
     cap_add:
@@ -218,7 +218,7 @@ services:
     expose:
       - 2019 # admin port
     networks:
-      - vlan_bridge
+      - frontend
     restart: unless-stopped
     environment:
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
@@ -271,7 +271,7 @@ services:
     expose:
       - 3000
     networks:
-      - vlan_bridge
+      - frontend
       - backend
     environment:
       TIMEZONE: ${HUGINN_TIMEZONE}
@@ -342,7 +342,7 @@ services:
     ports:
       - 6878:80
     networks:
-      - vlan_bridge
+      - frontend
 
   esphome:
     container_name: esphome
@@ -357,7 +357,7 @@ services:
     environment:
       ESPHOME_DASHBOARD_USE_PING: true
     networks:
-      - vlan_bridge
+      - frontend
 
   epicgames-freegames:
     image: ghcr.io/claabs/epicgames-freegames-node
@@ -416,7 +416,7 @@ services:
     depends_on:
       - db
     networks:
-      - vlan_bridge
+      - frontend
       - backend
 
   scrypted:
@@ -440,7 +440,7 @@ services:
     networks:
       macvlan:
         ipv4_address: 192.168.10.17
-      vlan_bridge:
+      frontend:
     expose:
       - 10443 # scrypted https
       - 11080 # scrypted http (used by Caddy)
@@ -453,7 +453,7 @@ services:
     environment:
       <<: *env
     networks:
-      - vlan_bridge
+      - frontend
     expose:
       - 5055
     volumes:
@@ -477,7 +477,7 @@ services:
     expose:
       - 3000
     networks:
-      - vlan_bridge     
+      - frontend     
       - backend
     volumes:
       - ./homepage/config:/app/config
@@ -549,7 +549,7 @@ services:
       - 443 # https
     restart: unless-stopped
     networks:
-      - vlan_bridge     
+      - frontend     
     volumes:
       - ./speedtest-tracker/config:/config
 
@@ -560,7 +560,7 @@ services:
     expose:
       - 8080 # web UI
     networks:
-      vlan_bridge:
+      frontend:
         ipv4_address: 172.20.0.202 # static ip for NUT. Allowlisted on Synology NAS
     environment:
       NUT_HOST: 172.20.0.1
@@ -590,7 +590,7 @@ services:
     volumes:
       - ./scrutiny/config:/opt/scrutiny/config
     networks:
-      - vlan_bridge     
+      - frontend     
       - backend
     environment:
       SCRUTINY_WEB_INFLUXDB_HOST: 'scrutiny-influxdb'
@@ -633,7 +633,7 @@ services:
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     restart: unless-stopped
     networks:
-      - vlan_bridge
+      - frontend
       - backend
     expose:
       - 8000 # UI
@@ -698,8 +698,8 @@ networks:
       config:
         - subnet: 192.168.10.0/24
           gateway: 192.168.10.1
-  vlan_bridge:
-    name: docker_vlan_bridge
+  frontend:
+    name: docker_frontend
     driver: bridge
     enable_ipv6: false
     ipam:
