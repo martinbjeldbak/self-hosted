@@ -44,6 +44,7 @@
         icon: synology.svg
         description: diskstation
         ping: 192.168.10.10
+        href: "https://nas.local.martinbjeldbak.com"
         widget:
             type: diskstation
             url: http://192.168.10.10:5000
