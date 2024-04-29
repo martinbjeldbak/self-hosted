@@ -90,12 +90,12 @@ services:
       <<: *env
 
   # NOTE: this is a once-off task and runs using cron in synology "Tasks" section
-  plex-meta-manager:
-    image: meisnate12/plex-meta-manager
+  kometa:
+    image: kometateam/kometa
+    container_name: kometa
     command: --run
     networks:
       - backend
-    container_name: plex-meta-manager
     restart: "no"
     environment:
       PMM_NO_MISSING: 'true'
@@ -666,7 +666,7 @@ services:
       PAPERLESS_TIKA_ENABLED: 1
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
-      
+      PAPERLESS_OCR_USER_ARGS: '{"invalidate_digital_signatures": true}'
       # PAPERLESS_ADMIN_USER: martinbjeldbak # required on first run only
       # PAPERLESS_ADMIN_PASSWORD: asdf
 
