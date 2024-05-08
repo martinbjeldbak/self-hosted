@@ -153,6 +153,11 @@
         widget:
             type: speedtest
             url: http://speedtest-tracker
+    - icloudpd:
+        icon: docker.svg
+        description: icloud photos downloader for backup to NAS
+        server: localdocker
+        container: icloudpd-n
 
 - AdGuard:
     - AdGuard Home:

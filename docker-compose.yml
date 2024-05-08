@@ -715,6 +715,27 @@ services:
       - 9998
     restart: unless-stopped
 
+  icloudpd-n:
+    container_name: icloudpd-n
+    image: icloudpd/icloudpd
+    environment:
+      TZ: Australia/Melbourne
+    volumes:
+      - ${N_PHOTO_VOLUME}/icloudpd:/data
+      # NOTE: if reauth needed (every ~2 months), run sudo docker-compose run icloudpd-n icloudpd --username xxx --password yyy --auth-only
+      - ./icloudpd/n/cookies:/root/.pyicloud # so we don't need to keep reauthing
+    command: >
+       icloudpd
+       --directory /data
+       --username ${ICLOUD_N_USERNAME}
+       --password ${ICLOUD_N_PASSWORD}
+       --smtp-username ${SMTP_USER_NAME}
+       --smtp-password ${HUGINN_SMTP_PASSWORD}
+       --smtp-host ${SMTP_SERVER}
+       --smtp-port 465
+       --notification-email-from icloudpd@martinbjeldbak.com
+       --watch-with-interval 3600
+
 networks:
   backend:
   macvlan:
