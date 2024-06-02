@@ -383,7 +383,7 @@ services:
       RUN_ON_STARTUP: true
       CRON_SCHEDULE: 0 0,6,12,18 * * * # (every six hours)
     networks:
-      - backend
+      - frontend
 
   invidious:
     container_name: invidious
@@ -570,6 +570,7 @@ services:
   scrutiny-influxdb:
     image: influxdb:2.2
     container_name: scrutiny-influxdb
+    restart: unless-stopped
     expose:
       - 8086
     volumes:
@@ -594,6 +595,7 @@ services:
       - backend
     environment:
       SCRUTINY_WEB_INFLUXDB_HOST: 'scrutiny-influxdb'
+    restart: unless-stopped
     depends_on:
       scrutiny-influxdb:
         condition: service_healthy
@@ -607,6 +609,7 @@ services:
   scrutiny-collector:
     image: ghcr.io/analogj/scrutiny:master-collector
     container_name: scrutiny-collector
+    restart: unless-stopped
     cap_add:
       - SYS_RAWIO
       - SYS_ADMIN
