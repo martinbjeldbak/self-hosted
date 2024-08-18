@@ -239,6 +239,13 @@
 		encode gzip
 	}
 
+	@roms host roms.local.martinbjeldbak.com
+	handle @roms {
+		reverse_proxy romm:8080
+
+		encode gzip
+	}
+
 	# Fallback for otherwise unhandled domains
 	handle {
 		abort

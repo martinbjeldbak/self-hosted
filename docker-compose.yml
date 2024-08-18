@@ -3,6 +3,7 @@ x-env: &env
   PUID: ${PUID}
   PGID: ${PGID}
   TZ: ${TZ}
+  UMASK: 022
 
 services:
   adguardhome:
@@ -168,12 +169,13 @@ services:
     container_name: gluetun
     restart: always
     cap_add:
-      - net_admin
+      - NET_ADMIN
     devices:
       - /dev/net/tun:/dev/net/tun
     volumes:
       - ./gluetun:/gluetun
     environment:
+      <<: *env
       VPN_SERVICE_PROVIDER: mullvad
       VPN_TYPE: wireguard
       WIREGUARD_PRIVATE_KEY: ${GLUETUN_WIREGUARD_PRIVATE_KEY}
@@ -182,7 +184,6 @@ services:
       DOT: 'off' # turn off local unbound in favor of adguardhome
       # DNS_ADDRESS: 172.20.0.200 # TODO: try disable this and DNS_KEEP_NAMESERVER on, see https://github.com/qdm12/gluetun-wiki/blob/3c3cfccf06045767d50d58efae22fbafe95b2ab2/setup/options/dns.md?plain=1#L9
       DNS_KEEP_NAMESERVER: on
-      <<: *env
     expose:
       - 9091 # transmission UI
       - 9696 # Prowlarr
@@ -252,13 +253,14 @@ services:
       WATCHTOWER_SCHEDULE: 0 0 2 * * *
       WATCHTOWER_HTTP_API_METRICS: true
       WATCHTOWER_HTTP_API_TOKEN: ${WATCHTOWER_API_TOKEN}
+      WATCHTOWER_MONITOR_ONLY: true # so many broken upgrades!
 
-  db:
+  huginn-postgres:
     image: postgres:14.6-alpine
-    container_name: postgres
+    container_name: huginn-postgres
     restart: always
     volumes:
-      - ./postgres:/var/lib/postgresql/data
+      - ./huginn-postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     networks:
@@ -288,9 +290,9 @@ services:
       DATABASE_ADAPTER: postgresql
       DATABASE_USERNAME: postgres
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
-      DATABASE_HOST: db
+      DATABASE_HOST: huginn-postgres
     depends_on:
-      - db
+      - huginn-postgres
 
   prowlarr:
     image: ghcr.io/linuxserver/prowlarr:latest
@@ -315,6 +317,12 @@ services:
       <<: *env
       RECYCLARR_CREATE_CONFIG: "true"
       CRON_SCHEDULE: "@daily"
+      RADARR_API_KEY: ${RADARR_API_KEY}
+      RADARR_BASE_URL: http://radarr:7878
+      SONARR_API_KEY: ${SONARR_API_KEY}
+      SONARR_BASE_URL: http://sonarr:8989
+
+
 
   # NOTE: this is a once-off task and runs using cron in synology "Tasks" section
   adguardhome-sync:
@@ -385,66 +393,66 @@ services:
     networks:
       - frontend
 
-  invidious:
-    container_name: invidious
-    image: quay.io/invidious/invidious:latest
-    restart: unless-stopped
-    expose:
-      - 3000
-    environment:
-      INVIDIOUS_CONFIG: |
-        database_url: postgres://postgres:kba.tft.DRE8tnt4cvy@db:5432/postgres
-        check_tables: true
-        hmac_key: CK2jJrAvaeeQABNXdCD7
-        admins: ["martinbjeldbak"]
-        domain: invidious.local.martinbjeldbak.com
-        external_port: 443
-        use_innertube_for_captions: true
-        default_user_preferences:
-          region: AU
-          captions: ["English", "Danish", "Burmese"]
-          save_player_pos: true
-    healthcheck:
-      test: wget -nv --tries=1 --spider http://127.0.0.1:3000/api/v1/comments/jNQXAC9IVRw || exit 1
-      interval: 30s
-      timeout: 5s
-      retries: 2
-    logging:
-      options:
-        max-size: "1G"
-        max-file: "4"
-    depends_on:
-      - db
-    networks:
-      - frontend
-      - backend
+  #invidious:
+  #  container_name: invidious
+  #  image: quay.io/invidious/invidious:latest
+  #  restart: unless-stopped
+  #  expose:
+  #    - 3000
+  #  environment:
+  #    INVIDIOUS_CONFIG: |
+  #      database_url: postgres://postgres:kba.tft.DRE8tnt4cvy@db:5432/postgres
+  #      check_tables: true
+  #      hmac_key: CK2jJrAvaeeQABNXdCD7
+  #      admins: ["martinbjeldbak"]
+  #      domain: invidious.local.martinbjeldbak.com
+  #      external_port: 443
+  #      use_innertube_for_captions: true
+  #      default_user_preferences:
+  #        region: AU
+  #        captions: ["English", "Danish", "Burmese"]
+  #        save_player_pos: true
+  #  healthcheck:
+  #    test: wget -nv --tries=1 --spider http://127.0.0.1:3000/api/v1/comments/jNQXAC9IVRw || exit 1
+  #    interval: 30s
+  #    timeout: 5s
+  #    retries: 2
+  #  logging:
+  #    options:
+  #      max-size: "1G"
+  #      max-file: "4"
+  #  depends_on:
+  #    - db
+  #  networks:
+  #    - frontend
+  #    - backend
 
-  scrypted:
-    container_name: scrypted
-    restart: unless-stopped
-    image: ghcr.io/koush/scrypted
-    environment:
-      SCRYPTED_NVR_VOLUME: /nvr
-      SCRYPTED_WEBHOOK_UPDATE_AUTHORIZATION: Bearer ${SCRYPTED_BEARER_TOKEN}
-      SCRYPTED_WEBHOOK_UPDATE: http://localhost:10444/v1/update
-    volumes:
-      - ./scrypted/nvr:/nvr
-      - ./scrypted/volume:/server/volume
-    logging:
-        driver: "json-file"
-        options:
-            max-size: "10m"
-            max-file: "10"
-    labels:
-        - "com.centurylinklabs.watchtower.scope=scrypted"
-    networks:
-      macvlan:
-        ipv4_address: 192.168.10.17
-      frontend:
-    expose:
-      - 10443 # scrypted https
-      - 11080 # scrypted http (used by Caddy)
-      - 31797 # homekit port Pan/Tilt
+  # scrypted:
+  #   container_name: scrypted
+  #   restart: unless-stopped
+  #   image: ghcr.io/koush/scrypted
+  #   environment:
+  #     SCRYPTED_NVR_VOLUME: /nvr
+  #     SCRYPTED_WEBHOOK_UPDATE_AUTHORIZATION: Bearer ${SCRYPTED_BEARER_TOKEN}
+  #     SCRYPTED_WEBHOOK_UPDATE: http://localhost:10444/v1/update
+  #   volumes:
+  #     - ./scrypted/nvr:/nvr
+  #     - ./scrypted/volume:/server/volume
+  #   logging:
+  #       driver: "json-file"
+  #       options:
+  #           max-size: "10m"
+  #           max-file: "10"
+  #   labels:
+  #       - "com.centurylinklabs.watchtower.scope=scrypted"
+  #   networks:
+  #     macvlan:
+  #       ipv4_address: 192.168.10.17
+  #     frontend:
+  #   expose:
+  #     - 10443 # scrypted https
+  #     - 11080 # scrypted http (used by Caddy)
+  #     - 31797 # homekit port Pan/Tilt
 
   overseerr:
     container_name: overseerr
@@ -511,6 +519,8 @@ services:
       HOMEPAGE_VAR_UPTIME_ROBOT_HOME_INTERNET_API_KEY: ${UPTIME_ROBOT_HOME_INTERNET_API_KEY}
       HOMEPAGE_VAR_WATCHTOWER_API_TOKEN: ${WATCHTOWER_API_TOKEN}
       HOMEPAGE_VAR_PAPERLESS_KEY: ${PAPERLESS_KEY}
+      HOMEPAGE_VAR_ROMM_USERNAME: ${ROMM_USERNAME}
+      HOMEPAGE_VAR_ROMM_PASSWORD: ${ROMM_PASSWORD}
     restart: unless-stopped
 
   dockerproxy:
@@ -534,7 +544,12 @@ services:
     image: lscr.io/linuxserver/speedtest-tracker
     environment:
       <<: *env
+      APP_KEY: ${SPEEDTEST_TRACKER_APP_KEY}
       APP_URL: https://speedtest.local.martinbjeldbak.com
+      APP_TIMEZONE: ${TZ}
+      DISPLAY_TIMEZONE: ${TZ}
+      SPEEDTEST_SCHEDULE: "0 * * * *" # every hour
+      SPEEDTEST_SERVERS: "25134,14670,12491,13275,60412,18714"
       DB_CONNECTION: sqlite
       MAIL_MAILER: smtp
       MAIL_HOST: ${SMTP_SERVER}
@@ -695,7 +710,7 @@ services:
       - backend
 
   gotenberg:
-    image: gotenberg/gotenberg:7.10
+    image: gotenberg/gotenberg:8.8
     container_name: gotenberg
     restart: unless-stopped
     networks:
@@ -708,6 +723,8 @@ services:
       - "gotenberg"
       - "--chromium-disable-javascript=true"
       - "--chromium-allow-list=file:///tmp/.*"
+      - "--libreoffice-auto-start=true"
+      - "--libreoffice-start-timeout=300s"
 
   tika:
     image: ghcr.io/paperless-ngx/tika
@@ -715,14 +732,61 @@ services:
     networks:
       - backend
     expose:
-      - 9998
+      - 9999
     restart: unless-stopped
+
+  romm:
+    image: rommapp/romm:latest
+    container_name: romm
+    restart: unless-stopped
+    user: ${PUID}:${PGID}
+    networks:
+      - frontend 
+      - backend
+    environment:
+      <<: *env
+      DB_HOST: romm-db
+      DB_NAME: romm
+      DB_USER: romm-user
+      DB_PASSWD: ${ROMM_DB_USER_PASSWORD}
+      ROMM_AUTH_SECRET_KEY: ${ROMM_AUTH_SECRET_KEY}
+      IGDB_CLIENT_ID: ${IGDB_CLIENT_ID}
+      IGDB_CLIENT_SECRET: ${IGDB_CLIENT_SECRET}
+      MOBYGAMES_API_KEY: ${MOBYGAMES_API_KEY}
+      STEAMGRIDDB_API_KEY: ${STEAMGRIDDB_API_KEY}
+      ROMM_AUTH_USERNAME: ${ROMM_USERNAME}
+      ROMM_AUTH_PASSWORD: ${ROMM_PASSWORD}
+    volumes:
+     - ./romm/resources:/romm/resources # Resources fetched from IGDB (covers, screenshots, etc.)
+     - ./romm/redis:/redis-data # Cached data for background tasks
+     - ${DOCKER_DATA_DIR}/emulators:/romm/library
+     - ./romm/assets:/romm/assets # Uploaded saves, states, etc.
+     - ./romm/config:/romm/config # Path where config.yml is stored
+    expose:
+     - 8080
+    depends_on:
+     - romm-db
+
+  romm-db:
+    image: mariadb:latest    
+    container_name: romm-db
+    restart: unless-stopped
+    user: ${PUID}:${PGID}
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ROMM_DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: romm
+      MYSQL_USER: romm-user
+      MYSQL_PASSWORD: ${ROMM_DB_USER_PASSWORD}
+    volumes:
+      - ./romm/database:/var/lib/mysql
+    networks:
+      - backend
 
   icloudpd-n:
     container_name: icloudpd-n
     image: icloudpd/icloudpd
     environment:
-      TZ: Australia/Melbourne
+      TZ: ${TZ}
     volumes:
       - ${N_PHOTO_VOLUME}/icloudpd:/data
       # NOTE: if reauth needed (every ~2 months), run sudo docker-compose run icloudpd-n icloudpd --username xxx --password yyy --auth-only
