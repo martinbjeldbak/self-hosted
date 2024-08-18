@@ -1,6 +1,6 @@
 exclude:
   # Exclude platforms to be scanned
-  platforms: [] # ['my_excluded_platform_1', 'my_excluded_platform_2']
+  platforms: ["@Eadir"] # ['my_excluded_platform_1', 'my_excluded_platform_2']
 
   # Exclude roms or parts of roms to be scanned
   roms:
