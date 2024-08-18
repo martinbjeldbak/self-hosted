@@ -92,6 +92,17 @@
             url: http://gluetun:9091
             username: {{HOMEPAGE_VAR_TRANSMISSION_USERNAME}}
             password: {{HOMEPAGE_VAR_TRANSMISSION_PASSWORD}}
+    - Romm:
+        icon: romm.svg
+        description: roms
+        href: "https://roms.local.martinbjeldbak.com"
+        server: localdocker
+        container: romm
+        widget:
+            type: romm 
+            url: http://romm:8080
+            username: {{HOMEPAGE_VAR_ROMM_USERNAME}}
+            password: {{HOMEPAGE_VAR_ROMM_PASSWORD}}
 
 - Releases:
     - Calendar:
