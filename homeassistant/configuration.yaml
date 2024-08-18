@@ -5,7 +5,7 @@ default_config:
 http:
   trusted_proxies:
     - 172.20.0.0/24
-
+    - 0.0.0.0/0
   use_x_forwarded_for: true
   ip_ban_enabled: true
   login_attempts_threshold: 5
@@ -50,6 +50,24 @@ rest_command:
       username: !secret opnsense_user
       password: !secret opnsense_key
 
+  wake_nandar_work_laptop_wifi:
+      url: 'https://192.168.1.1/api/wol/wol/set'
+      verify_ssl: false
+      method: POST
+      payload: '{"wake":{"interface": "opt3","mac": "64:bc:58:b7:46:ca"}}'
+      content_type:  'application/json'
+      username: !secret opnsense_user
+      password: !secret opnsense_key
+
+  wake_martin_gaming_pc:
+      url: 'https://192.168.1.1/api/wol/wol/set'
+      verify_ssl: false
+      method: POST
+      payload: '{"wake":{"interface": "opt3","mac": "b4:2e:99:ee:96:73"}}'
+      content_type:  'application/json'
+      username: !secret opnsense_user
+      password: !secret opnsense_key
+
 switch:
   - platform: broadlink
     mac: E8:16:56:7D:9B:AA
@@ -59,15 +77,48 @@ switch:
         command_off: JgDIACoOKg8NKSkOKBAMKgwrDCoNKg0oDikq5ikPKQ8MKygQKA8NKgwqDSoMKwwqDCopAAEKKg4qDg0pKg4qDg0pDikNKgwqDSoMKirmKQ8pDg0qKQ4pDg0qDSkNKgwqDCoNKigAAQooDygPDCsnDikODSoNKQ0pDSoMKgwqKOYpDigODikpDigPDSkMKg0qDCoNKgwqKAABCygOKQ4NKSkOKQ4NKQ4pDSkNKgwqDSoo5ikPKQ4NKSkOKQ4NKgwqDCoNKgwqDCsnAA0F
   - platform: template
     switches:
+      martin_gaming_pc:
+        unique_id: martin_gaming_pc
+        friendly_name: "Martin's Gaming PC"
+        value_template: "{{ is_state('binary_sensor.martins_gaming_pc_local_martinbjeldbak_com', 'on') }}"
+        turn_on:
+          service: rest_command.wake_martin_gaming_pc
+        turn_off: # Added as required, no way to wake-off-lan without running script
+          service: switch.turn_off
+          target:
+            entity_id: switch.martin_s_gaming_pc
+        icon_template: >-
+          {% if is_state('binary_sensor.martin_s_gaming_pc', 'on') %}
+            mdi:laptop
+          {% else %}
+            mdi:laptop-off
+          {% endif %}
+  - platform: template
+    switches:
       nandar_work_laptop:
         unique_id: nandar_work_laptop
-        friendly_name: "Nandar's Work Laptop"
+        friendly_name: "Nandar's Work Laptop (ethernet)"
         value_template: "{{ is_state('binary_sensor.nandar_s_work_laptop', 'on') }}"
         turn_on:
           service: rest_command.wake_nandar_work_laptop
         turn_off: # Added as required, no way to wake-off-lan without running script
         icon_template: >-
           {% if is_state('binary_sensor.nandar_s_work_laptop', 'on') %}
+            mdi:laptop
+          {% else %}
+            mdi:laptop-off
+          {% endif %}
+  - platform: template
+    switches:
+      nandar_work_laptop_wifi:
+        unique_id: nandar_work_laptop_wifi
+        friendly_name: "Nandar's Work Laptop (wifi)"
+        value_template: "{{ is_state('binary_sensor.nandar_s_work_laptop_wifi', 'on') }}"
+        turn_on:
+          service: rest_command.wake_nandar_work_laptop_wifi
+        turn_off: # Added as required, no way to wake-off-lan without running script
+        icon_template: >-
+          {% if is_state('binary_sensor.nandar_s_work_laptop_wifi', 'on') %}
             mdi:laptop
           {% else %}
             mdi:laptop-off
@@ -94,18 +145,11 @@ homekit:
       - fan
       - climate
     include_entities:
-      - switch.string_lights
       - switch.longfan
+      - switch.string_lights
   entity_config:
     fan.mi_air_purifier_3h:
       name: Air Purifier
-
-binary_sensor:
-  - platform: ping
-    host: 192.168.20.15
-    name: "Nandar's Work Laptop"
-    count: 2
-    scan_interval: 30
 
 adaptive_lighting:
 
@@ -115,6 +159,7 @@ script: !include scripts.yaml
 scene: !include scenes.yaml
 
 smartir:
+  check_updates: false # installed via HACS https://github.com/smartHomeHub/SmartIR?tab=readme-ov-file#hacs
 climate:
   - platform: smartir
     name: Living room AC
@@ -123,3 +168,9 @@ climate:
     controller_data: remote.living_room_broadlink
     temperature_sensor: sensor.living_room_broadlink_temperature
     humidity_sensor: sensor.living_room_broadlink_humidity
+
+command_line:
+  - switch:
+      name: Martin's Gaming PC
+      unique_id: martin_gaming_pc_ssh
+      command_off: "ssh -o StrictHostKeyChecking no -i id_ed25519 homeassistant@martins-gaming-pc.local.martinbjeldbak.com -t \"systemctl suspend -i\""

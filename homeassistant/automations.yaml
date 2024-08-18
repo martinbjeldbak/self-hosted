@@ -82,10 +82,15 @@
     to: long_release
   condition: []
   action:
-  - service: switch.turn_on
-    data: {}
-    target:
-      entity_id: switch.nandar_work_laptop
+  - parallel:
+    - service: switch.turn_on
+      data: {}
+      target:
+        entity_id: switch.nandar_work_laptop
+    - service: switch.turn_on
+      data: {}
+      target:
+        entity_id: switch.nandar_work_laptop_wifi
   mode: single
 - id: '1694784402214'
   alias: Hue Dimmer Turn on living room
