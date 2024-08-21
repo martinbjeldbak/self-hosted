@@ -246,6 +246,27 @@
 		encode gzip
 	}
 
+	@icloudpd-n host icloudpd-n.local.martinbjeldbak.com
+	handle @icloudpd-n {
+		reverse_proxy icloudpd-n:8080
+
+		encode gzip
+	}
+
+	@SLZB06M host SLZB-06M.local.martinbjeldbak.com
+	handle @SLZB06M {
+		reverse_proxy {$SLZB06M_IP}:80
+
+		encode gzip
+	}
+
+	@zigbee2mqtt host zigbee2mqtt.local.martinbjeldbak.com
+	handle @zigbee2mqtt {
+		reverse_proxy zigbee2mqtt:8080
+
+		encode gzip
+	}
+
 	# Fallback for otherwise unhandled domains
 	handle {
 		abort

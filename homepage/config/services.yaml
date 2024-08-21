@@ -167,8 +167,10 @@
     - icloudpd:
         icon: docker.svg
         description: icloud photos downloader for backup to NAS
+        href: https://icloudpd-n.local.martinbjeldbak.com
         server: localdocker
         container: icloudpd-n
+
 
 - AdGuard:
     - AdGuard Home:
@@ -219,6 +221,8 @@
         widget:
             type: esphome
             url: http://esphome:6052
+    - zigbee2mqtt:
+        href: https://zigbee2mqtt.local.martinbjeldbak.com
 
 
 - Network:

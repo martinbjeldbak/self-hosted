@@ -1,24 +1,22 @@
 ---
 # Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
-
 http:
   trusted_proxies:
     - 172.20.0.0/24
+    - 172.20.0.7 # no idea why this not covered
     - 0.0.0.0/0
   use_x_forwarded_for: true
   ip_ban_enabled: true
   login_attempts_threshold: 5
-
 #   url: https://192.168.1.1/api
 #   api_key: !secret opnsense_user
 #   api_secret: !secret opnsense_key
 #   verify_ssl: false
 #   tracker_interfaces:
 #     - USER
-
 notify:
-  - name: "Email using Fastmail"
+  - name: Email using Fastmail
     platform: smtp
     sender: homeassistant@martinbjeldbak.com
     recipient: me@martinbjeldbak.com
@@ -28,46 +26,41 @@ notify:
     password: !secret smtp_password
     encryption: tls
     sender_name: Martin's Home Assistant
-
 sensor:
-   - platform: epsonworkforce
-     host: 192.168.30.17
-     monitored_conditions:
-     - black
-     - photoblack
-     - yellow
-     - magenta
-     - cyan
-     - clean
-
+  - platform: epsonworkforce
+    host: 192.168.30.17
+    monitored_conditions:
+      - black
+      - photoblack
+      - yellow
+      - magenta
+      - cyan
+      - clean
 rest_command:
   wake_nandar_work_laptop:
-      url: 'https://192.168.1.1/api/wol/wol/set'
-      verify_ssl: false
-      method: POST
-      payload: '{"wake":{"interface": "opt3","mac": "80:fa:5b:90:f0:fd"}}'
-      content_type:  'application/json'
-      username: !secret opnsense_user
-      password: !secret opnsense_key
-
+    url: https://192.168.1.1/api/wol/wol/set
+    verify_ssl: false
+    method: POST
+    payload: '{"wake":{"interface": "opt3","mac": "80:fa:5b:90:f0:fd"}}'
+    content_type: application/json
+    username: !secret opnsense_user
+    password: !secret opnsense_key
   wake_nandar_work_laptop_wifi:
-      url: 'https://192.168.1.1/api/wol/wol/set'
-      verify_ssl: false
-      method: POST
-      payload: '{"wake":{"interface": "opt3","mac": "64:bc:58:b7:46:ca"}}'
-      content_type:  'application/json'
-      username: !secret opnsense_user
-      password: !secret opnsense_key
-
+    url: https://192.168.1.1/api/wol/wol/set
+    verify_ssl: false
+    method: POST
+    payload: '{"wake":{"interface": "opt3","mac": "64:bc:58:b7:46:ca"}}'
+    content_type: application/json
+    username: !secret opnsense_user
+    password: !secret opnsense_key
   wake_martin_gaming_pc:
-      url: 'https://192.168.1.1/api/wol/wol/set'
-      verify_ssl: false
-      method: POST
-      payload: '{"wake":{"interface": "opt3","mac": "b4:2e:99:ee:96:73"}}'
-      content_type:  'application/json'
-      username: !secret opnsense_user
-      password: !secret opnsense_key
-
+    url: https://192.168.1.1/api/wol/wol/set
+    verify_ssl: false
+    method: POST
+    payload: '{"wake":{"interface": "opt3","mac": "b4:2e:99:ee:96:73"}}'
+    content_type: application/json
+    username: !secret opnsense_user
+    password: !secret opnsense_key
 switch:
   - platform: broadlink
     mac: E8:16:56:7D:9B:AA
@@ -79,15 +72,15 @@ switch:
     switches:
       martin_gaming_pc:
         unique_id: martin_gaming_pc
-        friendly_name: "Martin's Gaming PC"
-        value_template: "{{ is_state('binary_sensor.martins_gaming_pc_local_martinbjeldbak_com', 'on') }}"
+        friendly_name: Martin's Gaming PC
+        value_template: '{{ is_state(''binary_sensor.martins_gaming_pc_local_martinbjeldbak_com'', ''on'') }}'
         turn_on:
           service: rest_command.wake_martin_gaming_pc
         turn_off: # Added as required, no way to wake-off-lan without running script
           service: switch.turn_off
           target:
             entity_id: switch.martin_s_gaming_pc
-        icon_template: >-
+        icon_template: |-
           {% if is_state('binary_sensor.martin_s_gaming_pc', 'on') %}
             mdi:laptop
           {% else %}
@@ -97,12 +90,12 @@ switch:
     switches:
       nandar_work_laptop:
         unique_id: nandar_work_laptop
-        friendly_name: "Nandar's Work Laptop (ethernet)"
-        value_template: "{{ is_state('binary_sensor.nandar_s_work_laptop', 'on') }}"
+        friendly_name: Nandar's Work Laptop (ethernet)
+        value_template: '{{ is_state(''binary_sensor.nandar_s_work_laptop'', ''on'') }}'
         turn_on:
           service: rest_command.wake_nandar_work_laptop
         turn_off: # Added as required, no way to wake-off-lan without running script
-        icon_template: >-
+        icon_template: |-
           {% if is_state('binary_sensor.nandar_s_work_laptop', 'on') %}
             mdi:laptop
           {% else %}
@@ -112,18 +105,17 @@ switch:
     switches:
       nandar_work_laptop_wifi:
         unique_id: nandar_work_laptop_wifi
-        friendly_name: "Nandar's Work Laptop (wifi)"
-        value_template: "{{ is_state('binary_sensor.nandar_s_work_laptop_wifi', 'on') }}"
+        friendly_name: Nandar's Work Laptop (wifi)
+        value_template: '{{ is_state(''binary_sensor.nandar_s_work_laptop_wifi'', ''on'') }}'
         turn_on:
           service: rest_command.wake_nandar_work_laptop_wifi
         turn_off: # Added as required, no way to wake-off-lan without running script
-        icon_template: >-
+        icon_template: |-
           {% if is_state('binary_sensor.nandar_s_work_laptop_wifi', 'on') %}
             mdi:laptop
           {% else %}
             mdi:laptop-off
           {% endif %}
-
 homeassistant:
   name: Home
   unit_system: metric
@@ -133,44 +125,110 @@ homeassistant:
   currency: AUD
   internal_url: !secret external_url
   external_url: !secret external_url
-
 logger:
   default: info
-
 homekit:
-  advertise_ip: "192.168.10.16"
+  advertise_ip: 192.168.10.16
   filter:
     include_domains:
       - sensor
       - fan
       - climate
+      - light
     include_entities:
       - switch.longfan
       - switch.string_lights
+    exclude_entities:
+      - sensor.electricity_maps_grid_fossil_fuel_percentage
+      - sensor.electricity_maps_co2_intensity
   entity_config:
     fan.mi_air_purifier_3h:
       name: Air Purifier
-
 adaptive_lighting:
-
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
-
 smartir:
   check_updates: false # installed via HACS https://github.com/smartHomeHub/SmartIR?tab=readme-ov-file#hacs
-climate:
-  - platform: smartir
-    name: Living room AC
-    unique_id: living_room_ac
-    device_code: 1135 # source: https://github.com/smartHomeHub/SmartIR/blob/master/docs/CLIMATE.md#available-codes-for-climate-devices
-    controller_data: remote.living_room_broadlink
-    temperature_sensor: sensor.living_room_broadlink_temperature
-    humidity_sensor: sensor.living_room_broadlink_humidity
+# 2024-08-21: disabled as no longer have broadlink AC
+#climate:
+#  - platform: smartir
+#    name: Living room AC
+#    unique_id: living_room_ac
+#    device_code: 1135 # source: https://github.com/smartHomeHub/SmartIR/blob/master/docs/CLIMATE.md#available-codes-for-climate-devices
+#    controller_data: remote.living_room_broadlink
+#    temperature_sensor: sensor.living_room_broadlink_temperature
+#    humidity_sensor: sensor.living_room_broadlink_humidity
 
 command_line:
   - switch:
       name: Martin's Gaming PC
       unique_id: martin_gaming_pc_ssh
-      command_off: "ssh -o StrictHostKeyChecking no -i id_ed25519 homeassistant@martins-gaming-pc.local.martinbjeldbak.com -t \"systemctl suspend -i\""
+      command_off: ssh -o StrictHostKeyChecking=no -i id_ed25519 homeassistant@martins-gaming-pc.local.martinbjeldbak.com -t "systemctl suspend -i"
+monitor_docker:
+  - name: Docker
+    containers:
+      - adguardhome
+      - homeassistant
+      - mqtt
+      - zigbee2mqtt
+      - plex
+      - radarr
+      - sonarr
+      - tautulli
+      - bazarr
+      - gluetun
+      - transmission
+      - caddy
+      - prowlarr
+      - esphome
+      - epicgames-freegames
+      - overseerr
+      - homepage
+      - speedtest-tracker
+      - paperless
+      - romm
+      - icloudpd-n
+    rename:
+      adguardhome: AdGuard Home
+      homeassistant: Home Assistant
+      mqtt: Mosquitto
+      zigbee2mqtt: Zigbee2MQTT
+      plex: Plex
+      radarr: Radarr
+      sonarr: Sonarr
+      tautulli: Tautulli
+      bazarr: Bazarr
+      gluetun: Gluetun
+      transmission: Transmission
+      caddy: Caddy
+      prowlarr: Prowlarry
+      esphome: ESPHome
+      epicgames-freegames: Epic Games Store Weekly Free Games
+      overseerr: Overseerr
+      homepage: Homepage
+      speedtest-tracker:  Speedtest Tracker
+      paperless: Paperless
+      romm: ROMM
+      icloudpd-n: iCloud Photos Downloader
+
+    monitored_conditions:
+      - version
+      - containers_running
+      - containers_total
+      - containers_cpu_percentage
+      - containers_memory
+      - containers_memory_percentage
+      - state
+      - status
+      - health
+      - uptime
+      - image
+      - cpu_percentage
+      - memory
+      - memory_percentage
+      - network_speed_up
+      - network_speed_down
+      - network_total_up
+      - network_total_down

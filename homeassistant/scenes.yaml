@@ -1,0 +1,44 @@
+- id: '1724333606484'
+  name: Watching TV
+  entities:
+    light.hue_living_room_light_strip:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - candle
+      - fireplace
+      - colorloop
+      - finish_effect
+      - stop_effect
+      - stop_hue_effect
+      supported_color_modes:
+      - color_temp
+      - xy
+      effect:
+      color_mode:
+      brightness:
+      color_temp_kelvin:
+      color_temp:
+      hs_color:
+      rgb_color:
+      xy_color:
+      friendly_name: Hue Living Room Light Strip
+      supported_features: 44
+      color:
+        x: 0.4042
+        y: 0.3902
+      linkquality: 200
+      update:
+        installed_version: 16783104
+        latest_version: 16783104
+        state: idle
+      update_available: false
+      state: 'off'
+  icon: mdi:television
+  metadata: {}

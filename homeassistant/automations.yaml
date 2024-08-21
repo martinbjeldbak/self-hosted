@@ -66,97 +66,63 @@
     after: sunset
     after_offset: -01:00:00
   action:
-  - service: scene.turn_on
-    target:
-      entity_id: scene.living_room_movie_paused
+  - target:
+      entity_id: scene.watching_tv
     metadata: {}
+    action: scene.turn_on
   mode: single
 - id: '1694783062795'
   alias: Hue Dimmer Nandar Laptop WOL
   description: WOL integration to turn on Nandar's laptop via Hue Dimmer switch
   trigger:
-  - platform: state
-    entity_id:
-    - event.hue_dimmer_switch_button_2
-    attribute: event_type
-    to: long_release
+  - platform: device
+    domain: mqtt
+    device_id: 04229db32395a8222ce78362a5da4c8b
+    type: action
+    subtype: up-hold
   condition: []
   action:
   - parallel:
-    - service: switch.turn_on
-      data: {}
+    - data: {}
       target:
         entity_id: switch.nandar_work_laptop
-    - service: switch.turn_on
-      data: {}
+      action: switch.turn_on
+    - data: {}
       target:
         entity_id: switch.nandar_work_laptop_wifi
+      action: switch.turn_on
   mode: single
 - id: '1694784402214'
   alias: Hue Dimmer Turn on living room
   description: Living room lights
   trigger:
-  - platform: state
-    entity_id:
-    - event.hue_dimmer_switch_button_1
-    attribute: event_type
-    to: short_release
+  - platform: device
+    domain: mqtt
+    device_id: 04229db32395a8222ce78362a5da4c8b
+    type: action
+    subtype: on_press
   condition: []
   action:
-  - parallel:
-    - service: adaptive_lighting.apply
-      data:
-        adapt_color: true
-        adapt_brightness: true
-        turn_on_lights: true
-        entity_id: switch.adaptive_lighting_living_room
-    - service: climate.turn_on
-      metadata: {}
-      data: {}
-      target:
-        entity_id: climate.living_room_ac
-  - if:
-    - condition: numeric_state
-      entity_id: sensor.living_room_broadlink_temperature
-      above: 24
-    then:
-    - service: climate.set_hvac_mode
-      target: {}
-      data:
-        hvac_mode: cool
-    else:
-    - service: climate.set_hvac_mode
-      target:
-        entity_id:
-        - climate.living_room_ac
-      data:
-        hvac_mode: dry
-  - service: climate.set_fan_mode
-    metadata: {}
-    data:
-      fan_mode: highest
+  - data: {}
+    action: light.turn_on
     target:
-      entity_id: climate.living_room_ac
+      entity_id: light.living_room_lights
   mode: single
 - id: '1694784530273'
   alias: Hue Dimmer turn off living room
   description: Living room lights
   trigger:
-  - platform: state
-    entity_id:
-    - event.hue_dimmer_switch_button_4
+  - platform: device
+    domain: mqtt
+    device_id: 04229db32395a8222ce78362a5da4c8b
+    type: action
+    subtype: off_press
   condition: []
   action:
-  - parallel:
-    - service: light.turn_off
-      data: {}
-      target:
-        area_id: living_room
-    - service: climate.turn_off
-      metadata: {}
-      data: {}
-      target:
-        entity_id: climate.living_room_ac
+  - data: {}
+    target:
+      area_id: living_room
+    action: light.turn_off
   mode: single
 - id: '1694785112288'
   alias: 'Adaptive lighting: reset manual_control after 1 hour'
@@ -181,43 +147,47 @@
   alias: 'Hue Dimmer: Increase brightness'
   description: ''
   trigger:
-  - platform: state
-    entity_id:
-    - event.hue_dimmer_switch_button_2
-    attribute: event_type
-    to: short_release
+  - platform: device
+    domain: mqtt
+    device_id: 04229db32395a8222ce78362a5da4c8b
+    type: action
+    subtype: up_press
   condition: []
   action:
-  - service: light.turn_on
-    data:
-      brightness_step_pct: 20
-    target:
-      area_id: living_room
-  - service: adaptive_lighting.set_manual_control
-    data:
+  - data:
       manual_control: true
       entity_id: switch.adaptive_lighting_living_room
+    action: adaptive_lighting.set_manual_control
+    enabled: false
+  - data:
+      brightness_step_pct: 20
+      transition: 2
+    target:
+      area_id: living_room
+    action: light.turn_on
   mode: single
 - id: '1694785348532'
   alias: 'Hue Dimmer: Decrease brightness'
   description: ''
   trigger:
-  - platform: state
-    entity_id:
-    - event.hue_dimmer_switch_button_3
-    attribute: event_type
-    from: short_release
+  - platform: device
+    domain: mqtt
+    device_id: 04229db32395a8222ce78362a5da4c8b
+    type: action
+    subtype: down_press
   condition: []
   action:
-  - service: light.turn_on
-    data:
+  - data:
       brightness_step_pct: -20
+      transition: 2
     target:
       area_id: living_room
-  - service: adaptive_lighting.set_manual_control
-    data:
+    action: light.turn_on
+  - data:
       manual_control: true
       entity_id: switch.adaptive_lighting_living_room
+    action: adaptive_lighting.set_manual_control
+    enabled: false
   mode: single
 - id: '1704424867342'
   alias: Aranet low battery notification
@@ -253,4 +223,152 @@
   - service: script.longfan_oscillate
     metadata: {}
     data: {}
+  mode: single
+- id: '1724334337502'
+  alias: Apply adaptive lighting
+  description: Living room lights
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 04229db32395a8222ce78362a5da4c8b
+    type: action
+    subtype: on-hold
+  condition: []
+  action:
+  - action: adaptive_lighting.apply
+    metadata: {}
+    data:
+      adapt_color: true
+      adapt_brightness: true
+      turn_on_lights: true
+      lights:
+      - light.hue_living_room_filament_bulb
+      - light.hue_living_room_light_strip
+      - light.hue_living_room_white_bulb
+      entity_id: switch.adaptive_lighting_living_room
+  mode: single
+- id: '1724497467298'
+  alias: 'Bedroom Dimmer: Turn on'
+  description: Beroom lights
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 11fe4eb3d9903045257bbbed8af16b4a
+    type: action
+    subtype: on_press
+  condition: []
+  action:
+  - if:
+    - condition: time
+      after: '21:00:00'
+    then:
+    - action: switch.turn_on
+      metadata: {}
+      data: {}
+      target:
+        entity_id: switch.adaptive_lighting_sleep_mode_bedroom
+    enabled: false
+  - action: light.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: light.bedroom_lights
+  mode: single
+- id: '1724497757357'
+  alias: 'Hue Dimmer: Turn off bedroom lights'
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 11fe4eb3d9903045257bbbed8af16b4a
+    type: action
+    subtype: off_press
+  condition: []
+  action:
+  - data: {}
+    action: light.turn_off
+    target:
+      entity_id: light.bedroom_lights
+  mode: single
+- id: '1724497874059'
+  alias: Bedroom turn down brightness
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 11fe4eb3d9903045257bbbed8af16b4a
+    type: action
+    subtype: down_press
+  condition: []
+  action:
+  - data:
+      brightness_step_pct: -20
+      transition: 2
+    target:
+      area_id: living_room
+    action: light.turn_on
+  - data:
+      manual_control: true
+      entity_id: switch.adaptive_lighting_bedroom
+    action: adaptive_lighting.set_manual_control
+  mode: single
+- id: '1724497930665'
+  alias: Bedroom increase brightness
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 11fe4eb3d9903045257bbbed8af16b4a
+    type: action
+    subtype: up_press
+  condition: []
+  action:
+  - data:
+      manual_control: true
+      entity_id: switch.adaptive_lighting_bedroom
+    action: adaptive_lighting.set_manual_control
+  - data:
+      brightness_step_pct: 20
+      transition: 2
+    action: light.turn_on
+    target:
+      area_id: bedroom
+  mode: single
+- id: '1724629229771'
+  alias: Turn off sleep mode when sun rises
+  description: ''
+  trigger:
+  - platform: sun
+    event: sunrise
+    offset: 0
+  condition: []
+  action:
+  - action: switch.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: switch.adaptive_lighting_sleep_mode_bedroom
+  mode: single
+- id: '1724677054506'
+  alias: Apply adaptive-lighting Bedroom
+  description: Bedroom room lights
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 11fe4eb3d9903045257bbbed8af16b4a
+    type: action
+    subtype: on_hold
+  condition: []
+  action:
+  - action: adaptive_lighting.apply
+    metadata: {}
+    data:
+      adapt_color: true
+      adapt_brightness: true
+      turn_on_lights: true
+      lights:
+      - light.hue_bedroom_light_strip
+      - light.hue_martin_side
+      - light.hue_nandar_side_lamp
+      entity_id: switch.adaptive_lighting_bedroom
   mode: single

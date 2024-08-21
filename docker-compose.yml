@@ -3,7 +3,7 @@ x-env: &env
   PUID: ${PUID}
   PGID: ${PGID}
   TZ: ${TZ}
-  UMASK: 022
+  # UMASK: 022
 
 services:
   adguardhome:
@@ -31,15 +31,14 @@ services:
   homeassistant:
     image: ghcr.io/home-assistant/home-assistant:stable
     container_name: homeassistant
-    ports:
-      # Homekit ports https://www.home-assistant.io/integrations/homekit/#firewall
-      - "5353:5353"
-      - "21063:21063"
+    depends_on:
+      - mqtt
+      - zigbee2mqtt
     expose:
       - 8123 # UI
     networks:
       frontend:
-        ipv4_address: 172.20.0.201 # static ip for NUT. Allowlisted on Synology NAS
+        ipv4_address: 172.20.0.201 # static ip for NUT. Allowlisted on Synology NAS, access to mqtt
       macvlan:
         ipv4_address: 192.168.10.16 # enable homekit & WOL functionality
     environment:
@@ -47,7 +46,37 @@ services:
     volumes:
       - ./homeassistant:/config
       - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock
     restart: always
+
+  mqtt:
+    container_name: mqtt
+    networks:
+      - frontend
+    environment:
+      <<: *env
+    image: eclipse-mosquitto
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./mqtt/data:/mosquitto
+    command: mosquitto -c /mosquitto-no-auth.conf
+
+  zigbee2mqtt:
+    container_name: zigbee2mqtt
+    networks:
+      iot_macvlan:
+        ipv4_address: 192.168.30.101
+      frontend: # expose ui, connect to mqtt
+    expose:
+      - 8080 # frontend port
+    environment:
+      <<: *env
+    restart: unless-stopped
+    image: koenkk/zigbee2mqtt
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./zigbee2mqtt/data:/app/data
 
   plex:
     image: ghcr.io/linuxserver/plex
@@ -136,7 +165,7 @@ services:
       - ${DOCKER_DATA_DIR}:/data
 
   tautulli:
-    image: ghcr.io/linuxserver/tautulli:latest
+    image: ghcr.io/linuxserver/tautulli
     networks:
       - frontend
     container_name: tautulli
@@ -148,13 +177,14 @@ services:
     expose:
       - 8181 # UI
 
-  bazarr:
-    image: ghcr.io/linuxserver/bazarr
+  bazarr: # subtitles
+    image: lscr.io/linuxserver/bazarr
     networks:
       - frontend
     container_name: bazarr
     environment:
       <<: *env
+      # UMASK: # reset this, for some reason it prevents start
     expose:
       - 6767
     restart: unless-stopped
@@ -222,10 +252,11 @@ services:
       - frontend
     restart: unless-stopped
     environment:
+      <<: *env
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
       NAS_IP: ${STATIC_IP}
+      SLZB06M_IP: ${SLZB06M_IP}
       TLS_EMAIL: ${CADDY_TLS_EMAIL}
-      <<: *env
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ./caddy/config:/config
@@ -685,8 +716,6 @@ services:
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
       PAPERLESS_OCR_USER_ARGS: '{"invalidate_digital_signatures": true}'
-      # PAPERLESS_ADMIN_USER: martinbjeldbak # required on first run only
-      # PAPERLESS_ADMIN_PASSWORD: asdf
 
   paperless-postgres:
     container_name: paperless-postgres
@@ -710,7 +739,7 @@ services:
       - backend
 
   gotenberg:
-    image: gotenberg/gotenberg:8.8
+    image: gotenberg/gotenberg:8.9
     container_name: gotenberg
     restart: unless-stopped
     networks:
@@ -722,9 +751,9 @@ services:
     command:
       - "gotenberg"
       - "--chromium-disable-javascript=true"
-      - "--chromium-allow-list=file:///tmp/.*"
       - "--libreoffice-auto-start=true"
-      - "--libreoffice-start-timeout=300s"
+      - "--libreoffice-start-timeout=301s"
+      - "--api-timeout=300s"
 
   tika:
     image: ghcr.io/paperless-ngx/tika
@@ -787,24 +816,35 @@ services:
     image: icloudpd/icloudpd
     environment:
       TZ: ${TZ}
+    networks:
+      - frontend
+    expose:
+      - 8080 # web ui
     volumes:
       - ${N_PHOTO_VOLUME}/icloudpd:/data
-      # NOTE: if reauth needed (every ~2 months), run sudo docker-compose run icloudpd-n icloudpd --username xxx --password yyy --auth-only
+      # NOTE: if reauth needed (every ~2 months), run sudo docker-compose run icloudpd-n icloudpd --username ${ICLOUD_N_USERNAME} --password ${ICLOUD_N_PASSWORD} --auth-only
       - ./icloudpd/n/cookies:/root/.pyicloud # so we don't need to keep reauthing
     command: >
        icloudpd
        --directory /data
        --username ${ICLOUD_N_USERNAME}
        --password ${ICLOUD_N_PASSWORD}
-       --smtp-username ${SMTP_USER_NAME}
-       --smtp-password ${HUGINN_SMTP_PASSWORD}
-       --smtp-host ${SMTP_SERVER}
-       --smtp-port 465
-       --notification-email-from icloudpd@martinbjeldbak.com
+       --password-provider webui
+       --mfa-provider webui
        --watch-with-interval 3600
 
 networks:
   backend:
+  iot_macvlan:
+    name: iot_macvlan
+    driver: macvlan
+    enable_ipv6: false
+    driver_opts:
+      parent: eth1
+    ipam:
+      config:
+        - subnet: 192.168.30.0/24
+          gateway: 192.168.30.1
   macvlan:
     name: docker_macvlan
     driver: macvlan
