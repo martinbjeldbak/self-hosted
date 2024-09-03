@@ -458,32 +458,32 @@ services:
   #    - frontend
   #    - backend
 
-  # scrypted:
-  #   container_name: scrypted
-  #   restart: unless-stopped
-  #   image: ghcr.io/koush/scrypted
-  #   environment:
-  #     SCRYPTED_NVR_VOLUME: /nvr
-  #     SCRYPTED_WEBHOOK_UPDATE_AUTHORIZATION: Bearer ${SCRYPTED_BEARER_TOKEN}
-  #     SCRYPTED_WEBHOOK_UPDATE: http://localhost:10444/v1/update
-  #   volumes:
-  #     - ./scrypted/nvr:/nvr
-  #     - ./scrypted/volume:/server/volume
-  #   logging:
-  #       driver: "json-file"
-  #       options:
-  #           max-size: "10m"
-  #           max-file: "10"
-  #   labels:
-  #       - "com.centurylinklabs.watchtower.scope=scrypted"
-  #   networks:
-  #     macvlan:
-  #       ipv4_address: 192.168.10.17
-  #     frontend:
-  #   expose:
-  #     - 10443 # scrypted https
-  #     - 11080 # scrypted http (used by Caddy)
-  #     - 31797 # homekit port Pan/Tilt
+  scrypted:
+    container_name: scrypted
+    restart: unless-stopped
+    image: ghcr.io/koush/scrypted
+    environment:
+      SCRYPTED_NVR_VOLUME: /nvr
+      SCRYPTED_WEBHOOK_UPDATE_AUTHORIZATION: Bearer ${SCRYPTED_BEARER_TOKEN}
+      SCRYPTED_WEBHOOK_UPDATE: http://localhost:10444/v1/update
+    volumes:
+      - ./scrypted/nvr:/nvr
+      - ./scrypted/volume:/server/volume
+    logging:
+        driver: "json-file"
+        options:
+            max-size: "10m"
+            max-file: "10"
+    labels:
+        - "com.centurylinklabs.watchtower.scope=scrypted"
+    networks:
+      macvlan:
+        ipv4_address: 192.168.10.17
+      frontend:
+    expose:
+      - 10443 # scrypted https
+      - 11080 # scrypted http (used by Caddy)
+      - 31797 # homekit port Pan/Tilt
 
   overseerr:
     container_name: overseerr
