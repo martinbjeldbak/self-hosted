@@ -103,10 +103,11 @@
     subtype: on_press
   condition: []
   action:
-  - data: {}
-    action: light.turn_on
+  - action: light.toggle
     target:
-      entity_id: light.living_room_lights
+      entity_id:
+      - light.living_room_lights
+    data: {}
   mode: single
 - id: '1694784530273'
   alias: Hue Dimmer turn off living room
@@ -268,11 +269,11 @@
       target:
         entity_id: switch.adaptive_lighting_sleep_mode_bedroom
     enabled: false
-  - action: light.turn_on
-    metadata: {}
-    data: {}
+  - action: light.toggle
     target:
-      entity_id: light.bedroom_lights
+      entity_id:
+      - light.bedroom_lights
+    data: {}
   mode: single
 - id: '1724497757357'
   alias: 'Hue Dimmer: Turn off bedroom lights'

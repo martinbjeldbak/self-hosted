@@ -141,6 +141,8 @@ homekit:
     exclude_entities:
       - sensor.electricity_maps_grid_fossil_fuel_percentage
       - sensor.electricity_maps_co2_intensity
+      - switch.bedroom_lights
+      - switch.living_room_lights
   entity_config:
     fan.mi_air_purifier_3h:
       name: Air Purifier
@@ -203,7 +205,7 @@ monitor_docker:
       gluetun: Gluetun
       transmission: Transmission
       caddy: Caddy
-      prowlarr: Prowlarry
+      prowlarr: Prowlarr
       esphome: ESPHome
       epicgames-freegames: Epic Games Store Weekly Free Games
       overseerr: Overseerr
@@ -212,7 +214,6 @@ monitor_docker:
       paperless: Paperless
       romm: ROMM
       icloudpd-n: iCloud Photos Downloader
-
     monitored_conditions:
       - version
       - containers_running
