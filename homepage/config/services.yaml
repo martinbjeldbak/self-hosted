@@ -170,6 +170,12 @@
         href: https://icloudpd-n.local.martinbjeldbak.com
         server: localdocker
         container: icloudpd-n
+    - dawarich:
+        icon: dawarich.svg
+        description: Location tracking
+        href: https://dawarich.local.martinbjeldbak.com
+        server: localdocker
+        container: dawarich
 
 
 - AdGuard:
