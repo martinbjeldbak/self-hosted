@@ -11,9 +11,16 @@
 		output file /data/access-external.log
 	}
 
-	@pterodactyl host panel.martinbjeldbak.com
-	handle @pterodactyl {
-		reverse_proxy panel:80
+#	@pterodactyl host panel.martinbjeldbak.com
+#	handle @pterodactyl {
+#		reverse_proxy panel:80
+#
+#		encode gzip
+#	}
+
+	@dawarich host dawarich.martinbjeldbak.com
+	handle @dawarich {
+		reverse_proxy dawarich:3000
 
 		encode gzip
 	}
@@ -263,6 +270,13 @@
 	@zigbee2mqtt host zigbee2mqtt.local.martinbjeldbak.com
 	handle @zigbee2mqtt {
 		reverse_proxy zigbee2mqtt:8080
+
+		encode gzip
+	}
+
+	@dawarich host dawarich.local.martinbjeldbak.com
+	handle @dawarich {
+		reverse_proxy dawarich:3000
 
 		encode gzip
 	}
