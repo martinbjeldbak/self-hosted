@@ -39,7 +39,7 @@ dawarich.martinbjeldbak.com {
 
 	@nas host nas.local.martinbjeldbak.com
 	handle @nas {
-		reverse_proxy {$NAS_IP}:5000
+		reverse_proxy {env.NAS_IP}:5000
 
 		encode gzip
 	}
@@ -264,7 +264,7 @@ dawarich.martinbjeldbak.com {
 
 	@SLZB06M host SLZB-06M.local.martinbjeldbak.com
 	handle @SLZB06M {
-		reverse_proxy {$SLZB06M_IP}:80
+		reverse_proxy {env.SLZB06M_IP}:80
 
 		encode gzip
 	}
