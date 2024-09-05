@@ -248,12 +248,15 @@ services:
       - 80:80
     expose:
       - 2019 # admin port
+      - 443 # all the https
     networks:
       - frontend
     restart: unless-stopped
     environment:
       <<: *env
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
+      CLOUDFLARE_ZONE_TOKEN: ${CLOUDFLARE_ZONE_TOKEN}
+      CROWDSEC_API_KEY: ${CROWDSEC_API_KEY}
       NAS_IP: ${STATIC_IP}
       SLZB06M_IP: ${SLZB06M_IP}
       TLS_EMAIL: ${CADDY_TLS_EMAIL}
@@ -810,8 +813,6 @@ services:
       - ./romm/database:/var/lib/mysql
     networks:
       - backend
-
-
 
   icloudpd-n:
     container_name: icloudpd-n

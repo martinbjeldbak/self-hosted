@@ -1,34 +1,36 @@
 {
 	admin 0.0.0.0:2019
+	crowdsec {
+		api_url http://192.168.1.1:8089
+		api_key {env.CROWDSEC_API_KEY}
+		ticker_interval 15s
+		#disable_streaming
+		#enable_hard_fails
+	}
 }
 
-*.martinbjeldbak.com {
-	tls {$TLS_EMAIL} {
-		dns cloudflare {$CLOUDFLARE_API_TOKEN}
+dawarich.martinbjeldbak.com {
+	tls {
+		dns cloudflare {
+			zone_token {env.CLOUDFLARE_ZONE_TOKEN}
+			api_token {env.CLOUDFLARE_API_TOKEN}
+		}
 	}
-
 	log {
-		output file /data/access-external.log
+		output file /data/access-external-dawarich.log
 	}
-
-#	@pterodactyl host panel.martinbjeldbak.com
-#	handle @pterodactyl {
-#		reverse_proxy panel:80
-#
-#		encode gzip
-#	}
-
-	@dawarich host dawarich.martinbjeldbak.com
-	handle @dawarich {
+	route {
+		crowdsec
 		reverse_proxy dawarich:3000
-
-		encode gzip
 	}
 }
 
 *.local.martinbjeldbak.com {
-	tls {$TLS_EMAIL} {
-		dns cloudflare {$CLOUDFLARE_API_TOKEN}
+	tls {
+		dns cloudflare {
+			zone_token {env.CLOUDFLARE_ZONE_TOKEN}
+			api_token {env.CLOUDFLARE_API_TOKEN}
+		}
 	}
 
 	log {
@@ -286,3 +288,4 @@
 		abort
 	}
 }
+
