@@ -171,11 +171,17 @@
         server: localdocker
         container: icloudpd-n
     - dawarich:
-        icon: dawarich.svg
+        icon: docker.svg
         description: Location tracking
         href: https://dawarich.local.martinbjeldbak.com
         server: localdocker
         container: dawarich
+    - dozzle:
+        icon: docker.svg
+        description: Docker logs
+        href: https://dozzle.local.martinbjeldbak.com
+        server: localdocker
+        container: dozzle
 
 
 - AdGuard:

@@ -283,6 +283,13 @@ dawarich.martinbjeldbak.com {
 		encode gzip
 	}
 
+	@dozzle host dozzle.local.martinbjeldbak.com
+	handle @dozzle {
+		reverse_proxy dozzle:8080
+
+		encode gzip
+	}
+
 	# Fallback for otherwise unhandled domains
 	handle {
 		abort

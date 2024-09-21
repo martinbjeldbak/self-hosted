@@ -382,7 +382,7 @@ services:
     image: ghcr.io/martinbjeldbak/acestream-http-proxy
     container_name: acestream-http-proxy
     ports:
-      - 6878:80
+      - '6878:6878'
     networks:
       - frontend
 
@@ -461,32 +461,32 @@ services:
   #    - frontend
   #    - backend
 
-  scrypted:
-    container_name: scrypted
-    restart: unless-stopped
-    image: ghcr.io/koush/scrypted
-    environment:
-      SCRYPTED_NVR_VOLUME: /nvr
-      SCRYPTED_WEBHOOK_UPDATE_AUTHORIZATION: Bearer ${SCRYPTED_BEARER_TOKEN}
-      SCRYPTED_WEBHOOK_UPDATE: http://localhost:10444/v1/update
-    volumes:
-      - ./scrypted/nvr:/nvr
-      - ./scrypted/volume:/server/volume
-    logging:
-        driver: "json-file"
-        options:
-            max-size: "10m"
-            max-file: "10"
-    labels:
-        - "com.centurylinklabs.watchtower.scope=scrypted"
-    networks:
-      macvlan:
-        ipv4_address: 192.168.10.17
-      frontend:
-    expose:
-      - 10443 # scrypted https
-      - 11080 # scrypted http (used by Caddy)
-      - 31797 # homekit port Pan/Tilt
+  #scrypted:
+  #  container_name: scrypted
+  #  restart: unless-stopped
+  #  image: ghcr.io/koush/scrypted
+  #  environment:
+  #    SCRYPTED_NVR_VOLUME: /nvr
+  #    SCRYPTED_WEBHOOK_UPDATE_AUTHORIZATION: Bearer ${SCRYPTED_BEARER_TOKEN}
+  #    SCRYPTED_WEBHOOK_UPDATE: http://localhost:10444/v1/update
+  #  volumes:
+  #    - ./scrypted/nvr:/nvr
+  #    - ./scrypted/volume:/server/volume
+  #  logging:
+  #      driver: "json-file"
+  #      options:
+  #          max-size: "10m"
+  #          max-file: "10"
+  #  labels:
+  #      - "com.centurylinklabs.watchtower.scope=scrypted"
+  #  networks:
+  #    macvlan:
+  #      ipv4_address: 192.168.10.17
+  #    frontend:
+  #  expose:
+  #    - 10443 # scrypted https
+  #    - 11080 # scrypted http (used by Caddy)
+  #    - 31797 # homekit port Pan/Tilt
 
   overseerr:
     container_name: overseerr
@@ -751,12 +751,14 @@ services:
       - 3000
     # The gotenberg chromium route is used to convert .eml files. We do not
     # want to allow external content like tracking pixels or even javascript.
+    # https://github.com/gotenberg/gotenberg/issues/577#issuecomment-2249616949
     command:
       - "gotenberg"
       - "--chromium-disable-javascript=true"
       - "--libreoffice-auto-start=true"
       - "--libreoffice-start-timeout=301s"
-      - "--api-timeout=300s"
+      - "--api-timeout=900s"
+      - "--log-level=debug"
 
   tika:
     image: ghcr.io/paperless-ngx/tika
@@ -928,6 +930,16 @@ services:
       - dawarich-postgres
       - dawarich-redis
       - dawarich
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    expose:
+      - 8080
+    networks:
+      - frontend
 networks:
   backend:
   iot_macvlan:
