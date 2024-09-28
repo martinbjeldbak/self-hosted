@@ -802,7 +802,7 @@ services:
      - romm-db
 
   romm-db:
-    image: mariadb:latest    
+    image: mariadb:latest
     container_name: romm-db
     restart: unless-stopped
     user: ${PUID}:${PGID}
@@ -989,6 +989,49 @@ services:
       - UN_RADARR_0_DELETE_DELAY=5m
       - UN_RADARR_0_DELETE_ORIG=false
       - UN_RADARR_0_SYNCTHING=false
+
+  lubelogger:
+    image: ghcr.io/hargata/lubelogger
+    container_name: lubelogger
+    restart: unless-stopped
+    user: ${PUID}:${PGID}
+    depends_on:
+      - lubelogger-postgres
+    volumes:
+      - ./lubelogger/config:/App/config
+      - ./lubelogger/data:/App/data
+      - ./lubelogger/translations:/App/wwwroot/translations
+      - ./lubelogger/documents:/App/wwwroot/documents
+      - ./lubelogger/images:/App/wwwroot/images
+      - ./lubelogger/temp:/App/wwwroot/temp
+      - ./lubelogger/log:/App/log
+      - ./lubelogger/keys:/root/.aspnet/DataProtection-Keys
+    # expose port and/or use serving via traefik
+    expose:
+      - 8080 # ui
+    networks:
+      - frontend
+      - backend
+    environment:
+      <<: *env
+      POSTGRES_CONNECTION: Host=lubelogger-postgres:5432;Username=lubelogger;Password=$LUBELOGGER_POSTGRES_PASSWORD;Database=lubelogger;
+
+  lubelogger-postgres:
+    container_name: lubelogger-postgres
+    image: postgres:17
+    restart: unless-stopped
+    user: ${PUID}:${PGID}
+    networks:
+      - backend
+    volumes:
+      - ./lubelogger/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./lubelogger/postgres:/var/lib/postgresql/data
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      POSTGRES_DB: lubelogger
+      POSTGRES_USER: lubelogger
+      POSTGRES_PASSWORD: $LUBELOGGER_POSTGRES_PASSWORD
+
 networks:
   backend:
   iot_macvlan:

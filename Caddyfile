@@ -290,6 +290,13 @@ dawarich.martinbjeldbak.com {
 		encode gzip
 	}
 
+	@lubelogger host lubelogger.local.martinbjeldbak.com
+	handle @lubelogger {
+		reverse_proxy lubelogger:8080
+
+		encode gzip
+	}
+
 	# Fallback for otherwise unhandled domains
 	handle {
 		abort
