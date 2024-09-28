@@ -104,10 +104,9 @@
   condition: []
   action:
   - action: light.toggle
-    target:
-      entity_id:
-      - light.living_room_lights
     data: {}
+    target:
+      area_id: living_room
   mode: single
 - id: '1694784530273'
   alias: Hue Dimmer turn off living room
@@ -372,4 +371,16 @@
       - light.hue_martin_side
       - light.hue_nandar_side_lamp
       entity_id: switch.adaptive_lighting_bedroom
+  mode: single
+- id: '1727478901057'
+  alias: Backup configuration
+  description: ''
+  trigger:
+  - platform: time
+    at: 01:00:00
+  condition: []
+  action:
+  - action: backup.create
+    metadata: {}
+    data: {}
   mode: single
