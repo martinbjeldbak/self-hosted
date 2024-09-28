@@ -6,27 +6,28 @@
     cpu: true
     memory: true
     disk: /
-
 - search:
     provider: custom
     url: https://kagi.com/search?q=
     target: _blank
     suggestionUrl: https://kagi.com/api/autosuggest?q=
     showSearchSuggestions: true
-
 - openweathermap:
-    label: Melbourne
-    latitude: -37.8145996894535
-    longitude: 144.94083240519333
+    #label: Melbourne
+    #latitude: -37.8145996894535
+    #longitude: 144.94083240519333
     units: metric
     provider: openweathermap
     cache: 5
     format:
-        maximumFractionDigits: 1
-
+      maximumFractionDigits: 1
+- unifi_console:
+    url: https://unifi.local.martinbjeldbak.com
+    username: {{HOMEPAGE_VAR_UNIFI_USERNAME}}
+    password: {{HOMEPAGE_VAR_UNIFI_PASSWORD}}
 - datetime:
     text_size: xl
     locale: da
     format:
-        timeStyle: short
-        hourCycle: h23
+      timeStyle: short
+      hourCycle: h23

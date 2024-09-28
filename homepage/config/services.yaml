@@ -128,6 +128,16 @@
             type: paperlessngx
             url: http://paperless:8000
             key: {{HOMEPAGE_VAR_PAPERLESS_KEY}}
+    - lubelogger:
+        icon: "https://lubelogger.local.martinbjeldbak.com/defaults/lubelogger_icon_192.png"
+        href: "https://lubelogger.local.martinbjeldbak.com"
+        description: car maintenence
+        server: localdocker
+        container: lubelogger
+        widget:
+            type: lubelogger
+            url: http://lubelogger:8080
+            vehicleID: 1
     - Watchtower:
         icon: watchtower.svg
         description: docker updates
