@@ -138,6 +138,14 @@
             type: lubelogger
             url: http://lubelogger:8080
             vehicleID: 1
+    - Plant-it:
+        href: "https://plant-it.local.martinbjeldbak.com"
+        description: 🪴 Self-hosted, open source gardening companion app
+        icon: plant-it
+        widget:
+          type: plantit
+          url: http://plant-it:8080
+          key: {{HOMEPAGE_VAR_PLANT_IT_API_KEY}}
     - Watchtower:
         icon: watchtower.svg
         description: docker updates
