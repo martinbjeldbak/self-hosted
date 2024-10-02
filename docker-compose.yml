@@ -1032,69 +1032,6 @@ services:
       POSTGRES_USER: lubelogger
       POSTGRES_PASSWORD: $LUBELOGGER_POSTGRES_PASSWORD
 
-  plant-it:
-    container_name: plant-it
-    image:  msdeluise/plant-it-server
-    restart: unless-stopped
-    user: ${PUID}:${PGID}
-    networks:
-      - frontend
-      - backend
-    depends_on:
-      - plant-it-db
-      - plant-it-cache
-    volumes:
-      - ./plant-it/upload-dir:/upload-dir
-    environment:
-      MYSQL_HOST: plant-it-db
-      MYSQL_PORT: 3306
-      MYSQL_USERNAME: plant-it-user
-      MYSQL_PSW: ${PLANT_IT_MYSQL_PASSWORD}
-      MYSQL_DATABASE: plant-it
-      JWT_SECRET: ${PLANT_IT_JWT_SECRET}
-      JWT_EXP: 1
-      USERS_LIMIT: -1
-      UPLOAD_DIR: /upload-dir
-      API_PORT: 8080
-      LOG_LEVEL: DEBUG
-      # ALLOWED_ORIGINS: "https://plant-it.local.martinbjeldbak.com"
-      ALLOWED_ORIGINS: "*"
-      CACHE_TTL: 86400
-      CACHE_HOST: plant-it-cache
-      CACHE_PORT: 6379
-      # SMTP_HOST: ${SMTP_SERVER}
-      # SMTP_PORT: 465
-      # SMTP_EMAIL: ${PLANT_IT_EMAIL_FROM}
-      # SMTP_PASSWORD: ${HUGINN_SMTP_PASSWORD}
-      # SMTP_AUTH: plain
-      # SMTP_START_TLS: true
-      # CONTACT_MAIL: ${PLANT_IT_EMAIL_FROM}
-    expose:
-      - 8080 # API
-      - 3000 # UI
-
-  plant-it-db:
-    container_name: plant-it-db
-    image: mysql:8.0
-    restart: unless-stopped
-    user: ${PUID}:${PGID}
-    networks:
-      - backend
-    environment:
-      MYSQL_DATABASE: plant-it
-      MYSQL_ROOT_PASSWORD: ${PLANT_IT_ROOT_PASSWORD}
-      MYSQL_USER: plant-it-user
-      MYSQL_PASSWORD: ${PLANT_IT_MYSQL_PASSWORD}
-    volumes:
-      - ./plant-it/db:/var/lib/mysql
-
-  plant-it-cache:
-    container_name: plant-it-cache
-    image: redis:7
-    restart: unless-stopped
-    networks:
-      - backend
-
 networks:
   backend:
   iot_macvlan:
