@@ -244,7 +244,15 @@
             type: esphome
             url: http://esphome:6052
     - zigbee2mqtt:
+        icon: "https://zigbee2mqtt.local.martinbjeldbak.com/assets/favicon-a8299d0b.ico"
+        description: z2m integration
         href: https://zigbee2mqtt.local.martinbjeldbak.com
+        server: localdocker
+        container: zigbee2mqtt
+    - SLZB-06M:
+        icon: "https://slzb-06m.local.martinbjeldbak.com/icons.svg?upd=1#SMLogo"
+        description: zigbee hub
+        href: https://slzb-06m.local.martinbjeldbak.com
 
 
 - Network:

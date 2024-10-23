@@ -13,9 +13,9 @@
     suggestionUrl: https://kagi.com/api/autosuggest?q=
     showSearchSuggestions: true
 - openweathermap:
-    #label: Melbourne
-    #latitude: -37.8145996894535
-    #longitude: 144.94083240519333
+    label: Melbourne
+    latitude: -37.8145996894535
+    longitude: 144.94083240519333
     units: metric
     provider: openweathermap
     cache: 5
