@@ -4,19 +4,15 @@ default_config:
 http:
   trusted_proxies:
     - 172.20.0.0/24
+    - 172.20.0.25
     - 172.20.0.7 # no idea why this not covered
     - 0.0.0.0/0
   use_x_forwarded_for: true
   ip_ban_enabled: true
   login_attempts_threshold: 5
-#   url: https://192.168.1.1/api
-#   api_key: !secret opnsense_user
-#   api_secret: !secret opnsense_key
-#   verify_ssl: false
-#   tracker_interfaces:
-#     - USER
+
 notify:
-  - name: Email using Fastmail
+  - name: Martin's email
     platform: smtp
     sender: homeassistant@martinbjeldbak.com
     recipient: me@martinbjeldbak.com
@@ -26,16 +22,11 @@ notify:
     password: !secret smtp_password
     encryption: tls
     sender_name: Martin's Home Assistant
-sensor:
-  - platform: epsonworkforce
-    host: 192.168.30.17
-    monitored_conditions:
-      - black
-      - photoblack
-      - yellow
-      - magenta
-      - cyan
-      - clean
+  - platform: group
+    name: "Martin's devices"
+    services:
+      - action: mobile_app_dagobah
+      - action: martin_s_email
 rest_command:
   wake_nandar_work_laptop:
     url: https://192.168.1.1/api/wol/wol/set
@@ -61,6 +52,14 @@ rest_command:
     content_type: application/json
     username: !secret opnsense_user
     password: !secret opnsense_key
+  wake_living_room_tv:
+    url: https://192.168.1.1/api/wol/wol/set
+    verify_ssl: false
+    method: POST
+    payload: '{"wake":{"interface": "opt4","mac": "58:fd:b1:a5:d7:e4"}}'
+    content_type: application/json
+    username: !secret opnsense_user
+    password: !secret opnsense_key
 switch:
   - platform: broadlink
     mac: E8:16:56:7D:9B:AA
@@ -76,7 +75,7 @@ switch:
         value_template: '{{ is_state(''binary_sensor.martins_gaming_pc_local_martinbjeldbak_com'', ''on'') }}'
         turn_on:
           service: rest_command.wake_martin_gaming_pc
-        turn_off: # Added as required, no way to wake-off-lan without running script
+        turn_off:
           service: switch.turn_off
           target:
             entity_id: switch.martin_s_gaming_pc
@@ -115,6 +114,24 @@ switch:
             mdi:laptop
           {% else %}
             mdi:laptop-off
+          {% endif %}
+  - platform: template
+    switches:
+      living_room_tv_wol:
+        unique_id: living_room_tv_wol
+        friendly_name: Living Room TV WOL
+        value_template: '{{ is_state(''media_player.lg_webos_smart_tv'', ''on'') }}'
+        turn_on:
+          service: rest_command.wake_living_room_tv
+        turn_off:
+          action: media_player.turn_off
+          target:
+            entity_id: media_player.lg_webos_smart_tv
+        icon_template: |-
+          {% if is_state('media_player.lg_webos_smart_tv', 'on') %}
+            mdi:television
+          {% else %}
+            mdi:television-off
           {% endif %}
 homeassistant:
   name: Home
@@ -168,6 +185,11 @@ command_line:
       name: Martin's Gaming PC
       unique_id: martin_gaming_pc_ssh
       command_off: ssh -o StrictHostKeyChecking=no -i id_ed25519 homeassistant@martins-gaming-pc.local.martinbjeldbak.com -t "systemctl suspend -i"
+  - switch:
+      name: Start Steam
+      unique_id: martin_gaming_pc_ssh_steam
+      command_on: ssh -o StrictHostKeyChecking=no -i id_ed25519 martin@martins-gaming-pc.local.martinbjeldbak.com -t "pkill steam && systemd-run --user steam-runtime && pactl set-default-sink alsa_output.pci-0000_09_00.1.hdmi-stereo"
+      command_off: ssh -o StrictHostKeyChecking=no -i id_ed25519 martin@martins-gaming-pc.local.martinbjeldbak.com -t "pkill steam"
 monitor_docker:
   - name: Docker
     containers:
@@ -237,3 +259,23 @@ monitor_docker:
       - network_speed_down
       - network_total_up
       - network_total_down
+
+alert:
+  laundry_water_leak:
+    name: Laundry leak sensor detects moisture
+    done_message: Sensor no longer detects moisture
+    entity_id: binary_sensor.laundry_water_leak
+    state: "on"
+    repeat: 15
+    can_acknowledge: true
+    notifiers:
+      - martin_s_devices
+  kitchen_sink_leak:
+    name: Kitchen sink leak sensor detects moisture
+    done_message: Sensor no longer detects moisture
+    entity_id: binary_sensor.kitchen_sink_water_leak
+    state: "on"
+    repeat: 15
+    can_acknowledge: true
+    notifiers:
+      - martin_s_devices

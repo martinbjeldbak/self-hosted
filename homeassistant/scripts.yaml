@@ -1,46 +1,84 @@
-# Source: https://www.home-assistant.io/integrations/broadlink/#learning-commands
 longfan_on:
   sequence:
-      - service: remote.send_command
-        target:
-          entity_id: remote.broadlink_rm4_mini_bedroom
-        data:
-          device: longfan
-          command:
-            - power
-            - oscillate
+  - service: remote.send_command
+    target:
+      entity_id: remote.broadlink_rm4_mini_bedroom
+    data:
+      device: longfan
+      command:
+      - power
+      - oscillate
 longfan_power:
   sequence:
-      - service: remote.send_command
-        target:
-          entity_id: remote.broadlink_rm4_mini_bedroom
-        data:
-          device: longfan
-          command: power
+  - service: remote.send_command
+    target:
+      entity_id: remote.broadlink_rm4_mini_bedroom
+    data:
+      device: longfan
+      command: power
 longfan_speed:
   sequence:
-      - service: remote.send_command
-        target:
-          entity_id: remote.broadlink_rm4_mini_bedroom
-        data:
-          device: longfan
-          command: speed
+  - service: remote.send_command
+    target:
+      entity_id: remote.broadlink_rm4_mini_bedroom
+    data:
+      device: longfan
+      command: speed
 longfan_oscillate:
   sequence:
-      - service: remote.send_command
-        target:
-          entity_id: remote.broadlink_rm4_mini_bedroom
-        data:
-          device: longfan
-          command: oscillate
+  - service: remote.send_command
+    target:
+      entity_id: remote.broadlink_rm4_mini_bedroom
+    data:
+      device: longfan
+      command: oscillate
 learn_longfan_commands:
   sequence:
-    - service: remote.learn_command
-      target:
-        entity_id: remote.broadlink_rm4_mini_bedroom
+  - service: remote.learn_command
+    target:
+      entity_id: remote.broadlink_rm4_mini_bedroom
+    data:
+      device: longfan
+      command:
+      - power
+      - speed
+      - oscillate
+gaming_time:
+  alias: Gaming time
+  sequence:
+  - action: switch.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - switch.lg_tv_wol
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 10
+      milliseconds: 0
+  - action: switch.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - switch.martin_gaming_pc_2
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 15
+      milliseconds: 0
+  - parallel:
+    - action: media_player.select_source
+      metadata: {}
       data:
-        device: longfan
-        command:
-          - power
-          - speed
-          - oscillate
+        source: HDMI 1
+      target:
+        entity_id: media_player.lg_webos_smart_tv
+    - action: switch.turn_on
+      metadata: {}
+      data: {}
+      target:
+        entity_id: switch.start_steam
+  description: ''
+  icon: mdi:microsoft-xbox

@@ -384,3 +384,134 @@
     metadata: {}
     data: {}
   mode: single
+- id: '1727673306499'
+  alias: Adguard Home re-enable protection
+  description: ''
+  trigger:
+  - platform: device
+    type: turned_off
+    device_id: 01e54bbfb54d47bf1c8fd90f8c19b1aa
+    entity_id: 87e151a8d51720b2ace6a8e9cc5b56e1
+    domain: switch
+  condition: []
+  action:
+  - delay:
+      hours: 2
+      minutes: 0
+      seconds: 0
+      milliseconds: 0
+  - type: turn_on
+    device_id: 01e54bbfb54d47bf1c8fd90f8c19b1aa
+    entity_id: 87e151a8d51720b2ace6a8e9cc5b56e1
+    domain: switch
+  mode: single
+- id: '1727673671554'
+  alias: AdGuard Protection On
+  description: ''
+  trigger:
+  - platform: device
+    type: turned_on
+    device_id: 01e54bbfb54d47bf1c8fd90f8c19b1aa
+    entity_id: 87e151a8d51720b2ace6a8e9cc5b56e1
+    domain: switch
+  condition: []
+  action:
+  - type: turn_on
+    device_id: ca4923919fa9ac181bc629a20ad6b7b0
+    entity_id: 1d947504c00931fd8b19e2ae28c28b66
+    domain: switch
+  mode: single
+- id: '1727673692327'
+  alias: AdGuard Protection Off
+  description: ''
+  trigger:
+  - platform: device
+    type: turned_off
+    device_id: 01e54bbfb54d47bf1c8fd90f8c19b1aa
+    entity_id: 87e151a8d51720b2ace6a8e9cc5b56e1
+    domain: switch
+  condition: []
+  action:
+  - type: turn_off
+    device_id: ca4923919fa9ac181bc629a20ad6b7b0
+    entity_id: 1d947504c00931fd8b19e2ae28c28b66
+    domain: switch
+  mode: single
+- id: '1728990137117'
+  alias: Outside water flowing notification
+  description: To catch any leaks
+  triggers:
+  - type: value
+    device_id: fb1b4a5297db45ef6fb5f7f910ae8c83
+    entity_id: e6dcbc82e9d4165a7b511a0e8fbcf3c6
+    domain: sensor
+    trigger: device
+    above: 0
+  conditions: []
+  actions:
+  - action: notify.martin_s_devices
+    metadata: {}
+    data:
+      title: Water flowing in valve
+      message: Valve was turned on and is flowing
+  mode: single
+- id: '1729301727323'
+  alias: Turn off water valve automatically
+  description: To make sure we don't accidentally leave it open and cause leaks
+  triggers:
+  - type: turned_on
+    device_id: fb1b4a5297db45ef6fb5f7f910ae8c83
+    entity_id: ea62c05b6e5050ddfe2adf567499a31b
+    domain: switch
+    trigger: device
+    for:
+      hours: 0
+      minutes: 30
+      seconds: 0
+  conditions: []
+  actions:
+  - type: turn_off
+    device_id: fb1b4a5297db45ef6fb5f7f910ae8c83
+    entity_id: ea62c05b6e5050ddfe2adf567499a31b
+    domain: switch
+  mode: single
+- id: '1729319892883'
+  alias: Turn on Air Purifier when someone in office
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - device_tracker.nandar_gigabyte_laptop
+    - device_tracker.nandar_s_gigabyte_laptop
+    to: home
+  conditions: []
+  actions:
+  - type: turn_on
+    device_id: a974d5ae993c3a8ac8fe4b666c2ff223
+    entity_id: a46393b355794e72b229815d644cf743
+    domain: fan
+  mode: single
+- id: '1729426288351'
+  alias: Restart zigbee2mqtt
+  description: Otherwise it seems to randomly bug out
+  triggers:
+  - trigger: time
+    at: 00:00:00
+  conditions: []
+  actions:
+  - action: switch.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: switch.docker_zigbee2mqtt
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 30
+      milliseconds: 0
+  - action: switch.turn_on
+    target:
+      entity_id:
+      - switch.docker_zigbee2mqtt
+    data: {}
+  mode: single
