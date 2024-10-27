@@ -297,19 +297,13 @@ dawarich.martinbjeldbak.com {
 		encode gzip
 	}
 
-	@plantit host plant-it.local.martinbjeldbak.com
-	handle @plantit {
-		reverse_proxy plant-it:3000
+	@syncthing host syncthing.local.martinbjeldbak.com
+	handle @syncthing {
+		reverse_proxy syncthing:8384
 
 		encode gzip
 	}
 
-	@plantitapi host plant-it-api.local.martinbjeldbak.com
-	handle @plantitapi {
-		reverse_proxy plant-it:8080
-
-		encode gzip
-	}
 
 	# Fallback for otherwise unhandled domains
 	handle {

@@ -63,7 +63,10 @@ services:
     command: mosquitto -c /mosquitto-no-auth.conf
 
   zigbee2mqtt:
+    image: koenkk/zigbee2mqtt
+    user: ${PUID}:${PGID}
     container_name: zigbee2mqtt
+    privileged: true
     networks:
       iot_macvlan:
         ipv4_address: 192.168.30.101
@@ -73,7 +76,6 @@ services:
     environment:
       <<: *env
     restart: unless-stopped
-    image: koenkk/zigbee2mqtt
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./zigbee2mqtt/data:/app/data
@@ -461,32 +463,32 @@ services:
   #    - frontend
   #    - backend
 
-  #scrypted:
-  #  container_name: scrypted
-  #  restart: unless-stopped
-  #  image: ghcr.io/koush/scrypted
-  #  environment:
-  #    SCRYPTED_NVR_VOLUME: /nvr
-  #    SCRYPTED_WEBHOOK_UPDATE_AUTHORIZATION: Bearer ${SCRYPTED_BEARER_TOKEN}
-  #    SCRYPTED_WEBHOOK_UPDATE: http://localhost:10444/v1/update
-  #  volumes:
-  #    - ./scrypted/nvr:/nvr
-  #    - ./scrypted/volume:/server/volume
-  #  logging:
-  #      driver: "json-file"
-  #      options:
-  #          max-size: "10m"
-  #          max-file: "10"
-  #  labels:
-  #      - "com.centurylinklabs.watchtower.scope=scrypted"
-  #  networks:
-  #    macvlan:
-  #      ipv4_address: 192.168.10.17
-  #    frontend:
-  #  expose:
-  #    - 10443 # scrypted https
-  #    - 11080 # scrypted http (used by Caddy)
-  #    - 31797 # homekit port Pan/Tilt
+  # scrypted:
+  #   container_name: scrypted
+  #   restart: unless-stopped
+  #   image: ghcr.io/koush/scrypted
+  #   environment:
+  #     SCRYPTED_NVR_VOLUME: /nvr
+  #     SCRYPTED_WEBHOOK_UPDATE_AUTHORIZATION: Bearer ${SCRYPTED_BEARER_TOKEN}
+  #     SCRYPTED_WEBHOOK_UPDATE: http://localhost:10444/v1/update
+  #   volumes:
+  #     - ./scrypted/nvr:/nvr
+  #     - ./scrypted/volume:/server/volume
+  #   logging:
+  #       driver: "json-file"
+  #       options:
+  #           max-size: "10m"
+  #           max-file: "10"
+  #   labels:
+  #       - "com.centurylinklabs.watchtower.scope=scrypted"
+  #   networks:
+  #     macvlan:
+  #       ipv4_address: 192.168.10.17
+  #     frontend:
+  #   expose:
+  #     - 10443 # scrypted https
+  #     - 11080 # scrypted http (used by Caddy)
+  #     - 31797 # homekit port Pan/Tilt
 
   overseerr:
     container_name: overseerr
@@ -1031,6 +1033,24 @@ services:
       POSTGRES_DB: lubelogger
       POSTGRES_USER: lubelogger
       POSTGRES_PASSWORD: $LUBELOGGER_POSTGRES_PASSWORD
+
+  syncthing:
+    image: ghcr.io/linuxserver/syncthing
+    container_name: syncthing
+    networks:
+      - frontend
+    hostname: ${HOSTNAME}
+    environment:
+      <<: *env
+    volumes:
+      - ./syncthing/config:/config
+      - ${SYNCTHING_DATA_DIR_1}:/data
+    expose:
+      - 8384  # web UI
+      - 22000/tcp  # listening port (TCP)
+      - 22000/udp  # listening port (UDP)
+      - 21027/udp  # protocol discovery
+    restart: unless-stopped
 
 networks:
   backend:
