@@ -1038,7 +1038,9 @@ services:
     image: ghcr.io/linuxserver/syncthing
     container_name: syncthing
     networks:
-      - frontend
+      frontend:
+      macvlan:
+        ipv4_address: 192.168.10.18 # for discovery
     hostname: ${HOSTNAME}
     environment:
       <<: *env
@@ -1051,6 +1053,11 @@ services:
       - 22000/udp  # listening port (UDP)
       - 21027/udp  # protocol discovery
     restart: unless-stopped
+    healthcheck:
+      test: curl -fkLsS -m 2 127.0.0.1:8384/rest/noauth/health | grep -o --color=never OK || exit 1
+      interval: 1m
+      timeout: 10s
+      retries: 3
 
 networks:
   backend:
