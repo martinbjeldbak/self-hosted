@@ -75,6 +75,7 @@ services:
       - 8080 # frontend port
     environment:
       <<: *env
+      Z2M_WATCHDOG: default # been needing to restart container
     restart: unless-stopped
     volumes:
       - /etc/localtime:/etc/localtime:ro
