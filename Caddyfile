@@ -304,6 +304,34 @@ dawarich.martinbjeldbak.com {
 		encode gzip
 	}
 
+	@calibre-web host calibre-web.local.martinbjeldbak.com
+	handle @calibre-web {
+		reverse_proxy calibre-web:8083
+
+		encode gzip
+	}
+
+	@calibre host calibre.local.martinbjeldbak.com
+	handle @calibre {
+		reverse_proxy calibre:8080
+
+		encode gzip
+	}
+
+	@calibre-server host calibre-server.local.martinbjeldbak.com
+	handle @calibre-server {
+		reverse_proxy calibre:8081
+
+		encode gzip
+	}
+
+	@readarr host readarr.local.martinbjeldbak.com
+	handle @readarr {
+		reverse_proxy readarr:8787
+
+		encode gzip
+	}
+
 
 	# Fallback for otherwise unhandled domains
 	handle {

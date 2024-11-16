@@ -167,6 +167,21 @@ services:
       - ./sonarr:/config
       - ${DOCKER_DATA_DIR}:/data
 
+  readarr:
+    image: lscr.io/linuxserver/readarr:develop
+    networks:
+      - frontend
+      - backend
+    container_name: readarr
+    expose:
+      - 8787  # web UI
+    environment:
+      <<: *env
+    restart: unless-stopped
+    volumes:
+      - ./readarr:/config
+      - ${DOCKER_DATA_DIR}:/data
+
   tautulli:
     image: ghcr.io/linuxserver/tautulli
     networks:
@@ -558,6 +573,8 @@ services:
       HOMEPAGE_VAR_PAPERLESS_KEY: ${PAPERLESS_KEY}
       HOMEPAGE_VAR_ROMM_USERNAME: ${ROMM_USERNAME}
       HOMEPAGE_VAR_ROMM_PASSWORD: ${ROMM_PASSWORD}
+      HOMEPAGE_VAR_CALIBRE_WEB_USERNAME: ${CALIBRE_WEB_USERNAME}
+      HOMEPAGE_VAR_CALIBRE_WEB_PASSWORD: ${CALIBRE_WEB_PASSWORD}
     restart: unless-stopped
 
   dockerproxy:
@@ -1058,7 +1075,38 @@ services:
       test: curl -fkLsS -m 2 127.0.0.1:8384/rest/noauth/health | grep -o --color=never OK || exit 1
       interval: 1m
       timeout: 10s
-      retries: 3
+
+  calibre:
+    image: lscr.io/linuxserver/calibre
+    container_name: calibre
+    networks:
+      - frontend
+    environment:
+      <<: *env
+    volumes:
+      - ./calibre/config:/config
+      - ${DOCKER_DATA_DIR}:/data
+    expose:
+      - 8080 # UI
+      - 8181 # UI (HTTPS), not used
+      - 8081 # Content Server UI
+    restart: unless-stopped
+
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: calibre-web
+    networks:
+      - frontend
+    environment:
+      <<: *env
+      DOCKER_MODS: linuxserver/mods:universal-calibre # enable ebook conversion
+      OAUTHLIB_RELAX_TOKEN_SCOPE: 1 #optional
+    volumes:
+      - ${DOCKER_DATA_DIR}/media/books:/books
+      - ./calibre-web/config:/config
+    expose:
+      - 8083 # UI
+    restart: unless-stopped
 
 networks:
   backend:

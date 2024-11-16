@@ -104,6 +104,18 @@
             username: {{HOMEPAGE_VAR_ROMM_USERNAME}}
             password: {{HOMEPAGE_VAR_ROMM_PASSWORD}}
 
+    - Calibre-web:
+        icon: calibreweb.svg
+        description: ebooks
+        href: "https://calibre-web.local.martinbjeldbak.com"
+        server: localdocker
+        container: calibre-web
+        widget:
+            type: calibreweb
+            url: http://calibre-web:8083
+            username: {{HOMEPAGE_VAR_CALIBRE_WEB_USERNAME}}
+            password: {{HOMEPAGE_VAR_CALIBRE_WEB_PASSWORD}}
+
 - Releases:
     - Calendar:
         description: tv and movie releases
