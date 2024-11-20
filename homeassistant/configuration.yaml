@@ -152,17 +152,46 @@ homekit:
       - fan
       - climate
       - light
+      - valve
+    include_entity_globs:
+      - binary_sensor.*_contact # e.g. door and window sensors
+      - binary_sensor.*_water_leak # water leak sensors
+      - binary_sensor.*_occupancy
     include_entities:
-      - switch.longfan
-      - switch.string_lights
+      - light.bedroom_lights # not sure why not deleted. it removed in z2m
+      - switch.martin_gaming_pc_2 # WOL for martins desktop
+    exclude_entity_globs:
+      - sensor.opnsense_*
     exclude_entities:
       - sensor.electricity_maps_grid_fossil_fuel_percentage
       - sensor.electricity_maps_co2_intensity
-      - light.bedroom_lights
-      - light.living_room_lights
   entity_config:
     fan.mi_air_purifier_3h:
       name: Air Purifier
+    binary_sensor.front_door_contact:
+      linked_battery_sensor: sensor.front_door_battery
+      low_battery_threshold: 31
+    binary_sensor.bedroom_window_sensor_contact:
+      linked_battery_sensor: sensor.bedroom_window_sensor_battery
+      low_battery_threshold: 31
+    sensor.aranet4_20b7d_carbon_dioxide:
+      co2_threshold: 1500 # keep from annoying us
+    media_player.lg_webos_smart_tv:
+      feature_list:
+        - feature: on_off
+        - feature: play_pause
+        - feature: play_stop
+        - feature: toggle_mute
+    binary_sensor.laundry_water_leak:
+      linked_battery_sensor: sensor.laundry_battery
+      low_battery_threshold: 31
+    binary_sensor.kitchen_sink_water_leak:
+      linked_battery_sensor: sensor.kitchen_sink_battery
+      low_battery_threshold: 31
+    valve.outside_water_valve:
+      name: Water Valve
+      linked_battery_sensor: sensor.outside_water_valve_battery
+      low_battery_threshold: 31
 adaptive_lighting:
 group: !include groups.yaml
 automation: !include automations.yaml
