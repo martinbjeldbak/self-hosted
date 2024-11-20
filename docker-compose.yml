@@ -1093,19 +1093,19 @@ services:
     restart: unless-stopped
 
   calibre-web:
-    image: lscr.io/linuxserver/calibre-web:latest
+    image: lscr.io/linuxserver/calibre-web
     container_name: calibre-web
     networks:
       - frontend
     environment:
       <<: *env
-      DOCKER_MODS: linuxserver/mods:universal-calibre # enable ebook conversion
+      DOCKER_MODS: lscr.io/linuxserver/mods:universal-calibre-v7.16.0  # synology on 4.4 kernel, see https://github.com/linuxserver/docker-calibre-web/issues/306
       OAUTHLIB_RELAX_TOKEN_SCOPE: 1 #optional
     volumes:
       - ${DOCKER_DATA_DIR}/media/books:/books
       - ./calibre-web/config:/config
     expose:
-      - 8083 # UI
+      - 8083  # UI
     restart: unless-stopped
 
 networks:
