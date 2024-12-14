@@ -287,9 +287,8 @@ services:
 
   watchtower:
     image: containrrr/watchtower
-    networks:
-      - backend
     container_name: watchtower
+    restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro
@@ -310,7 +309,7 @@ services:
   huginn-postgres:
     image: postgres:14.6-alpine
     container_name: huginn-postgres
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./huginn-postgres:/var/lib/postgresql/data
     environment:
