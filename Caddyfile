@@ -9,6 +9,22 @@
 	}
 }
 
+invidious.martinbjeldbak.com {
+	tls {
+		dns cloudflare {
+			zone_token {env.CLOUDFLARE_ZONE_TOKEN}
+			api_token {env.CLOUDFLARE_API_TOKEN}
+		}
+	}
+	log {
+		output file /data/access-external-invidious.log
+	}
+	route {
+		crowdsec
+		reverse_proxy invidious:3000
+	}
+}
+
 dawarich.martinbjeldbak.com {
 	tls {
 		dns cloudflare {
@@ -117,13 +133,6 @@ dawarich.martinbjeldbak.com {
 	@homeassistant host homeassistant.local.martinbjeldbak.com
 	handle @homeassistant {
 		reverse_proxy homeassistant:8123
-
-		encode gzip
-	}
-
-	@pterodactyl host panel.martinbjeldbak.com
-	handle @pterodactyl {
-		reverse_proxy panel:80
 
 		encode gzip
 	}
@@ -332,6 +341,7 @@ dawarich.martinbjeldbak.com {
 		encode gzip
 	}
 
+	# REMEMBER TO ADD HOSTS TO UNBOUND
 
 	# Fallback for otherwise unhandled domains
 	handle {
