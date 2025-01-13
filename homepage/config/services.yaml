@@ -40,6 +40,17 @@
           type: bazarr
           url: http://bazarr:6767
           key: {{HOMEPAGE_VAR_BAZARR_API_KEY}}
+
+    - Readarr:
+        icon: readarr.svg
+        description: books
+        href: "https://readarr.local.martinbjeldbak.com"
+        server: localdocker
+        container: readarr
+        widget:
+          type: readarr
+          url: http://readarr:8787
+          key: {{HOMEPAGE_VAR_READARR_API_KEY}}
     - Synology:
         icon: synology.svg
         description: diskstation
@@ -130,6 +141,16 @@
                   service_name: Radarr
 
 - Applications:
+    - Authentik:
+        icon: authentik.svg
+        href: "https://auth.local.martinbjeldbak.com"
+        description: authentication erver
+        server: localdocker
+        container: authentik-server
+        widget:
+            type: authentik
+            url: http://authentik-server:9000
+            key: {{HOMEPAGE_VAR_AUTHENTIK_API_KEY}}
     - Paperless-ngx:
         icon: paperless-ngx.svg
         href: "https://paperless.local.martinbjeldbak.com"
@@ -186,6 +207,16 @@
         widget:
             type: speedtest
             url: http://speedtest-tracker
+    - Immich:
+        icon: immich.svg
+        href: "https://immich.local.martinbjeldbak.com"
+        server: localdocker
+        container: immich-server
+        widget:
+            type: immich
+            url: http://immich-server:2283
+            key: {{HOMEPAGE_VAR_IMMICH_KEY}}
+            version: 2
     - icloudpd:
         icon: docker.svg
         description: icloud photos downloader for backup to NAS
@@ -318,6 +349,7 @@
         widget:
             type: gluetun
             url: http://gluetun:8000
+            key: {{HOMEPAGE_VAR_GLUETUN_KEY}}
     - Tailscale Alderaan:
         icon: tailscale.svg
         description: mesh network
