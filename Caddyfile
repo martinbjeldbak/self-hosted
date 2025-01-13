@@ -41,241 +41,6 @@ dawarich.martinbjeldbak.com {
 	}
 }
 
-tv.local.martinbjeldbak.com {
-	tls {
-		dns cloudflare {
-			zone_token {env.CLOUDFLARE_ZONE_TOKEN}
-			api_token {env.CLOUDFLARE_API_TOKEN}
-		}
-	}
-	route {
-		# always forward outpost path to actual outpost
-		reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
-
-		# forward authentication to outpost
-		forward_auth http://authentik-server:9000 {
-			uri /outpost.goauthentik.io/auth/caddy
-
-			# capitalization of the headers is important, otherwise they will be empty
-			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
-
-			# optional, in this config trust all private ranges, should probably be set to the outposts IP
-			trusted_proxies private_ranges
-		}
-
-		# actual site configuration below, for example
-		reverse_proxy sonarr:8989
-	}
-}
-
-movies.local.martinbjeldbak.com {
-	tls {
-		dns cloudflare {
-			zone_token {env.CLOUDFLARE_ZONE_TOKEN}
-			api_token {env.CLOUDFLARE_API_TOKEN}
-		}
-	}
-	route {
-		# always forward outpost path to actual outpost
-		reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
-
-		# forward authentication to outpost
-		forward_auth http://authentik-server:9000 {
-			uri /outpost.goauthentik.io/auth/caddy
-
-			# capitalization of the headers is important, otherwise they will be empty
-			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
-
-			# optional, in this config trust all private ranges, should probably be set to the outposts IP
-			trusted_proxies private_ranges
-		}
-
-		reverse_proxy radarr:7878
-	}
-}
-
-torrents.local.martinbjeldbak.com {
-	tls {
-		dns cloudflare {
-			zone_token {env.CLOUDFLARE_ZONE_TOKEN}
-			api_token {env.CLOUDFLARE_API_TOKEN}
-		}
-	}
-	route {
-		# always forward outpost path to actual outpost
-		reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
-
-		# forward authentication to outpost
-		forward_auth http://authentik-server:9000 {
-			uri /outpost.goauthentik.io/auth/caddy
-
-			# capitalization of the headers is important, otherwise they will be empty
-			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
-
-			# optional, in this config trust all private ranges, should probably be set to the outposts IP
-			trusted_proxies private_ranges
-		}
-
-		reverse_proxy gluetun:9091
-	}
-}
-
-slzb-06m.local.martinbjeldbak.com {
-	tls {
-		dns cloudflare {
-			zone_token {env.CLOUDFLARE_ZONE_TOKEN}
-			api_token {env.CLOUDFLARE_API_TOKEN}
-		}
-	}
-	route {
-		# always forward outpost path to actual outpost
-		reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
-
-		# forward authentication to outpost
-		forward_auth http://authentik-server:9000 {
-			uri /outpost.goauthentik.io/auth/caddy
-
-			# capitalization of the headers is important, otherwise they will be empty
-			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
-
-			# optional, in this config trust all private ranges, should probably be set to the outposts IP
-			trusted_proxies private_ranges
-		}
-
-		reverse_proxy {env.SLZB06M_IP}:80
-	}
-}
-
-dns.local.martinbjeldbak.com {
-	tls {
-		dns cloudflare {
-			zone_token {env.CLOUDFLARE_ZONE_TOKEN}
-			api_token {env.CLOUDFLARE_API_TOKEN}
-		}
-	}
-	route {
-		# always forward outpost path to actual outpost
-		reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
-
-		# forward authentication to outpost
-		forward_auth http://authentik-server:9000 {
-			uri /outpost.goauthentik.io/auth/caddy
-
-			# capitalization of the headers is important, otherwise they will be empty
-			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
-
-			# optional, in this config trust all private ranges, should probably be set to the outposts IP
-			trusted_proxies private_ranges
-		}
-
-		reverse_proxy 192.168.1.1:3000
-	}
-}
-
-dns2.local.martinbjeldbak.com {
-	tls {
-		dns cloudflare {
-			zone_token {env.CLOUDFLARE_ZONE_TOKEN}
-			api_token {env.CLOUDFLARE_API_TOKEN}
-		}
-	}
-	route {
-		# always forward outpost path to actual outpost
-		reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
-
-		# forward authentication to outpost
-		forward_auth http://authentik-server:9000 {
-			uri /outpost.goauthentik.io/auth/caddy
-
-			# capitalization of the headers is important, otherwise they will be empty
-			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
-
-			# optional, in this config trust all private ranges, should probably be set to the outposts IP
-			trusted_proxies private_ranges
-		}
-
-		reverse_proxy adguardhome:3000
-	}
-}
-
-prowlarr.local.martinbjeldbak.com {
-	tls {
-		dns cloudflare {
-			zone_token {env.CLOUDFLARE_ZONE_TOKEN}
-			api_token {env.CLOUDFLARE_API_TOKEN}
-		}
-	}
-	route {
-		# always forward outpost path to actual outpost
-		reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
-
-		# forward authentication to outpost
-		forward_auth http://authentik-server:9000 {
-			uri /outpost.goauthentik.io/auth/caddy
-
-			# capitalization of the headers is important, otherwise they will be empty
-			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
-
-			# optional, in this config trust all private ranges, should probably be set to the outposts IP
-			trusted_proxies private_ranges
-		}
-
-		reverse_proxy gluetun:9696
-	}
-}
-
-subtitles.local.martinbjeldbak.com {
-	tls {
-		dns cloudflare {
-			zone_token {env.CLOUDFLARE_ZONE_TOKEN}
-			api_token {env.CLOUDFLARE_API_TOKEN}
-		}
-	}
-	route {
-		# always forward outpost path to actual outpost
-		reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
-
-		# forward authentication to outpost
-		forward_auth http://authentik-server:9000 {
-			uri /outpost.goauthentik.io/auth/caddy
-
-			# capitalization of the headers is important, otherwise they will be empty
-			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
-
-			# optional, in this config trust all private ranges, should probably be set to the outposts IP
-			trusted_proxies private_ranges
-		}
-
-		reverse_proxy bazarr:6767
-	}
-}
-
-speedtest.local.martinbjeldbak.com {
-	tls {
-		dns cloudflare {
-			zone_token {env.CLOUDFLARE_ZONE_TOKEN}
-			api_token {env.CLOUDFLARE_API_TOKEN}
-		}
-	}
-	route {
-		# always forward outpost path to actual outpost
-		reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
-
-		# forward authentication to outpost
-		forward_auth http://authentik-server:9000 {
-			uri /outpost.goauthentik.io/auth/caddy
-
-			# capitalization of the headers is important, otherwise they will be empty
-			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
-
-			# optional, in this config trust all private ranges, should probably be set to the outposts IP
-			trusted_proxies private_ranges
-		}
-
-		reverse_proxy speedtest-tracker:80
-	}
-}
-
 *.local.martinbjeldbak.com {
 	tls {
 		dns cloudflare {
@@ -295,14 +60,12 @@ speedtest.local.martinbjeldbak.com {
 		encode gzip
 	}
 
+	#@huginn host h.local.martinbjeldbak.com
+	#handle @huginn {
+	#	reverse_proxy huginn:3000
 
-
-	@huginn host h.local.martinbjeldbak.com
-	handle @huginn {
-		reverse_proxy huginn:3000
-
-		encode gzip
-	}
+	#	encode gzip
+	#}
 
 	@tautulli host tautulli.local.martinbjeldbak.com
 	handle @tautulli {
@@ -318,216 +81,388 @@ speedtest.local.martinbjeldbak.com {
 		encode gzip
 	}
 
-	@unifi host unifi.local.martinbjeldbak.com
-	handle @unifi {
-		reverse_proxy https://192.168.1.1:8443 {
-			transport http {
-				tls_insecure_skip_verify
-			}
-		}
-
-		encode gzip
-	}
-
-	@router host opnsense.local.martinbjeldbak.com
-	handle @router {
-		reverse_proxy https://192.168.1.1:443 {
-			transport http {
-				tls_insecure_skip_verify
-			}
-		}
-
-		encode gzip
-	}
-
-	@pterodactyllocal host panel.local.martinbjeldbak.com
-	handle @pterodactyllocal {
-		reverse_proxy panel:80
-
-		encode gzip
-	}
-
-	@pterodactylmartin host node-martin.local.martinbjeldbak.com
-	handle @pterodactylmartin {
-		reverse_proxy 192.168.1.14:443
-
-		encode gzip
-	}
-
-	@elmbot host elmbot.local.martinbjeldbak.com
-	handle @elmbot {
-		reverse_proxy elmbot:54377
-
-		encode gzip
-	}
-
 	@esphome host esphome.local.martinbjeldbak.com
 	handle @esphome {
+		reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
+
+		forward_auth http://authentik-server:9000 {
+			uri /outpost.goauthentik.io/auth/caddy
+
+			# capitalization of the headers is important, otherwise they will be empty
+			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version
+
+			# optional, in this config trust all private ranges, should probably be set to the outposts IP
+			trusted_proxies private_ranges
+		}
+
 		reverse_proxy esphome:6052
-
-		encode gzip
 	}
 
-	@epicgames host epicgames.local.martinbjeldbak.com
-	handle @epicgames {
-		reverse_proxy epicgames-freegames:3000
+	@speedtest host speedtest.local.martinbjeldbak.com
+	handle @speedtest {
+		# always forward outpost path to actual outpost
+		reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
 
-		encode gzip
+		# forward authentication to outpost
+		forward_auth http://authentik-server:9000 {
+			uri /outpost.goauthentik.io/auth/caddy
+
+			# capitalization of the headers is important, otherwise they will be empty
+			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
+
+			# optional, in this config trust all private ranges, should probably be set to the outposts IP
+			trusted_proxies private_ranges
+		}
+
+		reverse_proxy speedtest-tracker:80
+	}
+	@tv host tv.local.martinbjeldbak.com
+	handle @tv {
+		# always forward outpost path to actual outpost
+		reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
+
+		# forward authentication to outpost
+		forward_auth http://authentik-server:9000 {
+			uri /outpost.goauthentik.io/auth/caddy
+
+			# capitalization of the headers is important, otherwise they will be empty
+			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
+
+			# optional, in this config trust all private ranges, should probably be set to the outposts IP
+			trusted_proxies private_ranges
+		}
+
+		reverse_proxy sonarr:8989
 	}
 
-	@plex host plex.local.martinbjeldbak.com
-	handle @plex {
-		reverse_proxy plex:32400
+	@movies host movies.local.martinbjeldbak.com
+	handle @movies {
+		# always forward outpost path to actual outpost
+		reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
 
-		encode gzip
+		# forward authentication to outpost
+		forward_auth http://authentik-server:9000 {
+			uri /outpost.goauthentik.io/auth/caddy
+
+			# capitalization of the headers is important, otherwise they will be empty
+			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
+
+			# optional, in this config trust all private ranges, should probably be set to the outposts IP
+			trusted_proxies private_ranges
+		}
+
+		reverse_proxy radarr:7878
 	}
 
-	@invidious host invidious.local.martinbjeldbak.com
-	handle @invidious {
-		reverse_proxy invidious:3000
+	@torrents host torrents.local.martinbjeldbak.com
+	handle @torrents {
+			# always forward outpost path to actual outpost
+			reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
 
-		encode gzip
+			# forward authentication to outpost
+			forward_auth http://authentik-server:9000 {
+				uri /outpost.goauthentik.io/auth/caddy
+
+				# capitalization of the headers is important, otherwise they will be empty
+				copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
+
+				# optional, in this config trust all private ranges, should probably be set to the outposts IP
+				trusted_proxies private_ranges
+			}
+
+			reverse_proxy gluetun:9091
+		}
+
+		@slzb-06m host slzb-06m.local.martinbjeldbak.com
+		handle @slzb-06m {
+			# always forward outpost path to actual outpost
+			reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
+
+			# forward authentication to outpost
+			forward_auth http://authentik-server:9000 {
+				uri /outpost.goauthentik.io/auth/caddy
+
+				# capitalization of the headers is important, otherwise they will be empty
+				copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
+
+				# optional, in this config trust all private ranges, should probably be set to the outposts IP
+				trusted_proxies private_ranges
+			}
+
+			reverse_proxy {env.SLZB06M_IP}:80
+		}
+
+		@dns host dns.local.martinbjeldbak.com
+		handle @dns {
+			# always forward outpost path to actual outpost
+			reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
+
+			# forward authentication to outpost
+			forward_auth http://authentik-server:9000 {
+				uri /outpost.goauthentik.io/auth/caddy
+
+				# capitalization of the headers is important, otherwise they will be empty
+				copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
+
+				# optional, in this config trust all private ranges, should probably be set to the outposts IP
+				trusted_proxies private_ranges
+			}
+
+			reverse_proxy 192.168.1.1:3000
+		}
+
+		@dns2 host dns2.local.martinbjeldbak.com
+		handle @dns2 {
+			# always forward outpost path to actual outpost
+			reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
+
+			# forward authentication to outpost
+			forward_auth http://authentik-server:9000 {
+				uri /outpost.goauthentik.io/auth/caddy
+
+				# capitalization of the headers is important, otherwise they will be empty
+				copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
+
+				# optional, in this config trust all private ranges, should probably be set to the outposts IP
+				trusted_proxies private_ranges
+			}
+
+			reverse_proxy adguardhome:3000
+		}
+
+		@prowlarr host prowlarr.local.martinbjeldbak.com
+		handle @prowlarr {
+			# always forward outpost path to actual outpost
+			reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
+
+			# forward authentication to outpost
+			forward_auth http://authentik-server:9000 {
+				uri /outpost.goauthentik.io/auth/caddy
+
+				# capitalization of the headers is important, otherwise they will be empty
+				copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
+
+				# optional, in this config trust all private ranges, should probably be set to the outposts IP
+				trusted_proxies private_ranges
+			}
+
+			reverse_proxy gluetun:9696
+		}
+
+		@subtitles host subtitles.local.martinbjeldbak.com
+		handle @subtitles {
+			# always forward outpost path to actual outpost
+			reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
+
+			# forward authentication to outpost
+			forward_auth http://authentik-server:9000 {
+				uri /outpost.goauthentik.io/auth/caddy
+
+				# capitalization of the headers is important, otherwise they will be empty
+				copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
+
+				# optional, in this config trust all private ranges, should probably be set to the outposts IP
+				trusted_proxies private_ranges
+			}
+
+			reverse_proxy bazarr:6767
+		}
+
+		@unifi host unifi.local.martinbjeldbak.com
+		handle @unifi {
+			reverse_proxy https://192.168.1.1:8443 {
+				transport http {
+					tls_insecure_skip_verify
+				}
+			}
+
+			encode gzip
+		}
+
+		@router host opnsense.local.martinbjeldbak.com
+		handle @router {
+			reverse_proxy https://192.168.1.1:443 {
+				transport http {
+					tls_insecure_skip_verify
+				}
+			}
+
+			encode gzip
+		}
+
+		#@pterodactyllocal host panel.local.martinbjeldbak.com
+		#handle @pterodactyllocal {
+		#	reverse_proxy panel:80
+
+		#	encode gzip
+		#}
+
+		#@pterodactylmartin host node-martin.local.martinbjeldbak.com
+		#handle @pterodactylmartin {
+		#	reverse_proxy 192.168.1.14:443
+
+		#	encode gzip
+		#}
+
+		@elmbot host elmbot.local.martinbjeldbak.com
+		handle @elmbot {
+			reverse_proxy elmbot:54377
+
+			encode gzip
+		}
+
+		@epicgames host epicgames.local.martinbjeldbak.com
+		handle @epicgames {
+			reverse_proxy epicgames-freegames:3000
+
+			encode gzip
+		}
+
+		@plex host plex.local.martinbjeldbak.com
+		handle @plex {
+			reverse_proxy plex:32400
+
+			encode gzip
+		}
+
+		@invidious host invidious.local.martinbjeldbak.com
+		handle @invidious {
+			reverse_proxy invidious:3000
+
+			encode gzip
+		}
+
+		@scrypted host scrypted.local.martinbjeldbak.com
+		handle @scrypted {
+			reverse_proxy scrypted:11080
+
+			encode gzip
+		}
+
+		@request host request.local.martinbjeldbak.com
+		handle @request {
+			reverse_proxy overseerr:5055
+
+			encode gzip
+		}
+
+		@homepage host homepage.local.martinbjeldbak.com
+		handle @homepage {
+			reverse_proxy homepage:3000
+
+			encode gzip
+		}
+
+		@peanut host peanut-eaton-5e-1100i.local.martinbjeldbak.com
+		handle @peanut {
+			reverse_proxy peanut-eaton-5e-1100i:8080
+
+			encode gzip
+		}
+
+		@scrutiny host scrutiny.local.martinbjeldbak.com
+		handle @scrutiny {
+			reverse_proxy scrutiny-web:8080
+
+			encode gzip
+		}
+
+		@paperless host paperless.local.martinbjeldbak.com
+		handle @paperless {
+			reverse_proxy paperless:8000
+
+			encode gzip
+		}
+
+		@roms host roms.local.martinbjeldbak.com
+		handle @roms {
+			reverse_proxy romm:8080
+
+			encode gzip
+		}
+
+		@icloudpd-n host icloudpd-n.local.martinbjeldbak.com
+		handle @icloudpd-n {
+			reverse_proxy icloudpd-n:8080
+
+			encode gzip
+		}
+
+		@zigbee2mqtt host zigbee2mqtt.local.martinbjeldbak.com
+		handle @zigbee2mqtt {
+			reverse_proxy zigbee2mqtt:8080
+
+			encode gzip
+		}
+
+		# OAuth support: https://github.com/Freika/dawarich/discussions/66
+		@dawarich host dawarich.local.martinbjeldbak.com
+		handle @dawarich {
+			reverse_proxy dawarich:3000
+
+			encode gzip
+		}
+
+		@lubelogger host lubelogger.local.martinbjeldbak.com
+		handle @lubelogger {
+			reverse_proxy lubelogger:8080
+
+			encode gzip
+		}
+
+		@syncthing host syncthing.local.martinbjeldbak.com
+		handle @syncthing {
+			reverse_proxy syncthing:8384
+
+			encode gzip
+		}
+
+		@calibre-web host calibre-web.local.martinbjeldbak.com
+		handle @calibre-web {
+			reverse_proxy calibre-web:8083
+
+			encode gzip
+		}
+
+		@calibre host calibre.local.martinbjeldbak.com
+		handle @calibre {
+			reverse_proxy calibre:8080
+
+			encode gzip
+		}
+
+		@calibre-server host calibre-server.local.martinbjeldbak.com
+		handle @calibre-server {
+			reverse_proxy calibre:8081
+
+			encode gzip
+		}
+
+		@readarr host readarr.local.martinbjeldbak.com
+		handle @readarr {
+			reverse_proxy readarr:8787
+
+			encode gzip
+		}
+
+		@immich host immich.local.martinbjeldbak.com
+		handle @immich {
+			reverse_proxy immich-server:2283
+
+			encode gzip
+		}
+
+		@authentiknew host auth.local.martinbjeldbak.com
+		handle @authentiknew {
+			reverse_proxy authentik-server:9000
+
+			encode gzip
+		}
+
+		# REMEMBER TO ADD HOSTS TO UNBOUND
+
+		# Fallback for otherwise unhandled domains
+		handle {
+			abort
+		}
 	}
-
-	@scrypted host scrypted.local.martinbjeldbak.com
-	handle @scrypted {
-		reverse_proxy scrypted:11080
-
-		encode gzip
-	}
-
-	@request host request.local.martinbjeldbak.com
-	handle @request {
-		reverse_proxy overseerr:5055
-
-		encode gzip
-	}
-
-	@homepage host homepage.local.martinbjeldbak.com
-	handle @homepage {
-		reverse_proxy homepage:3000
-
-		encode gzip
-	}
-
-
-	@peanut host peanut-eaton-5e-1100i.local.martinbjeldbak.com
-	handle @peanut {
-		reverse_proxy peanut-eaton-5e-1100i:8080
-
-		encode gzip
-	}
-
-	@scrutiny host scrutiny.local.martinbjeldbak.com
-	handle @scrutiny {
-		reverse_proxy scrutiny-web:8080
-
-		encode gzip
-	}
-
-	@paperless host paperless.local.martinbjeldbak.com
-	handle @paperless {
-		reverse_proxy paperless:8000
-
-		encode gzip
-	}
-
-	@roms host roms.local.martinbjeldbak.com
-	handle @roms {
-		reverse_proxy romm:8080
-
-		encode gzip
-	}
-
-	@icloudpd-n host icloudpd-n.local.martinbjeldbak.com
-	handle @icloudpd-n {
-		reverse_proxy icloudpd-n:8080
-
-		encode gzip
-	}
-
-
-	@zigbee2mqtt host zigbee2mqtt.local.martinbjeldbak.com
-	handle @zigbee2mqtt {
-		reverse_proxy zigbee2mqtt:8080
-
-		encode gzip
-	}
-
-	@dawarich host dawarich.local.martinbjeldbak.com
-	handle @dawarich {
-		reverse_proxy dawarich:3000
-
-		encode gzip
-	}
-
-	@dozzle host dozzle.local.martinbjeldbak.com
-	handle @dozzle {
-		reverse_proxy dozzle:8080
-
-		encode gzip
-	}
-
-	@lubelogger host lubelogger.local.martinbjeldbak.com
-	handle @lubelogger {
-		reverse_proxy lubelogger:8080
-
-		encode gzip
-	}
-
-	@syncthing host syncthing.local.martinbjeldbak.com
-	handle @syncthing {
-		reverse_proxy syncthing:8384
-
-		encode gzip
-	}
-
-	@calibre-web host calibre-web.local.martinbjeldbak.com
-	handle @calibre-web {
-		reverse_proxy calibre-web:8083
-
-		encode gzip
-	}
-
-	@calibre host calibre.local.martinbjeldbak.com
-	handle @calibre {
-		reverse_proxy calibre:8080
-
-		encode gzip
-	}
-
-	@calibre-server host calibre-server.local.martinbjeldbak.com
-	handle @calibre-server {
-		reverse_proxy calibre:8081
-
-		encode gzip
-	}
-
-	@readarr host readarr.local.martinbjeldbak.com
-	handle @readarr {
-		reverse_proxy readarr:8787
-
-		encode gzip
-	}
-
-	@immich host immich.local.martinbjeldbak.com
-	handle @immich {
-		reverse_proxy immich-server:2283
-
-		encode gzip
-	}
-
-	@authentiknew host auth.local.martinbjeldbak.com
-	handle @authentiknew {
-		reverse_proxy authentik-server:9000
-
-		encode gzip
-	}
-
-	# REMEMBER TO ADD HOSTS TO UNBOUND
-
-	# Fallback for otherwise unhandled domains
-	handle {
-		abort
-	}
-}
