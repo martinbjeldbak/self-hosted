@@ -42,6 +42,10 @@ dawarich.martinbjeldbak.com {
 }
 
 *.local.martinbjeldbak.com {
+	reverse_proxy {
+		trusted_proxies private_ranges # TODO: hardcode authentik-server
+	}
+
 	tls {
 		dns cloudflare {
 			zone_token {env.CLOUDFLARE_ZONE_TOKEN}
@@ -60,6 +64,13 @@ dawarich.martinbjeldbak.com {
 		encode gzip
 	}
 
+	@homeassistant host homeassistant.local.martinbjeldbak.com
+	handle @homeassistant {
+		reverse_proxy homeassistant:8123
+
+		encode gzip
+	}
+
 	#@huginn host h.local.martinbjeldbak.com
 	#handle @huginn {
 	#	reverse_proxy huginn:3000
@@ -69,16 +80,15 @@ dawarich.martinbjeldbak.com {
 
 	@tautulli host tautulli.local.martinbjeldbak.com
 	handle @tautulli {
+		reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
+
+		forward_auth http://authentik-server:9000 {
+			uri /outpost.goauthentik.io/auth/caddy
+
+			# capitalization of the headers is important, otherwise they will be empty
+			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version
+		}
 		reverse_proxy tautulli:8181
-
-		encode gzip
-	}
-
-	@homeassistant host homeassistant.local.martinbjeldbak.com
-	handle @homeassistant {
-		reverse_proxy homeassistant:8123
-
-		encode gzip
 	}
 
 	@esphome host esphome.local.martinbjeldbak.com
@@ -90,9 +100,6 @@ dawarich.martinbjeldbak.com {
 
 			# capitalization of the headers is important, otherwise they will be empty
 			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version
-
-			# optional, in this config trust all private ranges, should probably be set to the outposts IP
-			trusted_proxies private_ranges
 		}
 
 		reverse_proxy esphome:6052
@@ -109,13 +116,11 @@ dawarich.martinbjeldbak.com {
 
 			# capitalization of the headers is important, otherwise they will be empty
 			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
-
-			# optional, in this config trust all private ranges, should probably be set to the outposts IP
-			trusted_proxies private_ranges
 		}
 
 		reverse_proxy speedtest-tracker:80
 	}
+
 	@tv host tv.local.martinbjeldbak.com
 	handle @tv {
 		# always forward outpost path to actual outpost
@@ -127,9 +132,6 @@ dawarich.martinbjeldbak.com {
 
 			# capitalization of the headers is important, otherwise they will be empty
 			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
-
-			# optional, in this config trust all private ranges, should probably be set to the outposts IP
-			trusted_proxies private_ranges
 		}
 
 		reverse_proxy sonarr:8989
@@ -146,9 +148,6 @@ dawarich.martinbjeldbak.com {
 
 			# capitalization of the headers is important, otherwise they will be empty
 			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
-
-			# optional, in this config trust all private ranges, should probably be set to the outposts IP
-			trusted_proxies private_ranges
 		}
 
 		reverse_proxy radarr:7878
@@ -165,9 +164,6 @@ dawarich.martinbjeldbak.com {
 
 				# capitalization of the headers is important, otherwise they will be empty
 				copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
-
-				# optional, in this config trust all private ranges, should probably be set to the outposts IP
-				trusted_proxies private_ranges
 			}
 
 			reverse_proxy gluetun:9091
@@ -184,9 +180,6 @@ dawarich.martinbjeldbak.com {
 
 				# capitalization of the headers is important, otherwise they will be empty
 				copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
-
-				# optional, in this config trust all private ranges, should probably be set to the outposts IP
-				trusted_proxies private_ranges
 			}
 
 			reverse_proxy {env.SLZB06M_IP}:80
@@ -203,9 +196,6 @@ dawarich.martinbjeldbak.com {
 
 				# capitalization of the headers is important, otherwise they will be empty
 				copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
-
-				# optional, in this config trust all private ranges, should probably be set to the outposts IP
-				trusted_proxies private_ranges
 			}
 
 			reverse_proxy 192.168.1.1:3000
@@ -222,9 +212,6 @@ dawarich.martinbjeldbak.com {
 
 				# capitalization of the headers is important, otherwise they will be empty
 				copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
-
-				# optional, in this config trust all private ranges, should probably be set to the outposts IP
-				trusted_proxies private_ranges
 			}
 
 			reverse_proxy adguardhome:3000
@@ -241,9 +228,6 @@ dawarich.martinbjeldbak.com {
 
 				# capitalization of the headers is important, otherwise they will be empty
 				copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
-
-				# optional, in this config trust all private ranges, should probably be set to the outposts IP
-				trusted_proxies private_ranges
 			}
 
 			reverse_proxy gluetun:9696
@@ -260,12 +244,26 @@ dawarich.martinbjeldbak.com {
 
 				# capitalization of the headers is important, otherwise they will be empty
 				copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
-
-				# optional, in this config trust all private ranges, should probably be set to the outposts IP
-				trusted_proxies private_ranges
 			}
 
 			reverse_proxy bazarr:6767
+		}
+
+		@dozzle host dozzle.local.martinbjeldbak.com
+		handle @dozzle {
+			# always forward outpost path to actual outpost
+			reverse_proxy /outpost.goauthentik.io/* http://authentik-server:9000
+
+			# forward authentication to outpost
+			forward_auth http://authentik-server:9000 {
+				uri /outpost.goauthentik.io/auth/caddy
+
+				# capitalization of the headers is important, otherwise they will be empty
+				# copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
+				copy_headers Remote-User Remote-Email Remote-Name Remote-Filter
+			}
+
+			reverse_proxy dozzle:8080
 		}
 
 		@unifi host unifi.local.martinbjeldbak.com
@@ -388,6 +386,7 @@ dawarich.martinbjeldbak.com {
 			encode gzip
 		}
 
+		# Forward proxy auth breaks websocket auth
 		@zigbee2mqtt host zigbee2mqtt.local.martinbjeldbak.com
 		handle @zigbee2mqtt {
 			reverse_proxy zigbee2mqtt:8080

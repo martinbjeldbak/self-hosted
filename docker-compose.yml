@@ -31,9 +31,9 @@ services:
   homeassistant:
     image: ghcr.io/home-assistant/home-assistant:stable
     container_name: homeassistant
-    depends_on:
-      - mqtt
-      - zigbee2mqtt
+    # depends_on:
+    #   - mqtt
+    #   - zigbee2mqtt
     expose:
       - 8123 # UI
     networks:
@@ -144,8 +144,9 @@ services:
       - 7878
     restart: unless-stopped
     networks:
-      - frontend
-      - backend
+      frontend:
+        ipv4_address: 172.20.0.101 # for access from prowlarr
+      backend:
     environment:
       <<: *env
     volumes:
@@ -155,8 +156,9 @@ services:
   sonarr:
     image: ghcr.io/linuxserver/sonarr
     networks:
-      - frontend
-      - backend
+      frontend:
+        ipv4_address: 172.20.0.102 # for access from prowlarr
+      backend:
     container_name: sonarr
     expose:
       - 8989
@@ -170,8 +172,9 @@ services:
   readarr:
     image: lscr.io/linuxserver/readarr:develop
     networks:
-      - frontend
-      - backend
+      frontend:
+        ipv4_address: 172.20.0.100 # for access from prowlarr
+      backend:
     container_name: readarr
     expose:
       - 8787  # web UI
@@ -221,17 +224,17 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     volumes:
-      - ./gluetun:/gluetun
+      - ./gluetun:/gluetun # for mullvad servers
     environment:
       <<: *env
-      VPN_SERVICE_PROVIDER: mullvad
+      VPN_SERVICE_PROVIDER: airvpn
       VPN_TYPE: wireguard
       WIREGUARD_PRIVATE_KEY: ${GLUETUN_WIREGUARD_PRIVATE_KEY}
+      WIREGUARD_PRESHARED_KEY: ${GLUETUN_WIREGUARD_PRESHARED_KEY}
       WIREGUARD_ADDRESSES: ${GLUETUN_WIREGUARD_ADDRESSES}
-      SERVER_CITIES: ${GLUETUN_CITIES}
-      DOT: 'off' # turn off local unbound in favor of adguardhome
-      # DNS_ADDRESS: 172.20.0.200 # TODO: try disable this and DNS_KEEP_NAMESERVER on, see https://github.com/qdm12/gluetun-wiki/blob/3c3cfccf06045767d50d58efae22fbafe95b2ab2/setup/options/dns.md?plain=1#L9
-      DNS_KEEP_NAMESERVER: on
+      SERVER_REGIONS: ${GLUETUN_REGIONS}
+      FIREWALL_VPN_INPUT_PORTS: ${GLUETUN_INPUT_PORTS}
+      UPDATER_PERIOD: 48h # update servers.json
     expose:
       - 9091 # transmission UI
       - 9696 # Prowlarr
@@ -265,8 +268,8 @@ services:
       - 443:443
       - 80:80
     expose:
-      - 2019 # admin port
-      - 443 # all the https
+      - 2019  # admin port
+      - 443   # all the https
     networks:
       - frontend
     restart: unless-stopped
@@ -285,65 +288,65 @@ services:
     healthcheck:
       test: ["CMD", "caddy", "version"]
 
-  watchtower:
-    image: containrrr/watchtower
-    container_name: watchtower
-    restart: unless-stopped
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /etc/localtime:/etc/localtime:ro
-    expose:
-      - 8080 # https://containrrr.dev/watchtower/metrics/
-    environment:
-      WATCHTOWER_NOTIFICATIONS: shoutrrr
-      WATCHTOWER_NOTIFICATION_URL: ${DISCORD_NOTIFICATION_URL}
-      WATCHTOWER_REMOVE_VOLUMES: true
-      WATCHTOWER_CLEANUP: true
-      WATCHTOWER_INCLUDE_STOPPED: true
-      WATCHTOWER_REVIVE_STOPPED: true
-      WATCHTOWER_SCHEDULE: 0 0 2 * * *
-      WATCHTOWER_HTTP_API_METRICS: true
-      WATCHTOWER_HTTP_API_TOKEN: ${WATCHTOWER_API_TOKEN}
-      WATCHTOWER_MONITOR_ONLY: true # so many broken upgrades!
+  #watchtower:
+  #  image: containrrr/watchtower
+  #  container_name: watchtower
+  #  restart: unless-stopped
+  #  volumes:
+  #    - /var/run/docker.sock:/var/run/docker.sock
+  #    - /etc/localtime:/etc/localtime:ro
+  #  expose:
+  #    - 8080 # https://containrrr.dev/watchtower/metrics/
+  #  environment:
+  #    WATCHTOWER_NOTIFICATIONS: shoutrrr
+  #    WATCHTOWER_NOTIFICATION_URL: ${DISCORD_NOTIFICATION_URL}
+  #    WATCHTOWER_REMOVE_VOLUMES: true
+  #    WATCHTOWER_CLEANUP: true
+  #    WATCHTOWER_INCLUDE_STOPPED: true
+  #    WATCHTOWER_REVIVE_STOPPED: true
+  #    WATCHTOWER_SCHEDULE: 0 0 2 * * *
+  #    WATCHTOWER_HTTP_API_METRICS: true
+  #    WATCHTOWER_HTTP_API_TOKEN: ${WATCHTOWER_API_TOKEN}
+  #    WATCHTOWER_MONITOR_ONLY: true # so many broken upgrades!
 
-  huginn-postgres:
-    image: postgres:14.6-alpine
-    container_name: huginn-postgres
-    restart: unless-stopped
-    volumes:
-      - ./huginn-postgres:/var/lib/postgresql/data
-    environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    networks:
-      - backend
+  #huginn-postgres:
+  #  image: postgres:14.6-alpine
+  #  container_name: huginn-postgres
+  #  restart: unless-stopped
+  #  volumes:
+  #    - ./huginn-postgres:/var/lib/postgresql/data
+  #  environment:
+  #    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #  networks:
+  #    - backend
 
-  huginn:
-    image: ghcr.io/huginn/huginn
-    container_name: huginn
-    restart: unless-stopped
-    expose:
-      - 3000
-    networks:
-      - frontend
-      - backend
-    environment:
-      TIMEZONE: ${HUGINN_TIMEZONE}
-      EMAIL_FROM_ADDRESS: ${HUGINN_EMAIL_FROM_ADDRESS}
-      SMTP_DOMAIN: ${HUGINN_SMTP_DOMAIN}
-      SMTP_PASSWORD: ${HUGINN_SMTP_PASSWORD}
-      INVITATION_CODE: ${HUGINN_INVITATION_CODE}
-      SMTP_USER_NAME: ${SMTP_USER_NAME}
-      SMTP_SERVER: ${SMTP_SERVER}
-      SMTP_PORT: 465
-      SMTP_SSL: 'true'
-      SMTP_AUTHENTICATION: plain
-      ENABLE_INSECURE_AGENTS: 'true' # trust all users
-      DATABASE_ADAPTER: postgresql
-      DATABASE_USERNAME: postgres
-      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
-      DATABASE_HOST: huginn-postgres
-    depends_on:
-      - huginn-postgres
+  #huginn:
+  #  image: ghcr.io/huginn/huginn
+  #  container_name: huginn
+  #  restart: unless-stopped
+  #  expose:
+  #    - 3000
+  #  networks:
+  #    - frontend
+  #    - backend
+  #  environment:
+  #    TIMEZONE: ${HUGINN_TIMEZONE}
+  #    EMAIL_FROM_ADDRESS: ${HUGINN_EMAIL_FROM_ADDRESS}
+  #    SMTP_DOMAIN: ${HUGINN_SMTP_DOMAIN}
+  #    SMTP_PASSWORD: ${HUGINN_SMTP_PASSWORD}
+  #    INVITATION_CODE: ${HUGINN_INVITATION_CODE}
+  #    SMTP_USER_NAME: ${SMTP_USER_NAME}
+  #    SMTP_SERVER: ${SMTP_SERVER}
+  #    SMTP_PORT: 465
+  #    SMTP_SSL: 'true'
+  #    SMTP_AUTHENTICATION: plain
+  #    ENABLE_INSECURE_AGENTS: 'true' # trust all users
+  #    DATABASE_ADAPTER: postgresql
+  #    DATABASE_USERNAME: postgres
+  #    DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+  #    DATABASE_HOST: huginn-postgres
+  #  depends_on:
+  #    - huginn-postgres
 
   prowlarr:
     image: ghcr.io/linuxserver/prowlarr:latest
@@ -415,6 +418,8 @@ services:
       - 6052 # UI
     environment:
       ESPHOME_DASHBOARD_USE_PING: true
+      USERNAME: martinbjeldbak
+      PASSWORD: ${ESPHOME_PASSWORD}
     networks:
       - frontend
 
@@ -443,40 +448,6 @@ services:
       CRON_SCHEDULE: 0 0,6,12,18 * * * # (every six hours)
     networks:
       - frontend
-
-  #invidious:
-  #  container_name: invidious
-  #  image: quay.io/invidious/invidious:latest
-  #  restart: unless-stopped
-  #  expose:
-  #    - 3000
-  #  environment:
-  #    INVIDIOUS_CONFIG: |
-  #      database_url: postgres://postgres:kba.tft.DRE8tnt4cvy@db:5432/postgres
-  #      check_tables: true
-  #      hmac_key: CK2jJrAvaeeQABNXdCD7
-  #      admins: ["martinbjeldbak"]
-  #      domain: invidious.local.martinbjeldbak.com
-  #      external_port: 443
-  #      use_innertube_for_captions: true
-  #      default_user_preferences:
-  #        region: AU
-  #        captions: ["English", "Danish", "Burmese"]
-  #        save_player_pos: true
-  #  healthcheck:
-  #    test: wget -nv --tries=1 --spider http://127.0.0.1:3000/api/v1/comments/jNQXAC9IVRw || exit 1
-  #    interval: 30s
-  #    timeout: 5s
-  #    retries: 2
-  #  logging:
-  #    options:
-  #      max-size: "1G"
-  #      max-file: "4"
-  #  depends_on:
-  #    - db
-  #  networks:
-  #    - frontend
-  #    - backend
 
   # scrypted:
   #   container_name: scrypted
@@ -574,16 +545,23 @@ services:
       HOMEPAGE_VAR_ROMM_PASSWORD: ${ROMM_PASSWORD}
       HOMEPAGE_VAR_CALIBRE_WEB_USERNAME: ${CALIBRE_WEB_USERNAME}
       HOMEPAGE_VAR_CALIBRE_WEB_PASSWORD: ${CALIBRE_WEB_PASSWORD}
+      HOMEPAGE_VAR_GLUETUN_KEY: ${GLUETUN_KEY}
+      HOMEPAGE_VAR_READARR_API_KEY: ${READARR_API_KEY}
+      HOMEPAGE_VAR_IMMICH_KEY: ${IMMICH_KEY}
+      HOMEPAGE_VAR_AUTHENTIK_API_KEY: ${AUTHENTIK_API_KEY}
     restart: unless-stopped
 
   dockerproxy:
     image: ghcr.io/tecnativa/docker-socket-proxy
     container_name: dockerproxy
     environment:
-      - CONTAINERS=1 # Allow access to viewing containers
-      - SERVICES=1 # Allow access to viewing services (necessary when using Docker Swarm)
-      - TASKS=1 # Allow access to viewing tasks (necessary when using Docker Swarm)
-      - POST=0 # Disallow any POST operations (effectively read-only)
+      CONTAINERS: 1 # Allow access to viewing containers
+      SERVICES: 1 # Allow access to viewing services (necessary when using Docker Swarm)
+      TASKS: 1 # Allow access to viewing tasks (necessary when using Docker Swarm)
+      # See https://github.com/goauthentik/authentik/discussions/5417#discussioncomment-7710921
+      POST: 0 # Disallow any POST operations (effectively read-only)
+      IMAGES: 1
+      INFO: 1
     networks:
       - backend
     expose:
@@ -617,7 +595,7 @@ services:
       - 443 # https
     restart: unless-stopped
     networks:
-      - frontend     
+      - frontend
     volumes:
       - ./speedtest-tracker/config:/config
 
@@ -738,7 +716,24 @@ services:
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
       PAPERLESS_OCR_USER_ARGS: '{"invalidate_digital_signatures": true}'
-
+      PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
+      PAPERLESS_SOCIALACCOUNT_PROVIDERS: >
+          {
+            "openid_connect": {
+              "APPS": [
+                {
+                  "provider_id": "authentik",
+                  "name": "Authentik",
+                  "client_id": "${PAPERLESS_AUTHENTIK_CLIENT_ID}",
+                  "secret": "${PAPERLESS_AUTHENTIK_CLIENT_SECRET}",
+                  "settings": {
+                    "server_url": "https://auth.local.martinbjeldbak.com/application/o/paperless/.well-known/openid-configuration"
+                  }
+                }
+              ],
+              "OAUTH_PKCE_ENABLED": "True"
+            }
+          }
   paperless-postgres:
     container_name: paperless-postgres
     image: postgres:16
@@ -809,6 +804,12 @@ services:
       STEAMGRIDDB_API_KEY: ${STEAMGRIDDB_API_KEY}
       ROMM_AUTH_USERNAME: ${ROMM_USERNAME}
       ROMM_AUTH_PASSWORD: ${ROMM_PASSWORD}
+      OIDC_ENABLED: true
+      OIDC_PROVIDER: authentik
+      OIDC_CLIENT_ID: ${AUTHENTIK_ROMM_CLIENT_ID}
+      OIDC_CLIENT_SECRET: ${AUTHENTIK_ROMM_OIDC_CLIENT_SECRET}
+      OIDC_REDIRECT_URI: https://roms.local.martinbjeldbak.com/api/oauth/openid
+      OIDC_SERVER_APPLICATION_URL: https://auth.local.martinbjeldbak.com/application/o/romm
     volumes:
      - ./romm/resources:/romm/resources # Resources fetched from IGDB (covers, screenshots, etc.)
      - ./romm/redis:/redis-data # Cached data for background tasks
@@ -864,10 +865,11 @@ services:
     networks:
       - backend
     volumes:
-      - ./dawarich/shared:/var/shared/redis
+      - ./dawarich/shared:/data
     restart: always
   dawarich-postgres:
     image: postgres:16
+    shm_size: 1G
     container_name: dawarich-postgres
     restart: always
     networks:
@@ -875,14 +877,21 @@ services:
     volumes:
       - ./dawarich/postgres:/var/lib/postgresql/data
       - ./dawarich/shared:/var/shared
+      - ./dawarich/postgresql.conf:/etc/postgresql/postgresql.conf
     environment:
       POSTGRES_USER: dawarich
       POSTGRES_PASSWORD: $DAWARICH_POSTGRES_PASSWORD
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d dawarich_development" ]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf # Use custom config, uncomment if you want to use a custom config
   dawarich:
     image: freikin/dawarich
     container_name: dawarich
     volumes:
-      - ./dawarich/gemcache:/usr/local/bundle/gems
       - ./dawarich/public:/var/app/public
     networks:
       - frontend
@@ -891,7 +900,7 @@ services:
       - 3000
     stdin_open: true
     tty: true
-    entrypoint: dev-entrypoint.sh
+    command: ['bin/rails', 'server', '-p', '3000', '-b', '::']
     command: ['bin/dev']
     restart: on-failure
     environment:
@@ -919,14 +928,13 @@ services:
     image: freikin/dawarich
     container_name: dawarich-sidekiq
     volumes:
-      - ./dawarich/gemcache:/usr/local/bundle/gems
       - ./dawarich/public:/var/app/public
     networks:
       - backend
     stdin_open: true
     tty: true
-    entrypoint: dev-entrypoint.sh
-    command: ['sidekiq']
+    entrypoint: sidekiq-entrypoint.sh
+    command: ['bundle', 'exec', 'sidekiq']
     restart: on-failure
     environment:
       RAILS_ENV: development
@@ -959,6 +967,8 @@ services:
       - 8080
     networks:
       - frontend
+    environment:
+      DOZZLE_AUTH_PROVIDER: forward-proxy
 
   unpackerr:
     image: golift/unpackerr
@@ -1106,6 +1116,259 @@ services:
     expose:
       - 8083  # UI
     restart: unless-stopped
+
+  invidious:
+    container_name: invidious
+    image: quay.io/invidious/invidious:latest
+    restart: unless-stopped
+    expose:
+      - 3000 # UI
+    environment:
+      INVIDIOUS_CONFIG: |
+        database_url: postgres://postgres:${INVIDIOUS_DB_PASSWORD}@invidious-db:5432/postgres
+        check_tables: true
+        signature_server: invidious_sig_helper:12999
+        visitor_data: ${INVIDIOUS_VISITOR_DATA} 
+        po_token: ${INVIDIOUS_PO_TOKEN}
+        https_only: true
+        domain: invidious.martinbjeldbak.com
+        external_port: 443
+        hmac_key: ${INVIDIOUS_HMAC_KEY}
+        admins: ["martinbjeldbak"]
+        use_innertube_for_captions: true
+        captcha_enabled: false
+        player_style: youtube
+        comments: ["youtube", "reddit"]
+        autoplay: true
+        continue: true
+        quality: dash
+        quality_dash: best
+        save_player_pos: true
+        registration_enabled: false
+        default_user_preferences:
+          region: AU
+          captions: ["English", "Danish", "Burmese"]
+          save_player_pos: true
+    healthcheck:
+      test: wget -nv --tries=1 --spider http://127.0.0.1:3000/api/v1/comments/jNQXAC9IVRw || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 2
+    logging:
+      options:
+        max-size: "1G"
+        max-file: "4"
+    depends_on:
+      - invidious-db
+    networks:
+      - frontend
+      - backend
+
+  invidious_sig_helper:
+    container_name: invidious_sig_helper
+    image: quay.io/invidious/inv-sig-helper:latest
+    init: true
+    command: ["--tcp", "0.0.0.0:12999"]
+    environment:
+      - RUST_LOG=info
+    restart: unless-stopped
+    cap_drop:
+      - ALL
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - backend
+
+  invidious-db:
+    container_name: invidious-db
+    image: docker.io/library/postgres:17.2
+    restart: unless-stopped
+    volumes:
+      - ./invidious/db:/var/lib/postgresql/data
+      - ./invidious/repo/config/sql:/config/sql
+      - ./invidious/repo/docker/init-invidious-db.sh:/docker-entrypoint-initdb.d/init-invidious-db.sh
+    environment:
+      POSTGRES_DB: invidious
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: kba.tft.DRE8tnt4cvy
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+    networks:
+      - backend
+
+  immich-server:
+    container_name: immich-server
+    image: ghcr.io/immich-app/immich-server:release
+    volumes:
+      - ${IMMICH_UPLOAD_LOCATION}:/usr/src/app/upload
+      - ${N_PHOTO_VOLUME}/icloudpd:/mnt/icloudpd-n/
+      - /etc/localtime:/etc/localtime:ro
+    expose:
+      - 2283
+    depends_on:
+      - immich-redis
+      - immich-postgres
+    environment:
+      TZ: ${TZ}
+      REDIS_HOSTNAME: immich-redis
+      DB_HOSTNAME: immich-postgres
+      DB_PASSWORD: ${IMMICH_DB_PASSWORD}
+    restart: always
+    healthcheck:
+      disable: false
+    networks:
+      - frontend
+      - backend
+
+  immich-machine-learning:
+    container_name: immich-machine-learning
+    image: ghcr.io/immich-app/immich-machine-learning:release
+    volumes:
+      - ./immich/model-cache:/cache
+    restart: always
+    healthcheck:
+      disable: false
+    networks:
+      - backend
+
+  immich-redis:
+    container_name: immich-redis
+    image: docker.io/redis:6.2-alpine
+    healthcheck:
+      test: redis-cli ping || exit 1
+    restart: always
+    networks:
+      - backend
+
+  immich-postgres:
+    container_name: immich-postgres
+    image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${IMMICH_DB_PASSWORD}
+      POSTGRES_DB: immich
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+    volumes:
+      # Do not edit the next line. If you want to change the database storage location on your system, edit the value of DB_DATA_LOCATION in the .env file
+      - ./immich/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: >-
+        pg_isready --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" || exit 1;
+        Chksum="$$(psql --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" --tuples-only --no-align
+        --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')";
+        echo "checksum failure count is $$Chksum";
+        [ "$$Chksum" = '0' ] || exit 1
+      interval: 5m
+      start_period: 5m
+    command: >-
+      postgres
+      -c shared_preload_libraries=vectors.so
+      -c 'search_path="$$user", public, vectors'
+      -c logging_collector=on
+      -c max_wal_size=2GB
+      -c shared_buffers=512MB
+      -c wal_compression=on
+    restart: always
+    networks:
+      - backend
+
+  authentik-postgres:
+    image: docker.io/library/postgres:16-alpine
+    restart: unless-stopped
+    container_name: authentik-postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+    volumes:
+      - authentik-database-v2:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${AUTHENTIK_PG_PASS:?database password required}
+      POSTGRES_USER: authentik
+      POSTGRES_DB: authentik
+    networks:
+      - backend
+
+  authentik-redis:
+    image: redis:alpine
+    container_name: authentik-redis
+    command: --save 60 1 --loglevel warning
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 3s
+    volumes:
+      - authentik-redis-v2:/data
+    networks:
+      - backend
+
+  authentik-server:
+    image: ghcr.io/goauthentik/server:2024.12.2
+    container_name: authentik-server
+    restart: unless-stopped
+    command: server
+    environment:
+      AUTHENTIK_REDIS__HOST: authentik-redis
+      AUTHENTIK_POSTGRESQL__HOST: authentik-postgres
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_PG_PASS}
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+    volumes:
+      - ./authentik/media:/media
+      - ./authentik/custom-templates:/templates
+    expose:
+      - 9000 # http
+      - 9443 # https
+    depends_on:
+      authentik-postgres:
+        condition: service_healthy
+      authentik-redis:
+        condition: service_healthy
+    networks:
+      - frontend
+      - backend
+  authentik-worker:
+    image: ghcr.io/goauthentik/server:2024.12.2
+    container_name: authentik-worker
+    restart: unless-stopped
+    command: worker
+    environment:
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+      AUTHENTIK_REDIS__HOST: authentik-redis
+      AUTHENTIK_POSTGRESQL__HOST: authentik-postgres
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${AUTHENTIK_PG_PASS}
+      AUTHENTIK_EMAIL__HOST: ${SMTP_SERVER}
+      AUTHENTIK_EMAIL__PORT: 465
+      AUTHENTIK_EMAIL__USE_TLS: "true"
+      AUTHENTIK_EMAIL__USERNAME: ${SMTP_USER_NAME}
+      AUTHENTIK_EMAIL__PASSWORD: ${HUGINN_SMTP_PASSWORD}
+      AUTHENTIK_EMAIL__FROM: authentik@martinbjeldbak.com
+    volumes:
+      - ./authentik/media:/media
+      - ./authentik/certs:/certs
+      - ./authentik/custom-templates:/templates
+    depends_on:
+      authentik-postgres:
+        condition: service_healthy
+      authentik-redis:
+        condition: service_healthy
+    networks:
+      - backend
+
+volumes:
+  authentik-database-v2:
+    driver: local
+  authentik-redis-v2:
+    driver: local
 
 networks:
   backend:
