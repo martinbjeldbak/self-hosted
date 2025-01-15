@@ -1128,7 +1128,7 @@ services:
         database_url: postgres://postgres:${INVIDIOUS_DB_PASSWORD}@invidious-db:5432/postgres
         check_tables: true
         signature_server: invidious_sig_helper:12999
-        visitor_data: ${INVIDIOUS_VISITOR_DATA} 
+        visitor_data: ${INVIDIOUS_VISITOR_DATA}
         po_token: ${INVIDIOUS_PO_TOKEN}
         https_only: true
         domain: invidious.martinbjeldbak.com
