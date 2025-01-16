@@ -418,7 +418,7 @@ services:
       - 6052 # UI
     environment:
       ESPHOME_DASHBOARD_USE_PING: true
-      USERNAME: martinbjeldbak
+      USERNAME: ${ESPHOME_USERNAME}
       PASSWORD: ${ESPHOME_PASSWORD}
     networks:
       - frontend
@@ -549,6 +549,9 @@ services:
       HOMEPAGE_VAR_READARR_API_KEY: ${READARR_API_KEY}
       HOMEPAGE_VAR_IMMICH_KEY: ${IMMICH_KEY}
       HOMEPAGE_VAR_AUTHENTIK_API_KEY: ${AUTHENTIK_API_KEY}
+      HOMEPAGE_VAR_ESPHOME_USERNAME: ${ESPHOME_USERNAME}
+      HOMEPAGE_VAR_ESPHOME_PASSWORD: ${ESPHOME_PASSWORD}
+      HOMEPAGE_VAR_AUTOBRR_KEY: ${AUTOBRR_HOMEPAGE_KEY}
     restart: unless-stopped
 
   dockerproxy:
@@ -1363,6 +1366,40 @@ services:
         condition: service_healthy
     networks:
       - backend
+
+  autobrr:
+    container_name: autobrr
+    image: ghcr.io/autobrr/autobrr
+    restart: unless-stopped
+    user: ${PUID}:${PGID}
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - ./autobrr/config:/config
+    expose:
+      - 7474
+    networks:
+      - frontend
+      - backend
+    environment:
+      AUTOBRR__OIDC_ENABLED: true
+      AUTOBRR__OIDC_ISSUER: https://auth.local.martinbjeldbak.com/application/o/autobrr/
+      AUTOBRR__OIDC_CLIENT_ID: ${AUTOBRR_AUTHENTIK_CLIENT_ID}
+      AUTOBRR__OIDC_CLIENT_SECRET: ${AUTOBRR_AUTHENTIK_CLIENT_SECRET}
+      AUTOBRR__OIDC_REDIRECT_URL: https://autobrr.local.martinbjeldbak.com/api/auth/oidc/callback
+
+
+  thelounge:
+    image: ghcr.io/thelounge/thelounge
+    container_name: thelounge
+    user: ${PUID}:${PGID}
+    expose:
+      - 9000
+    restart: unless-stopped
+    volumes:
+      - ./thelounge:/var/opt/thelounge
+    networks:
+      - frontend
 
 volumes:
   authentik-database-v2:

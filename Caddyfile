@@ -99,7 +99,7 @@
 			uri /outpost.goauthentik.io/auth/caddy
 
 			# capitalization of the headers is important, otherwise they will be empty
-			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlements X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version
+			copy_headers X-Authentik-Username X-Authentik-Groups X-Authentik-Entitlementp X-Authentik-Email X-Authentik-Name X-Authentik-Uid X-Authentik-Jwt X-Authentik-Meta-Jwks X-Authentik-Meta-Outpost X-Authentik-Meta-Provider X-Authentik-Meta-App X-Authentik-Meta-Version Authorization
 		}
 
 		reverse_proxy esphome:6052
@@ -355,6 +355,13 @@
 		encode gzip
 	}
 
+	@autobrr host autobrr.local.martinbjeldbak.com
+	handle @autobrr {
+		reverse_proxy autobrr:7474
+
+		encode gzip
+	}
+
 	@epicgames host epicgames.local.martinbjeldbak.com
 	handle @epicgames {
 		reverse_proxy epicgames-freegames:3000
@@ -482,6 +489,14 @@
 
 		encode gzip
 	}
+
+	@thelounge host thelounge.local.martinbjeldbak.com
+	handle @thelounge {
+		reverse_proxy thelounge:9000
+
+		encode gzip
+	}
+
 
 	# REMEMBER TO ADD HOSTS TO UNBOUND
 
